@@ -1,0 +1,22 @@
+
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        /* Print layout adjustments for professional Prescriptions and Records */
+        @media print {
+            body * { visibility: hidden; }
+            #print-area, #print-area * { visibility: visible; }
+            #print-area { position: absolute; left: 0; top: 0; width: 100%; }
+            .no-print { display: none !important; }
+        }
+        .active-tab {
+            background-color: rgb(240, 253, 250);
+            color: rgb(13, 148, 136);
+            border-left: 4px solid rgb(13, 148, 136);
+            font-weight: 700;
+        }
+    
