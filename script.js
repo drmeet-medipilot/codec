@@ -2,8 +2,8 @@
         // =========================================================================
         // 1. SUPABASE CLOUD SETUP (AHIYA TAMARI DETAILS NAKHO)
         // =========================================================================
-        const supabaseUrl = 'YOUR_SUPABASE_PROJECT_URL_HERE'; 
-        const supabaseKey = 'YOUR_SUPABASE_ANON_PUBLISHABLE_KEY_HERE';
+        const supabaseUrl = 'https://mhquthxfsjnakymtaizp.supabase.co'; 
+        const supabaseKey = 'sb_publishable_S_GEAd5Y35gqI0Dgz0XNEQ_VNKimiUY';
         const supabase = supabase.createClient(supabaseUrl, supabaseKey);
         
         let currentUser = null; // Stores logged-in clinic details
