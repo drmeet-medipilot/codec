@@ -13,22 +13,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <link href="style.css" rel="stylesheet"/></head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col md:flex-row antialiased">
-<div class="fixed inset-0 z-[9999] bg-slate-100 flex items-center justify-center p-4 backdrop-blur-md" id="login-overlay">
-<div class="bg-white p-8 rounded-2xl shadow-2xl border border-slate-200 w-full max-w-sm transform transition-all duration-300">
-<div class="flex justify-center mb-6">
-<div class="h-16 w-16 bg-teal-700 rounded-2xl flex items-center justify-center text-white text-3xl shadow-lg shadow-teal-700/30">
-<i class="fa-solid fa-shield-halved"></i>
-</div>
-</div>
-<h2 class="text-2xl font-extrabold text-slate-900 text-center mb-1 tracking-tight">MediPilot Gate</h2>
-<p class="text-xs text-slate-500 text-center mb-6 font-medium">Please authenticate to access the clinic terminal</p>
-<div class="space-y-4">
-<input class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600 transition-all font-medium text-sm" id="login-user" placeholder="Username" type="text"/>
-<input class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600 transition-all font-medium text-sm" id="login-pass" placeholder="Password" type="password"/>
-<button class="w-full py-3 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white font-bold rounded-xl transition-all duration-200 shadow-lg shadow-teal-700/20 hover:shadow-teal-700/30 active:scale-[0.99] text-sm cursor-pointer" onclick="processLogin()">Login to Dashboard</button>
-</div>
-</div>
-</div>
 <header class="bg-gradient-to-r from-teal-800 to-slate-900 text-white p-4 flex justify-between items-center md:hidden no-print shadow-md">
 <div class="flex items-center space-x-2">
 <i class="fa-solid fa-circle-h text-2xl text-emerald-400"></i>
@@ -67,11 +51,6 @@
 </button>
 <button class="nav-link w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-600 rounded-xl hover:bg-slate-50 transition-all cursor-pointer" data-target="backup">
 <i class="fa-solid fa-database w-5 text-center text-base"></i> <span>System Crypt Vault</span>
-</button>
-</div>
-<div class="border-t border-slate-100 bg-slate-50 p-4">
-<button class="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-white border border-rose-200 text-xs font-bold text-rose-600 rounded-xl hover:bg-rose-50 hover:text-rose-700 transition-all shadow-xs cursor-pointer active:scale-[0.98]" onclick="processLogout()">
-<i class="fa-solid fa-power-off"></i> <span>Secure System Logout</span>
 </button>
 </div>
 </nav>
@@ -723,7 +702,6 @@
 <option value="12">12 - Dec</option>
 </select>
 <select class="w-1/2 p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-bold text-slate-700 cursor-pointer" id="m-expiry-year" required="">
-<!-- Populated dynamically by UI.populateExpiryYears() -->
 </select>
 </div>
 </div>

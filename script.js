@@ -1,27 +1,4 @@
 
-        // LOGIN LOGIC
-        function processLogin() {
-            const u = document.getElementById('login-user').value;
-            const p = document.getElementById('login-pass').value;
-            if (u === 'admin' && p === 'admin') {
-                sessionStorage.setItem('isLoggedIn', 'true');
-                document.getElementById('login-overlay').classList.add('hidden');
-            } else {
-                alert('Invalid Credentials');
-            }
-        }
-        
-        // LOGOUT LOGIC
-        function processLogout() {
-            sessionStorage.removeItem('isLoggedIn');
-            window.location.reload(); 
-        }
-        
-        // Check session on load
-        if (sessionStorage.getItem('isLoggedIn') === 'true') {
-            document.getElementById('login-overlay').classList.add('hidden');
-        }
-
         /**
          * GLOBAL CONTROLLER ARCHITECTURE: ENCAPSULATED DATA STORAGE INTERFACE
          */
