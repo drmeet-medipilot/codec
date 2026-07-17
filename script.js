@@ -149,6 +149,34 @@
                 return new Date(dateStr);
             }
 
+            static renderGreeting() {
+                const db = SystemStorage.read();
+                const hour = new Date().getHours();
+                let greeting = 'Good Evening';
+                
+                if (hour >= 5 && hour < 12) {
+                    greeting = 'Good Morning';
+                } else if (hour >= 12 && hour < 17) {
+                    greeting = 'Good Afternoon';
+                }
+                
+                let docName = db.clinicProfile?.doctor?.trim() || '';
+                let finalName = "Dr.";
+                
+                if (docName) {
+                    if (docName.toLowerCase().startsWith('dr.') || docName.toLowerCase().startsWith('dr ')) {
+                        finalName = docName;
+                    } else {
+                        finalName = "Dr. " + docName;
+                    }
+                }
+                
+                const greetingEl = document.getElementById('dashboard-greeting');
+                if (greetingEl) {
+                    greetingEl.innerText = `${greeting}, ${finalName}`;
+                }
+            }
+
             static handleTimeframeChange() {
                 const timeframe = document.getElementById('dashboard-timeframe').value;
                 const customDiv = document.getElementById('custom-date-range');
@@ -476,6 +504,9 @@
 
             static triggerGlobalAuditRefresh() {
                 const db = SystemStorage.read();
+                
+                this.renderGreeting(); 
+
                 const timeframe = document.getElementById('dashboard-timeframe')?.value || 'TODAY';
                 
                 const filteredFinance = db.finance.filter(f => this.isDateInTimeframe(f.date, timeframe));
