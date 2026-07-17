@@ -309,8 +309,8 @@
                     </div>` : '';
 
                 return `
-                    <div id="patient-export-sheet" style="font-family:'Arial',sans-serif;background:#ffffff;color:#0f172a;padding:28px;width:794px;max-width:100%;margin:0 auto;">
-                        <div style="border:2px solid #0f766e;border-radius:14px;overflow:hidden;">
+                    <div id="patient-export-sheet" style="font-family:'Arial',sans-serif;background:#ffffff;color:#0f172a;width:100%;box-sizing:border-box;">
+                        <div style="border:2px solid #0f766e;border-radius:14px;overflow:hidden;box-sizing:border-box;width:100%;">
                             <div style="padding:18px 22px;border-bottom:3px solid #0f766e;text-align:center;background:#f0fdfa;">
                                 <div style="font-size:28px;font-weight:800;letter-spacing:.3px;color:#0f766e;text-transform:uppercase;">${clinic.name || 'Clinic Name'}</div>
                                 <div style="font-size:13px;color:#334155;margin-top:6px;">${clinic.address || 'Clinic Address'}</div>
