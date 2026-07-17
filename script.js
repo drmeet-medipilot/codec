@@ -201,32 +201,46 @@
                 return true;
             }
 
-            static populateVisitMedicineOptions() {
-                const rxSelect = document.getElementById('v-medicine');
-                const treatSelect = document.getElementById('v-treatment-medicine');
-                if(!rxSelect && !treatSelect) return;
+            static filterVisitMedicineOptions(selectId, filterType) {
+                const select = document.getElementById(selectId);
+                if(!select) return;
+                
                 const db = SystemStorage.read();
                 const inventory = Array.isArray(db.inventory) ? [...db.inventory].sort((a, b) => (a.name || '').localeCompare(b.name || '')) : [];
                 
-                const optionsHtml = '<option value="" data-type="" data-unitqty="">Select medicine from stock</option>' + 
-                    inventory.map(item => `<option value="${item.name}" data-type="${item.type || ''}" data-unitqty="${item.unitQty || 1}">${item.name}</option>`).join('');
+                const filtered = filterType === 'ALL' ? inventory : inventory.filter(i => i.type === filterType);
                 
-                if (rxSelect) rxSelect.innerHTML = optionsHtml;
-                if (treatSelect) treatSelect.innerHTML = optionsHtml;
+                const optionsHtml = '<option value="" data-type="" data-unitqty="">Select medicine from stock</option>' + 
+                    filtered.map(item => `<option value="${item.name}" data-type="${item.type || ''}" data-unitqty="${item.unitQty || 1}">${item.name}</option>`).join('');
+                
+                select.innerHTML = optionsHtml;
+                
+                if (selectId === 'v-medicine') {
+                    this.handlePrescriptionMedicineChange();
+                }
             }
 
             static handlePrescriptionMedicineChange() {
                 const select = document.getElementById('v-medicine');
                 const mlContainer = document.getElementById('v-ml-container');
                 const mlInput = document.getElementById('v-ml-input');
-                if(!select || !mlContainer) return;
+                const directQtyContainer = document.getElementById('v-direct-qty-container');
+                const directQtyInput = document.getElementById('v-direct-qty-input');
+                
+                if(!select) return;
                 
                 const option = select.options[select.selectedIndex];
-                if (option && option.dataset.type === 'Vial') {
-                    mlContainer.classList.remove('hidden');
-                } else {
-                    mlContainer.classList.add('hidden');
-                    mlInput.value = "";
+                const type = option ? option.dataset.type : '';
+                
+                if(mlContainer) mlContainer.classList.add('hidden');
+                if(directQtyContainer) directQtyContainer.classList.add('hidden');
+                
+                const directQtyTypes = ['Syrup', 'Ointment', 'Drop', 'Lotion', 'Sachet', 'Nab', 'Other'];
+                
+                if (type === 'Vial') {
+                    if(mlContainer) mlContainer.classList.remove('hidden');
+                } else if (directQtyTypes.includes(type)) {
+                    if(directQtyContainer) directQtyContainer.classList.remove('hidden');
                 }
             }
 
@@ -726,6 +740,7 @@
                             <button onclick="UI.initiateVisitModal('${p.id}')" title="Clinical Notes" class="px-2.5 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 font-bold text-xs rounded-xl transition-all cursor-pointer"><i class="fa-solid fa-notes-medical"></i></button>
                             <button onclick="UI.editLatestPrescription('${p.id}')" title="Edit Prescription" class="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold text-xs rounded-xl transition-all cursor-pointer"><i class="fa-solid fa-pen-to-square"></i></button>
                             <button onclick="UI.sharePatientPrescriptionWhatsApp('${p.id}')" title="Share WhatsApp" class="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs rounded-xl transition-all cursor-pointer"><i class="fa-brands fa-whatsapp"></i></button>
+                            <button onclick="UI.exportPatientPrescriptionPDF('${p.id}')" title="Export PDF" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-all cursor-pointer"><i class="fa-solid fa-file-pdf"></i></button>
                             <button onclick="UI.deletePatientRecord('${p.id}')" title="Delete Profile" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-xs rounded-xl transition-all cursor-pointer"><i class="fa-solid fa-trash-can"></i></button>
                         </td>
                     `;
@@ -847,6 +862,24 @@
                 this.renderInventoryGrid(SystemStorage.read(), this.currentInventoryFilter);
             }
 
+            static exportInventoryCSV() {
+                const db = SystemStorage.read();
+                let csvContent = "data:text/csv;charset=utf-8,";
+                csvContent += "Medicine Type,Medicine Name,Supplier,Expiry Date,Total Qty,PTR (Purchase),MRP (Selling),Stock Status\n";
+                db.inventory.forEach(i => {
+                    let status = (i.qty <= 0) ? "Depleted" : (i.qty <= 15 ? "Low Level" : "In Stock");
+                    let row = `"${i.type || ''}","${i.name}","${i.supplier || ''}","${i.expiry}","${i.qty}","${i.purchase}","${i.selling}","${status}"`;
+                    csvContent += row + "\r\n";
+                });
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", `MediPilot_Stock_Export_${new Date().toISOString().split('T')[0]}.csv`);
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+            }
+
             static renderInventoryGrid(db, filter = null) {
                 const container = document.getElementById('inventory-table-body');
                 if(!container) return;
@@ -880,11 +913,11 @@
                     tr.innerHTML = `
                         <td class="p-4">
                             <div class="font-bold text-slate-800 text-sm"><span class="text-teal-600 mr-1.5">[${i.type || 'N/A'}]</span>${i.name}</div>
-                            <div class="text-[11px] text-slate-400 font-medium mt-0.5">${i.generic || 'Generic Composition Clear'} • ${i.unitQty ? i.unitQty + ' Units/Pkg' : ''}</div>
+                            <div class="text-[11px] text-slate-400 font-medium mt-0.5">Unit: ${i.unitType || 'Pkg'} • ${i.unitQty ? i.unitQty + ' Units/Pkg' : ''}</div>
                         </td>
                         <td class="p-4 text-slate-500 font-semibold">${i.supplier || 'N/A'}</td>
                         <td class="p-4 font-bold text-slate-700 font-mono">${i.expiry}</td>
-                        <td class="p-4 text-center font-black text-slate-800">${parseFloat(Number(i.qty).toFixed(2))} units</td>
+                        <td class="p-4 text-center font-black text-slate-800">${parseFloat(Number(i.qty).toFixed(2))} total units</td>
                         <td class="p-4 text-right leading-relaxed font-semibold">PTR: <span class="text-slate-500">₹${Number(i.purchase).toFixed(2)}</span><br><span class="text-slate-900 font-black">MRP: ₹${Number(i.selling).toFixed(2)}</span></td>
                         <td class="p-4 text-center">${statusBadge}</td>
                         <td class="p-4 text-right space-x-1 whitespace-nowrap">
@@ -927,6 +960,12 @@
                     otherInput.removeAttribute('required');
                     otherInput.value = '';
                 }
+            }
+
+            static calculateTotalQty() {
+                const uQty = parseFloat(document.getElementById('m-unit-qty').value) || 1;
+                const pQty = parseFloat(document.getElementById('m-qty').value) || 0;
+                document.getElementById('m-total-qty').value = uQty * pQty;
             }
 
             static initMedicineModal() {
@@ -981,11 +1020,13 @@
                 }
 
                 document.getElementById('m-edit-id').value = item.id;
+                document.getElementById('m-unit-type').value = item.unitType || 'Strip';
                 document.getElementById('m-unit-qty').value = item.unitQty || 1;
+                document.getElementById('m-qty').value = item.qty / (item.unitQty || 1); // Reverse calculate package volume based on current stock
+                document.getElementById('m-total-qty').value = item.qty;
+                
                 document.getElementById('m-name').value = item.name;
-                document.getElementById('m-generic').value = item.generic || '';
                 document.getElementById('m-supplier').value = item.supplier || '';
-                document.getElementById('m-qty').value = item.qty;
                 document.getElementById('m-purchase').value = item.purchase;
                 document.getElementById('m-selling').value = item.selling;
 
@@ -1009,11 +1050,11 @@
                     id: editId || `MED-${Math.floor(1000 + Math.random() * 9000)}`,
                     type: actualType,
                     name: document.getElementById('m-name').value.trim(),
-                    generic: document.getElementById('m-generic').value.trim(),
                     supplier: document.getElementById('m-supplier').value,
                     expiry: expiryVal,
-                    unitQty: parseInt(document.getElementById('m-unit-qty').value) || 1,
-                    qty: parseFloat(document.getElementById('m-qty').value) || 0,
+                    unitType: document.getElementById('m-unit-type').value,
+                    unitQty: parseFloat(document.getElementById('m-unit-qty').value) || 1,
+                    qty: parseFloat(document.getElementById('m-total-qty').value) || 0,
                     purchase: parseFloat(document.getElementById('m-purchase').value) || 0,
                     selling: parseFloat(document.getElementById('m-selling').value) || 0
                 };
@@ -1299,7 +1340,14 @@
                 
                 this.toggleRBS();
                 this.toggleTreatment();
-                this.populateVisitMedicineOptions();
+                
+                if(document.getElementById('v-treatment-med-type')) {
+                    this.filterVisitMedicineOptions('v-treatment-medicine', document.getElementById('v-treatment-med-type').value);
+                }
+                if(document.getElementById('v-rx-med-type')) {
+                    this.filterVisitMedicineOptions('v-medicine', document.getElementById('v-rx-med-type').value);
+                }
+
                 this.handlePrescriptionMedicineChange(); 
                 this.pendingStockDeductions = [];
 
@@ -1358,6 +1406,7 @@
                 const durInput = document.getElementById('v-duration');
                 const rxArea = document.getElementById('v-prescription');
                 const mlInput = document.getElementById('v-ml-input');
+                const directQtyInput = document.getElementById('v-direct-qty-input');
 
                 if(!medSelect.value) {
                     alert("Please select a target compound parameter from localized stock selectors.");
@@ -1376,6 +1425,8 @@
                 if(doseSelect.value === '1-1-1') dailyCount = 3;
                 if(['1-0-0','0-1-0','0-0-1'].includes(doseSelect.value)) dailyCount = 1;
 
+                const directQtyTypes = ['Syrup', 'Ointment', 'Drop', 'Lotion', 'Sachet', 'Nab', 'Other'];
+
                 if(isVial) {
                     const mlDose = parseFloat(mlInput.value) || 0;
                     if(mlDose <= 0) {
@@ -1385,6 +1436,14 @@
                     line = `${medSelect.value} -- ${mlDose} ML per dose -- ${doseSelect.value} -- ${mealSelect.value} -- ${durInput.value || 'As directed'}`;
                     const totalMLNeeded = mlDose * dailyCount * days;
                     calculatedUnits = totalMLNeeded / unitQty; 
+                } else if (directQtyTypes.includes(medOption.dataset.type)) {
+                    const directQty = parseFloat(directQtyInput.value) || 0;
+                    if(directQty <= 0) {
+                        alert("Please enter a valid Qty Given for this medicine type.");
+                        return;
+                    }
+                    line = `${medSelect.value} -- ${doseSelect.value} -- ${mealSelect.value} -- ${durInput.value || 'As directed'} -- [Qty Dispensed: ${directQty}]`;
+                    calculatedUnits = directQty;
                 } else {
                     line = `${medSelect.value} -- ${doseSelect.value} -- ${mealSelect.value} -- ${durInput.value || 'As directed'}`;
                     calculatedUnits = days * dailyCount;
@@ -1397,6 +1456,7 @@
                 medSelect.selectedIndex = 0;
                 durInput.value = "";
                 mlInput.value = "";
+                directQtyInput.value = "";
                 this.handlePrescriptionMedicineChange(); 
             }
 

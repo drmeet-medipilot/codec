@@ -106,7 +106,7 @@
 </div>
 <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
 <h3 class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-4">Accelerated Actions Terminal</h3>
-<div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+<div class="grid grid-cols-2 sm:grid-cols-6 gap-3">
 <button class="flex flex-col items-center justify-center p-4 rounded-xl bg-teal-50/70 text-teal-700 border border-teal-100 hover:bg-teal-100/80 transition-all shadow-xs cursor-pointer font-bold active:scale-[0.97]" onclick="UI.openPatientModal()">
 <i class="fa-solid fa-user-plus text-xl mb-2"></i><span class="text-xs">Add Patient</span>
 </button>
@@ -121,6 +121,9 @@
 </button>
 <button class="flex flex-col items-center justify-center p-4 rounded-xl bg-rose-50/70 text-rose-700 border border-rose-100 hover:bg-rose-100/80 transition-all shadow-xs cursor-pointer font-bold active:scale-[0.97]" onclick="UI.openModal('modal-expense')">
 <i class="fa-solid fa-receipt text-xl mb-2"></i><span class="text-xs">Log Expense</span>
+</button>
+<button class="flex flex-col items-center justify-center p-4 rounded-xl bg-purple-50/70 text-purple-700 border border-purple-100 hover:bg-purple-100/80 transition-all shadow-xs cursor-pointer font-bold active:scale-[0.97]" onclick="UI.openCreditsModal()">
+<i class="fa-solid fa-hand-holding-dollar text-xl mb-2"></i><span class="text-xs">Credit Logs</span>
 </button>
 </div>
 </div>
@@ -332,9 +335,14 @@
 <h2 class="text-3xl font-black text-slate-900">Stock Management</h2>
 <p class="text-xs font-medium text-slate-500 mt-0.5">Dynamic pharmaceutical index matrices, low-tier metric alarms, and supplier correlation mappings.</p>
 </div>
-<button class="px-5 py-2.5 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-teal-700/20 active:scale-[0.98] self-start cursor-pointer flex items-center" onclick="UI.initMedicineModal()">
+<div class="flex gap-2.5 self-start">
+<button class="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-emerald-700/20 active:scale-[0.98] cursor-pointer flex items-center" onclick="UI.exportInventoryCSV()">
+<i class="fa-solid fa-file-csv mr-2"></i>Export Stock
+                    </button>
+<button class="px-5 py-2.5 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-teal-700/20 active:scale-[0.98] cursor-pointer flex items-center" onclick="UI.initMedicineModal()">
 <i class="fa-solid fa-pills mr-2"></i>Add Medicine Batch
-                </button>
+                    </button>
+</div>
 </div>
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
@@ -575,16 +583,34 @@
 </select>
 </div>
 <div class="hidden space-y-3 pt-3 border-t border-slate-200" id="treatment-container">
-<div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+<div class="md:col-span-1">
+<label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Med Type Filter</label>
+<select class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-semibold" id="v-treatment-med-type" onchange="UI.filterVisitMedicineOptions('v-treatment-medicine', this.value)">
+<option value="ALL">All Types</option>
+<option value="Tablet">Tablet</option>
+<option value="Capsule">Capsule</option>
+<option value="Syrup">Syrup</option>
+<option value="Ointment">Ointment</option>
+<option value="Drop">Drop</option>
+<option value="Vial">Vial</option>
+<option value="Ampule">Ampule</option>
+<option value="SN">SN</option>
+<option value="Lotion">Lotion</option>
+<option value="Sachet">Sachet</option>
+<option value="Nab">Nab</option>
+<option value="Other">Other</option>
+</select>
+</div>
 <div class="md:col-span-2">
 <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Target Compound stock</label>
 <select class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-semibold" id="v-treatment-medicine"></select>
 </div>
-<div>
+<div class="md:col-span-1">
 <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Dose Volume</label>
 <input class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-semibold" id="v-treatment-qty" placeholder="e.g. 1 Amp / 1 Vial" type="text"/>
 </div>
-<div class="md:col-span-3 flex justify-end">
+<div class="md:col-span-4 flex justify-end">
 <button class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs rounded-xl transition-all shadow-xs flex items-center cursor-pointer" onclick="UI.addTreatmentToPrescription()" type="button">
 <i class="fa-solid fa-plus mr-1"></i> Add to Treatment Plan
                                     </button>
@@ -596,13 +622,35 @@
 <div class="border border-slate-200 p-4 rounded-xl bg-slate-50/50 space-y-3 shadow-inner">
 <label class="block text-xs font-black text-slate-600 uppercase tracking-wider">Prescription Architecture &amp; Stock Auto Deductions</label>
 <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-<div class="col-span-2 md:col-span-4">
+<div class="col-span-2 md:col-span-1">
+<label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Med Type Filter</label>
+<select class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-semibold" id="v-rx-med-type" onchange="UI.filterVisitMedicineOptions('v-medicine', this.value)">
+<option value="ALL">All Types</option>
+<option value="Tablet">Tablet</option>
+<option value="Capsule">Capsule</option>
+<option value="Syrup">Syrup</option>
+<option value="Ointment">Ointment</option>
+<option value="Drop">Drop</option>
+<option value="Vial">Vial</option>
+<option value="Ampule">Ampule</option>
+<option value="SN">SN</option>
+<option value="Lotion">Lotion</option>
+<option value="Sachet">Sachet</option>
+<option value="Nab">Nab</option>
+<option value="Other">Other</option>
+</select>
+</div>
+<div class="col-span-2 md:col-span-3">
 <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Medicine Compound Selection</label>
 <select class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-semibold" id="v-medicine" onchange="UI.handlePrescriptionMedicineChange()"></select>
 </div>
 <div class="hidden col-span-2 md:col-span-1" id="v-ml-container">
 <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Dose (ML)</label>
 <input class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-bold text-teal-700" id="v-ml-input" placeholder="e.g. 2.5" step="0.1" type="number"/>
+</div>
+<div class="hidden col-span-2 md:col-span-1" id="v-direct-qty-container">
+<label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Qty Given</label>
+<input class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-bold text-teal-700" id="v-direct-qty-input" placeholder="Total Qty" step="0.1" type="number"/>
 </div>
 <div class="col-span-2 md:col-span-1">
 <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Frequency Matrix</label>
@@ -697,10 +745,6 @@
 <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Medicine Name Descriptor *</label>
 <input class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800" id="m-name" placeholder="e.g., Augmentin 625 Duo" required="" type="text"/>
 </div>
-<div class="sm:col-span-2">
-<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Generic Chemical Content Formulation</label>
-<input class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all text-slate-800" id="m-generic" placeholder="e.g., Amoxicillin + Potassium Clavulanate" type="text"/>
-</div>
 <div>
 <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Associated Network Vendor</label>
 <select class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-700" id="m-supplier">
@@ -731,13 +775,26 @@
 <div class="sm:col-span-2">
 <hr class="border-slate-100 my-1"/>
 </div>
-<div>
-<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Units per Pkg (Strip/ML/Box/Tray) *</label>
-<input class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none font-bold text-slate-800" id="m-unit-qty" min="1" placeholder="e.g., 10" required="" type="number"/>
+<div class="sm:col-span-2">
+<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Package Type &amp; Units per Pkg *</label>
+<div class="flex space-x-2">
+<select class="w-1/2 p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-bold text-slate-700" id="m-unit-type">
+<option value="Strip">Strip</option>
+<option value="ML">ML</option>
+<option value="Box">Box</option>
+<option value="Tray">Tray</option>
+<option value="Pck">Pck</option>
+</select>
+<input class="w-1/2 p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none font-bold text-slate-800" id="m-unit-qty" min="1" oninput="UI.calculateTotalQty()" placeholder="Units per pkg (e.g. 10)" required="" type="number"/>
+</div>
 </div>
 <div>
-<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Quantity Volume *</label>
-<input class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none font-bold text-slate-800" id="m-qty" required="" type="number"/>
+<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Quantity Volume / Packages *</label>
+<input class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none font-bold text-slate-800" id="m-qty" oninput="UI.calculateTotalQty()" placeholder="e.g. 5" required="" type="number"/>
+</div>
+<div>
+<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Total Units in Inventory</label>
+<input class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-100 focus:outline-none font-black text-teal-700" id="m-total-qty" readonly="" type="number"/>
 </div>
 <div>
 <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">PTR Value Basis (₹) *</label>
