@@ -502,6 +502,10 @@
                 this.openModal('modal-credits');
             }
 
+            static triggerInventoryFilter() {
+                this.renderInventoryGrid(SystemStorage.read(), this.currentInventoryFilter);
+            }
+
             static triggerGlobalAuditRefresh() {
                 const db = SystemStorage.read();
                 
@@ -906,6 +910,100 @@
                 this.renderInventoryGrid(SystemStorage.read(), this.currentInventoryFilter);
             }
 
+            // NEW FUNCTION: Print Inventory Stock
+            static printInventoryStock() {
+                const db = SystemStorage.read();
+                let datasets = db.inventory;
+                
+                // Apply active filters so only shown items are printed
+                if (this.currentInventoryFilter === 'LOW_STOCK') {
+                    datasets = datasets.filter(i => i.qty <= 15);
+                } else if (this.currentInventoryFilter === 'NEAR_EXPIRY') {
+                    let today = new Date();
+                    let sixMonthsHence = new Date(today.getTime() + (180 * 24 * 60 * 60 * 1000));
+                    datasets = datasets.filter(i => {
+                        let expDate = new Date(i.expiry + "-01");
+                        return expDate >= today && expDate <= sixMonthsHence;
+                    });
+                }
+
+                const searchInput = document.getElementById('inventory-search');
+                if (searchInput) {
+                    const searchTerm = searchInput.value.toLowerCase().trim();
+                    if (searchTerm) {
+                        datasets = datasets.filter(i => 
+                            (i.name && i.name.toLowerCase().includes(searchTerm)) || 
+                            (i.supplier && i.supplier.toLowerCase().includes(searchTerm))
+                        );
+                    }
+                }
+
+                const typeFilter = document.getElementById('inventory-type-filter');
+                if (typeFilter && typeFilter.value !== 'ALL') {
+                    datasets = datasets.filter(i => i.type === typeFilter.value);
+                }
+
+                const clinic = db.clinicProfile || {};
+                const printDate = new Date().toLocaleDateString('en-IN') + ' ' + new Date().toLocaleTimeString('en-IN');
+
+                let html = `
+                    <div style="font-family:'Arial',sans-serif;background:#ffffff;color:#0f172a;width:100%;box-sizing:border-box;padding:20px;">
+                        <div style="text-align:center; margin-bottom: 20px; border-bottom: 2px solid #0f766e; padding-bottom: 10px;">
+                            <h2 style="margin:0; font-size: 24px; color: #0f766e; text-transform: uppercase; font-weight:800;">${clinic.name || 'Clinic Stock Report'}</h2>
+                            <p style="margin:5px 0 0; font-size: 13px; color: #475569;">${clinic.address || ''}</p>
+                            <p style="margin:8px 0 0; font-size: 15px; font-weight: bold; color:#0f172a;">Current Stock Inventory Ledger</p>
+                            <p style="margin:4px 0 0; font-size: 11px; color: #64748b;">Generated on: ${printDate}</p>
+                        </div>
+                        <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">
+                            <thead>
+                                <tr style="background-color: #f8fafc; border-bottom: 2px solid #cbd5e1;">
+                                    <th style="padding: 10px 8px; border: 1px solid #e2e8f0; color:#334155;">Sr No.</th>
+                                    <th style="padding: 10px 8px; border: 1px solid #e2e8f0; color:#334155;">Medicine Name</th>
+                                    <th style="padding: 10px 8px; border: 1px solid #e2e8f0; color:#334155;">Type</th>
+                                    <th style="padding: 10px 8px; border: 1px solid #e2e8f0; color:#334155;">Supplier</th>
+                                    <th style="padding: 10px 8px; border: 1px solid #e2e8f0; color:#334155;">Expiry</th>
+                                    <th style="padding: 10px 8px; border: 1px solid #e2e8f0; color:#334155;">Qty (Units)</th>
+                                    <th style="padding: 10px 8px; border: 1px solid #e2e8f0; color:#334155;">PTR (₹)</th>
+                                    <th style="padding: 10px 8px; border: 1px solid #e2e8f0; color:#334155;">MRP (₹)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+
+                if (datasets.length === 0) {
+                    html += `<tr><td colspan="8" style="padding: 12px; text-align: center; border: 1px solid #e2e8f0; color:#64748b; font-style: italic;">No stock records found for current filters.</td></tr>`;
+                } else {
+                    datasets.forEach((i, idx) => {
+                        let qtyStyle = i.qty <= 0 ? 'color:#e11d48;font-weight:bold;' : (i.qty <= 15 ? 'color:#ea580c;font-weight:bold;' : 'font-weight:bold;');
+                        html += `
+                            <tr style="border-bottom: 1px solid #e2e8f0;">
+                                <td style="padding: 8px; border: 1px solid #e2e8f0;">${idx + 1}</td>
+                                <td style="padding: 8px; border: 1px solid #e2e8f0; font-weight: bold; color:#0f172a;">${i.name}</td>
+                                <td style="padding: 8px; border: 1px solid #e2e8f0; color:#475569;">${i.type || '-'}</td>
+                                <td style="padding: 8px; border: 1px solid #e2e8f0; color:#475569;">${i.supplier || '-'}</td>
+                                <td style="padding: 8px; border: 1px solid #e2e8f0; color:#475569;">${i.expiry}</td>
+                                <td style="padding: 8px; border: 1px solid #e2e8f0; ${qtyStyle}">${parseFloat(Number(i.qty).toFixed(2))}</td>
+                                <td style="padding: 8px; border: 1px solid #e2e8f0; color:#475569;">${Number(i.purchase).toFixed(2)}</td>
+                                <td style="padding: 8px; border: 1px solid #e2e8f0; color:#475569;">${Number(i.selling).toFixed(2)}</td>
+                            </tr>
+                        `;
+                    });
+                }
+
+                html += `
+                            </tbody>
+                        </table>
+                        <div style="margin-top: 30px; font-size: 11px; color: #94a3b8; text-align: center;">
+                            Printed via MediPilot Clinic Management System
+                        </div>
+                    </div>
+                `;
+
+                const printArea = document.getElementById('print-area');
+                printArea.innerHTML = html;
+                window.print();
+            }
+
             static exportInventoryCSV() {
                 const db = SystemStorage.read();
                 let csvContent = "data:text/csv;charset=utf-8,";
@@ -931,6 +1029,7 @@
 
                 let datasets = db.inventory;
                 
+                // Existing logic for button filters
                 if (filter === 'LOW_STOCK') {
                     datasets = datasets.filter(i => i.qty <= 15);
                 } else if (filter === 'NEAR_EXPIRY') {
@@ -940,6 +1039,24 @@
                         let expDate = new Date(i.expiry + "-01");
                         return expDate >= today && expDate <= sixMonthsHence;
                     });
+                }
+
+                // Search by Name/Supplier
+                const searchInput = document.getElementById('inventory-search');
+                if (searchInput) {
+                    const searchTerm = searchInput.value.toLowerCase().trim();
+                    if (searchTerm) {
+                        datasets = datasets.filter(i => 
+                            (i.name && i.name.toLowerCase().includes(searchTerm)) || 
+                            (i.supplier && i.supplier.toLowerCase().includes(searchTerm))
+                        );
+                    }
+                }
+
+                // Filter by Medicine Type
+                const typeFilter = document.getElementById('inventory-type-filter');
+                if (typeFilter && typeFilter.value !== 'ALL') {
+                    datasets = datasets.filter(i => i.type === typeFilter.value);
                 }
 
                 if(datasets.length === 0) {

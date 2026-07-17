@@ -10,9 +10,9 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link href="style.css" rel="stylesheet"/>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-</head>
+<link href="style.css" rel="stylesheet"/></head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col md:flex-row antialiased">
 <div class="fixed inset-0 z-[9999] bg-slate-100 flex items-center justify-center p-4 backdrop-blur-md" id="login-overlay">
 <div class="bg-white p-8 rounded-2xl shadow-2xl border border-slate-200 w-full max-w-sm transform transition-all duration-300">
@@ -338,7 +338,11 @@
 <h2 class="text-3xl font-black text-slate-900">Stock Management</h2>
 <p class="text-xs font-medium text-slate-500 mt-0.5">Dynamic pharmaceutical index matrices, low-tier metric alarms, and supplier correlation mappings.</p>
 </div>
-<div class="flex gap-2.5 self-start">
+<!-- ADDED PRINT BUTTON HERE -->
+<div class="flex gap-2.5 self-start flex-wrap">
+<button class="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-indigo-700/20 active:scale-[0.98] cursor-pointer flex items-center" onclick="UI.printInventoryStock()">
+<i class="fa-solid fa-print mr-2"></i>Print Stock
+                    </button>
 <button class="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-emerald-700/20 active:scale-[0.98] cursor-pointer flex items-center" onclick="UI.exportInventoryCSV()">
 <i class="fa-solid fa-file-csv mr-2"></i>Export Stock
                     </button>
@@ -376,6 +380,30 @@
 </div>
 <div class="h-10 w-10 bg-teal-600/50 text-white rounded-xl flex items-center justify-center text-base shadow-inner"><i class="fa-solid fa-truck-field"></i></div>
 </button>
+</div>
+<!-- SEARCH AND FILTER SECTION FOR INVENTORY -->
+<div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row gap-4 items-center">
+<div class="relative flex-1 w-full">
+<i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-slate-400 text-sm"></i>
+<input class="w-full pl-11 pr-4 py-3 border border-slate-200 rounded-xl text-sm bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all font-medium" id="inventory-search" oninput="UI.triggerInventoryFilter()" placeholder="Search medicine by name or supplier..." type="text"/>
+</div>
+<div class="w-full md:w-56">
+<select class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all font-bold text-slate-700" id="inventory-type-filter" onchange="UI.triggerInventoryFilter()">
+<option value="ALL">All Medicine Types</option>
+<option value="Tablet">Tablet</option>
+<option value="Capsule">Capsule</option>
+<option value="Syrup">Syrup</option>
+<option value="Ointment">Ointment</option>
+<option value="Drop">Drop</option>
+<option value="Vial">Vial</option>
+<option value="Ampule">Ampule</option>
+<option value="SN">SN</option>
+<option value="Lotion">Lotion</option>
+<option value="Sachet">Sachet</option>
+<option value="Nab">Nab</option>
+<option value="Other">Other</option>
+</select>
+</div>
 </div>
 <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
 <div class="overflow-x-auto">
