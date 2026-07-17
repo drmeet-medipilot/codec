@@ -70,7 +70,7 @@
                     finance: [],
                     credits: [],
                     suppliers: [],
-                    clinicProfile: { name: '', address: '', mobile: '', regno: '', doctor: '' },
+                    clinicProfile: { name: '', address: '', mobile: '', regno: '', doctor: '', degree: '' },
                     metadata: { initializedAt: new Date().toISOString(), softwareVersion: "2026.7.4 (Cloud Vault)" }
                 };
             }
@@ -252,7 +252,8 @@
                     'clinic-address': clinic.address || '',
                     'clinic-mobile': clinic.mobile || '',
                     'clinic-regno': clinic.regno || '',
-                    'clinic-doctor': clinic.doctor || ''
+                    'clinic-doctor': clinic.doctor || '',
+                    'clinic-degree': clinic.degree || ''
                 };
                 Object.entries(map).forEach(([id, value]) => {
                     const el = document.getElementById(id);
@@ -267,10 +268,11 @@
                     address: document.getElementById('clinic-address')?.value.trim() || '',
                     mobile: document.getElementById('clinic-mobile')?.value.trim() || '',
                     regno: document.getElementById('clinic-regno')?.value.trim() || '',
-                    doctor: document.getElementById('clinic-doctor')?.value.trim() || ''
+                    doctor: document.getElementById('clinic-doctor')?.value.trim() || '',
+                    degree: document.getElementById('clinic-degree')?.value.trim() || ''
                 };
                 SystemStorage.write(db);
-                alert('Clinic details saved successfully.');
+                alert('Clinic profile details saved successfully.');
             }
 
             static getPatientExportData(patientId) {
@@ -289,6 +291,9 @@
                 const diagnosis = latestVisit?.diagnosis || 'Not recorded';
                 const visitDate = latestVisit?.date || new Date().toLocaleDateString('en-IN');
                 
+                const docDegree = clinic.degree ? ` (${clinic.degree})` : '';
+                const docName = clinic.doctor ? clinic.doctor + docDegree : 'Consultant Name';
+
                 const vitalsHtml = latestVisit?.vitals && (latestVisit.vitals.bp || latestVisit.vitals.pulse || latestVisit.vitals.spo2 || latestVisit.vitals.rbs) ? `
                     <div style="font-size:12px; border-bottom:1px solid #cbd5e1; padding-bottom:8px; margin-bottom:12px; display:flex; gap:16px;">
                         ${latestVisit.vitals.bp ? `<div><b>BP:</b> ${latestVisit.vitals.bp}</div>` : ''}
@@ -309,7 +314,7 @@
                             <div style="padding:18px 22px;border-bottom:3px solid #0f766e;text-align:center;background:#f0fdfa;">
                                 <div style="font-size:28px;font-weight:800;letter-spacing:.3px;color:#0f766e;text-transform:uppercase;">${clinic.name || 'Clinic Name'}</div>
                                 <div style="font-size:13px;color:#334155;margin-top:6px;">${clinic.address || 'Clinic Address'}</div>
-                                <div style="font-size:13px;color:#334155;margin-top:4px;">Consultant: ${clinic.doctor || 'Consultant Name'} | Reg. No.: ${clinic.regno || 'Not set'} | Contact: ${clinic.mobile || 'Not set'}</div>
+                                <div style="font-size:13px;color:#334155;margin-top:4px;">Consultant: ${docName} | Reg. No.: ${clinic.regno || 'Not set'} | Contact: ${clinic.mobile || 'Not set'}</div>
                             </div>
                             <div style="padding:18px 22px 10px;">
                                 <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:10px 18px;font-size:13px;border-bottom:1px solid #cbd5e1;padding-bottom:12px;">
@@ -343,7 +348,7 @@
                                 <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-top:28px;">
                                     <div style="font-size:11px;color:#64748b;max-width:60%;">This prescription is generated from clinic records via MediPilot. Please review medicines before printing.</div>
                                     <div style="min-width:210px;text-align:center;">
-                                        <div style="border-top:1px solid #334155;padding-top:8px;font-size:13px;font-weight:700;color:#0f172a;">${clinic.doctor || 'Consultant Name'}</div>
+                                        <div style="border-top:1px solid #334155;padding-top:8px;font-size:13px;font-weight:700;color:#0f172a;">${docName}</div>
                                         <div style="font-size:12px;color:#64748b;">Authorized Signatory</div>
                                     </div>
                                 </div>
@@ -351,6 +356,14 @@
                         </div>
                     </div>
                 `;
+            }
+
+            static printPatientPrescription(patientId) {
+                const html = this.buildPatientPrescriptionHTML(patientId);
+                if (!html) return;
+                const printArea = document.getElementById('print-area');
+                printArea.innerHTML = html;
+                window.print();
             }
 
             static exportPatientPrescriptionPDF(patientId) {
@@ -740,7 +753,7 @@
                             <button onclick="UI.initiateVisitModal('${p.id}')" title="Clinical Notes" class="px-2.5 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 font-bold text-xs rounded-xl transition-all cursor-pointer"><i class="fa-solid fa-notes-medical"></i></button>
                             <button onclick="UI.editLatestPrescription('${p.id}')" title="Edit Prescription" class="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold text-xs rounded-xl transition-all cursor-pointer"><i class="fa-solid fa-pen-to-square"></i></button>
                             <button onclick="UI.sharePatientPrescriptionWhatsApp('${p.id}')" title="Share WhatsApp" class="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs rounded-xl transition-all cursor-pointer"><i class="fa-brands fa-whatsapp"></i></button>
-                            <button onclick="UI.exportPatientPrescriptionPDF('${p.id}')" title="Export PDF" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-all cursor-pointer"><i class="fa-solid fa-file-pdf"></i></button>
+                            <button onclick="UI.printPatientPrescription('${p.id}')" title="Print Prescription" class="px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-xl transition-all cursor-pointer"><i class="fa-solid fa-print"></i></button>
                             <button onclick="UI.deletePatientRecord('${p.id}')" title="Delete Profile" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-xs rounded-xl transition-all cursor-pointer"><i class="fa-solid fa-trash-can"></i></button>
                         </td>
                     `;
@@ -1582,7 +1595,7 @@
                         </div>
                         <div class="text-right font-medium">
                             <span class="text-teal-700 font-bold block">${v.date}</span>
-                            <button onclick="UI.exportPatientPrescriptionPDF('${v.patientId}')" class="text-[10px] text-slate-500 hover:text-teal-700 underline font-bold transition-colors cursor-pointer mt-0.5">PDF Sheet</button>
+                            <button onclick="UI.printPatientPrescription('${v.patientId}')" class="text-[10px] text-slate-500 hover:text-teal-700 underline font-bold transition-colors cursor-pointer mt-0.5">Print Sheet</button>
                         </div>
                     `;
                     container.appendChild(item);
