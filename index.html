@@ -84,8 +84,8 @@
 <section class="erp-section space-y-6" id="mod-dashboard">
 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between border-b border-slate-200 pb-5 gap-4">
 <div>
-<h2 class="text-3xl font-black tracking-tight text-slate-900" id="dashboard-greeting">Clinic Command Centre</h2>
-<p class="text-xs font-medium text-slate-500 mt-0.5">Clinic Command Centre • Real-time localized metrics compiled safely inside browser application environments.</p>
+<h2 class="text-3xl font-black tracking-tight text-slate-900" id="dashboard-greeting">Clinic Management System</h2>
+<p class="text-xs font-medium text-slate-500 mt-0.5">Clinic Management System • Real-time localized metrics compiled safely inside browser application environments.</p>
 </div>
 <div class="flex flex-col sm:flex-row items-center gap-3 self-start lg:self-end">
 <select class="text-xs font-bold bg-white px-3 py-2.5 border border-slate-200 rounded-xl text-teal-800 shadow-xs focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition cursor-pointer" id="dashboard-timeframe" onchange="UI.handleTimeframeChange()">
@@ -375,8 +375,8 @@
 </button>
 <button class="bg-gradient-to-br from-teal-700 to-teal-900 hover:from-teal-800 hover:to-teal-950 p-5 rounded-2xl text-white shadow-md flex items-center justify-between text-left transition-all cursor-pointer active:scale-[0.98]" onclick="UI.viewVendorNetwork()">
 <div>
-<p class="text-[10px] font-bold tracking-wider uppercase text-teal-200">Suppliers Pipeline</p>
-<h3 class="text-xs font-extrabold mt-1 uppercase tracking-wide flex items-center"><i class="fa-solid fa-eye mr-1.5 text-emerald-400"></i>Open Registry</h3>
+<p class="text-[10px] font-bold tracking-wider uppercase text-teal-200">Supplier Network</p>
+<h3 class="text-xs font-extrabold mt-1 uppercase tracking-wide flex items-center"><i class="fa-solid fa-eye mr-1.5 text-emerald-400"></i>View &amp; Add Supplier</h3>
 </div>
 <div class="h-10 w-10 bg-teal-600/50 text-white rounded-xl flex items-center justify-center text-base shadow-inner"><i class="fa-solid fa-truck-field"></i></div>
 </button>
@@ -861,7 +861,7 @@
 </div>
 </div>
 <div>
-<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Total Units Packages *</label>
+<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Total Units Per Box/Packages *</label>
 <input class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none font-bold text-slate-800" id="m-qty" oninput="UI.calculateTotalQty()" placeholder="e.g. 5" required="" type="number"/>
 </div>
 <div>
@@ -892,7 +892,7 @@
 <p class="text-xs text-teal-200 mt-1 font-medium" id="vendor-network-meta">Procurement integration directory logs</p>
 </div>
 <div class="flex items-center gap-3">
-<button class="px-3 py-1.5 bg-white text-teal-900 rounded-lg text-xs font-bold hover:bg-slate-50 transition-all shadow-xs cursor-pointer active:scale-[0.96]" onclick="UI.openAddVendorFromNetwork()">Add Vendor</button>
+<button class="px-3 py-1.5 bg-white text-teal-900 rounded-lg text-xs font-bold hover:bg-slate-50 transition-all shadow-xs cursor-pointer active:scale-[0.96]" onclick="UI.openAddVendorFromNetwork()">Add Supplier</button>
 <button class="text-white/80 hover:text-white text-xl cursor-pointer" onclick="UI.closeModal('modal-vendors')"><i class="fa-solid fa-xmark"></i></button>
 </div>
 </div>

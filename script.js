@@ -173,6 +173,7 @@
                 
                 const greetingEl = document.getElementById('dashboard-greeting');
                 if (greetingEl) {
+                    // Update header if replacing static string dynamically, but leaving as is logically
                     greetingEl.innerText = `${greeting}, ${finalName}`;
                 }
             }
