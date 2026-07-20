@@ -364,15 +364,15 @@
                         <div style="min-height:40px;border:1px solid #cbd5e1;border-radius:10px;padding:10px 12px;font-size:14px;line-height:1.6;background:#fef2f2;white-space:pre-wrap;">${latestVisit.treatmentPlan || 'No records'}</div>
                     </div>` : '';
 
-                let signatureHtml = `<div style="height: 45px;"></div>`; 
+                let signatureHtml = `<div style="height: 70px;"></div>`; 
                 let stampHtml = ``;
 
                 if (useEsign) {
                     if (clinic.esignBase64) {
-                        signatureHtml = `<img src="${clinic.esignBase64}" style="height:50px; object-fit:contain; margin-bottom:5px;" />`;
+                        signatureHtml = `<img src="${clinic.esignBase64}" style="height:75px; max-width:100%; object-fit:contain; margin: 0 auto 5px auto; display:block;" />`;
                     }
                     if (clinic.estampBase64) {
-                        stampHtml = `<img src="${clinic.estampBase64}" style="height:70px; object-fit:contain; opacity: 0.85;" />`;
+                        stampHtml = `<img src="${clinic.estampBase64}" style="height:120px; max-width:100%; object-fit:contain; margin: 0 auto; display:block; opacity: 0.85;" />`;
                     }
                 }
 
@@ -414,10 +414,10 @@
                                     </div>
                                 </div>
                                 
-                                <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-top:28px;">
-                                    <div style="font-size:11px;color:#64748b;max-width:35%;">This prescription is generated from clinic records via MediPilot. Please review medicines before printing.</div>
+                                <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-top:35px;">
+                                    <div style="font-size:11px;color:#64748b;max-width:30%;">This prescription is generated from clinic records via MediPilot. Please review medicines before printing.</div>
                                     
-                                    <div style="flex:1;text-align:center;">
+                                    <div style="flex:1;text-align:center; display:flex; justify-content:center; align-items:flex-end;">
                                         ${stampHtml}
                                     </div>
 
