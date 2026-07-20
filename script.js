@@ -664,8 +664,8 @@
                 const filteredVisits = db.visits.filter(v => this.isDateInTimeframe(v.date, timeframe));
                 const totalOPD = filteredVisits.length;
 
-                let stockAssetValue = db.inventory.reduce((a,c) => a + (c.qty * c.selling), 0);
-                let totalStockValuePTR = db.inventory.reduce((a, c) => a + (c.qty * c.purchase), 0);
+                let stockAssetValue = db.inventory.reduce((a,c) => a + ((c.qty / (c.unitQty || 1)) * c.selling), 0);
+                let totalStockValuePTR = db.inventory.reduce((a, c) => a + ((c.qty / (c.unitQty || 1)) * c.purchase), 0);
                 let lowStockCount = db.inventory.filter(i => i.qty <= 15).length;
                 let today = new Date();
                 let sixMonthsHence = new Date(today.getTime() + (180 * 24 * 60 * 60 * 1000));
@@ -1740,7 +1740,9 @@
                         return;
                     }
                     line = `[Stat Administered] ${medSelect.value} -- Vol/Dose: ${qtyInput.value}`;
-                    this.pendingStockDeductions.push({ name: medSelect.value, qty: 1 });
+                    
+                    let deductQty = parseFloat(qtyInput.value) || 1;
+                    this.pendingStockDeductions.push({ name: medSelect.value, qty: deductQty });
                     medSelect.selectedIndex = 0;
                     qtyInput.value = "";
                 }
@@ -1784,7 +1786,7 @@
                     }
                     line = `${medSelect.value} -- ${mlDose} ML per dose -- ${doseSelect.value} -- ${mealSelect.value} -- ${durInput.value || 'As directed'}`;
                     const totalMLNeeded = mlDose * dailyCount * days;
-                    calculatedUnits = totalMLNeeded / unitQty; 
+                    calculatedUnits = totalMLNeeded; // FIXED: Direct ML Minus
                 } else if (directQtyTypes.includes(medOption.dataset.type)) {
                     const directQty = parseFloat(directQtyInput.value) || 0;
                     if(directQty <= 0) {
