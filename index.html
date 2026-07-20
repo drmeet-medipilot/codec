@@ -532,10 +532,10 @@
 <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Registration Number</label>
 <input class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800" id="clinic-regno" placeholder="e.g. G-12345" type="text"/>
 </div>
-<!-- E-SIGN CONFIGURATION AREA -->
+<!-- E-SIGN & E-STAMP CONFIGURATION AREA -->
 <div class="md:col-span-2 pt-4 border-t border-slate-100 mt-2">
-<h3 class="font-bold text-sm text-slate-800 mb-3"><i class="fa-solid fa-signature text-teal-600 mr-2"></i>E-Signature Configuration</h3>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+<h3 class="font-bold text-sm text-slate-800 mb-3"><i class="fa-solid fa-signature text-teal-600 mr-2"></i>E-Signature &amp; E-Stamp Configuration</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-5">
 <div>
 <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Upload Signature</label>
 <input accept="image/*" class="w-full p-2 border border-slate-200 rounded-xl bg-slate-50 text-sm font-medium file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100 cursor-pointer" id="clinic-esign-file" type="file"/>
@@ -543,8 +543,14 @@
 <img class="mt-2 h-12 object-contain hidden border border-slate-200 rounded bg-white p-1" id="esign-preview" src=""/>
 </div>
 <div>
-<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">E-Sign Passcode (PIN)</label>
-<input class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800" id="clinic-esign-pin" placeholder="Enter passcode to lock signature" type="password"/>
+<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Upload E-Stamp</label>
+<input accept="image/*" class="w-full p-2 border border-slate-200 rounded-xl bg-slate-50 text-sm font-medium file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100 cursor-pointer" id="clinic-estamp-file" type="file"/>
+<input id="clinic-estamp-base64" type="hidden"/>
+<img class="mt-2 h-16 object-contain hidden border border-slate-200 rounded bg-white p-1" id="estamp-preview" src=""/>
+</div>
+<div>
+<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Security Passcode (PIN)</label>
+<input class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800" id="clinic-esign-pin" placeholder="Enter PIN to lock both" type="password"/>
 </div>
 </div>
 </div>

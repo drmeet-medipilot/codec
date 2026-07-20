@@ -70,7 +70,7 @@
                     finance: [],
                     credits: [],
                     suppliers: [],
-                    clinicProfile: { name: '', address: '', mobile: '', regno: '', doctor: '', degree: '', esignBase64: '', esignPin: '' },
+                    clinicProfile: { name: '', address: '', mobile: '', regno: '', doctor: '', degree: '', esignBase64: '', estampBase64: '', esignPin: '' },
                     metadata: { initializedAt: new Date().toISOString(), softwareVersion: "2026.7.4 (Cloud Vault)" }
                 };
             }
@@ -173,7 +173,6 @@
                 
                 const greetingEl = document.getElementById('dashboard-greeting');
                 if (greetingEl) {
-                    // Custom formatting to keep title but no tag lines
                     greetingEl.innerText = `Clinic Management System`;
                 }
             }
@@ -284,6 +283,7 @@
                     'clinic-doctor': clinic.doctor || '',
                     'clinic-degree': clinic.degree || '',
                     'clinic-esign-base64': clinic.esignBase64 || '',
+                    'clinic-estamp-base64': clinic.estampBase64 || '',
                     'clinic-esign-pin': clinic.esignPin || ''
                 };
                 Object.entries(map).forEach(([id, value]) => {
@@ -291,14 +291,25 @@
                     if (el) el.value = value;
                 });
 
-                const preview = document.getElementById('esign-preview');
-                if (preview) {
+                const previewSign = document.getElementById('esign-preview');
+                if (previewSign) {
                     if (clinic.esignBase64) {
-                        preview.src = clinic.esignBase64;
-                        preview.classList.remove('hidden');
+                        previewSign.src = clinic.esignBase64;
+                        previewSign.classList.remove('hidden');
                     } else {
-                        preview.src = '';
-                        preview.classList.add('hidden');
+                        previewSign.src = '';
+                        previewSign.classList.add('hidden');
+                    }
+                }
+
+                const previewStamp = document.getElementById('estamp-preview');
+                if (previewStamp) {
+                    if (clinic.estampBase64) {
+                        previewStamp.src = clinic.estampBase64;
+                        previewStamp.classList.remove('hidden');
+                    } else {
+                        previewStamp.src = '';
+                        previewStamp.classList.add('hidden');
                     }
                 }
             }
@@ -313,10 +324,11 @@
                     doctor: document.getElementById('clinic-doctor')?.value.trim() || '',
                     degree: document.getElementById('clinic-degree')?.value.trim() || '',
                     esignBase64: document.getElementById('clinic-esign-base64')?.value || '',
+                    estampBase64: document.getElementById('clinic-estamp-base64')?.value || '',
                     esignPin: document.getElementById('clinic-esign-pin')?.value || ''
                 };
                 SystemStorage.write(db);
-                alert('Clinic profile & E-Signature details saved successfully.');
+                alert('Clinic profile & E-Security details saved successfully.');
             }
 
             static getPatientExportData(patientId) {
@@ -352,14 +364,16 @@
                         <div style="min-height:40px;border:1px solid #cbd5e1;border-radius:10px;padding:10px 12px;font-size:14px;line-height:1.6;background:#fef2f2;white-space:pre-wrap;">${latestVisit.treatmentPlan || 'No records'}</div>
                     </div>` : '';
 
-                let signatureHtml = `<div style="font-size:12px;color:#64748b;margin-top:25px;">Authorized Signatory</div>`;
-                if (useEsign && clinic.esignBase64) {
-                    signatureHtml = `
-                        <div style="margin-top:5px;">
-                            <img src="${clinic.esignBase64}" style="height:45px; object-fit:contain; margin-bottom:2px;" />
-                            <div style="font-size:11px;color:#64748b;font-weight:bold;">Digitally Signed</div>
-                        </div>
-                    `;
+                let signatureHtml = `<div style="height: 45px;"></div>`; 
+                let stampHtml = ``;
+
+                if (useEsign) {
+                    if (clinic.esignBase64) {
+                        signatureHtml = `<img src="${clinic.esignBase64}" style="height:50px; object-fit:contain; margin-bottom:5px;" />`;
+                    }
+                    if (clinic.estampBase64) {
+                        stampHtml = `<img src="${clinic.estampBase64}" style="height:70px; object-fit:contain; opacity: 0.85;" />`;
+                    }
                 }
 
                 return `
@@ -399,13 +413,21 @@
                                         <div style="min-height:40px;border:1px dashed #cbd5e1;border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.6;background:#fcfcfd;">History / Allergies: ${patient.allergies || 'None recorded'}</div>
                                     </div>
                                 </div>
+                                
                                 <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-top:28px;">
-                                    <div style="font-size:11px;color:#64748b;max-width:60%;">This prescription is generated from clinic records via MediPilot. Please review medicines before printing.</div>
+                                    <div style="font-size:11px;color:#64748b;max-width:35%;">This prescription is generated from clinic records via MediPilot. Please review medicines before printing.</div>
+                                    
+                                    <div style="flex:1;text-align:center;">
+                                        ${stampHtml}
+                                    </div>
+
                                     <div style="min-width:210px;text-align:center;">
-                                        <div style="border-top:1px solid #334155;padding-top:8px;font-size:13px;font-weight:700;color:#0f172a;">${docName}</div>
                                         ${signatureHtml}
+                                        <div style="border-top:1px solid #334155;padding-top:8px;font-size:13px;font-weight:700;color:#0f172a;">${docName}</div>
+                                        <div style="font-size:12px;color:#64748b;">Authorized Signatory</div>
                                     </div>
                                 </div>
+
                             </div>
                         </div>
                     </div>
@@ -417,13 +439,13 @@
                 const clinic = db.clinicProfile || {};
                 let useEsign = false;
                 
-                if (clinic.esignBase64 && clinic.esignPin) {
-                    const pin = prompt("Enter E-Sign Passcode to attach signature (Leave blank to print normally):");
+                if ((clinic.esignBase64 || clinic.estampBase64) && clinic.esignPin) {
+                    const pin = prompt("Enter Security Passcode to attach E-Sign & Stamp (Leave blank to print normally):");
                     if (pin !== null && pin !== "") {
                         if (pin === clinic.esignPin) {
                             useEsign = true;
                         } else {
-                            alert("Incorrect Passcode! Printing without signature.");
+                            alert("Incorrect Passcode! Printing without signature/stamp.");
                         }
                     }
                 }
@@ -443,13 +465,13 @@
                 const clinic = db.clinicProfile || {};
                 let useEsign = false;
                 
-                if (clinic.esignBase64 && clinic.esignPin) {
-                    const pin = prompt("Enter E-Sign Passcode to attach signature (Leave blank to generate normally):");
+                if ((clinic.esignBase64 || clinic.estampBase64) && clinic.esignPin) {
+                    const pin = prompt("Enter Security Passcode to attach E-Sign & Stamp (Leave blank to generate normally):");
                     if (pin !== null && pin !== "") {
                         if (pin === clinic.esignPin) {
                             useEsign = true;
                         } else {
-                            alert("Incorrect Passcode! Generating PDF without signature.");
+                            alert("Incorrect Passcode! Generating PDF without signature/stamp.");
                         }
                     }
                 }
@@ -540,6 +562,7 @@
                 document.getElementById('dash-date').innerText = new Date().toLocaleDateString('en-IN', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
                 document.getElementById('patient-search').addEventListener('input', (e) => UI.renderPatientsGrid(e.target.value));
 
+                // E-Sign Upload Handler
                 const esignFile = document.getElementById('clinic-esign-file');
                 if(esignFile) {
                     esignFile.addEventListener('change', function(e) {
@@ -549,6 +572,24 @@
                             reader.onload = function(evt) {
                                 document.getElementById('clinic-esign-base64').value = evt.target.result;
                                 const preview = document.getElementById('esign-preview');
+                                preview.src = evt.target.result;
+                                preview.classList.remove('hidden');
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    });
+                }
+
+                // E-Stamp Upload Handler
+                const estampFile = document.getElementById('clinic-estamp-file');
+                if(estampFile) {
+                    estampFile.addEventListener('change', function(e) {
+                        const file = e.target.files[0];
+                        if(file) {
+                            const reader = new FileReader();
+                            reader.onload = function(evt) {
+                                document.getElementById('clinic-estamp-base64').value = evt.target.result;
+                                const preview = document.getElementById('estamp-preview');
                                 preview.src = evt.target.result;
                                 preview.classList.remove('hidden');
                             };
