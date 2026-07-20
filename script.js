@@ -961,7 +961,7 @@
                                     <th style="padding: 10px 8px; border: 1px solid #e2e8f0; color:#334155;">Medicine Name</th>
                                     <th style="padding: 10px 8px; border: 1px solid #e2e8f0; color:#334155;">Type</th>
                                     <th style="padding: 10px 8px; border: 1px solid #e2e8f0; color:#334155;">Supplier</th>
-                                    <th style="padding: 10px 8px; border: 1px solid #e2e8f0; color:#334155;">Expiry</th>
+                                    <th style="padding: 10px 8px; border: 1px solid #e2e8f0; color:#334155;">Expiry Date</th>
                                     <th style="padding: 10px 8px; border: 1px solid #e2e8f0; color:#334155;">Qty (Units)</th>
                                     <th style="padding: 10px 8px; border: 1px solid #e2e8f0; color:#334155;">PTR (₹)</th>
                                     <th style="padding: 10px 8px; border: 1px solid #e2e8f0; color:#334155;">MRP (₹)</th>
@@ -1137,8 +1137,8 @@
 
                 this.populateExpiryYears(); 
 
-                document.getElementById('medicine-modal-title').innerHTML = '<i class="fa-solid fa-pills mr-2 text-emerald-400"></i>Register New Stock Component';
-                document.getElementById('medicine-submit-btn').innerText = "Commit Pharmaceutical Batch to Stock";
+                document.getElementById('medicine-modal-title').innerHTML = '<i class="fa-solid fa-pills mr-2 text-emerald-400"></i>Register New Medicine';
+                document.getElementById('medicine-submit-btn').innerText = "Save & Add Medicine";
                 
                 const select = document.getElementById('m-supplier');
                 if(select) {
