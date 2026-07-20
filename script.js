@@ -1111,13 +1111,14 @@
                                     <th style="padding: 10px 8px; border: 1px solid #e2e8f0; color:#334155;">Qty (Units)</th>
                                     <th style="padding: 10px 8px; border: 1px solid #e2e8f0; color:#334155;">PTR (₹)</th>
                                     <th style="padding: 10px 8px; border: 1px solid #e2e8f0; color:#334155;">MRP (₹)</th>
+                                    <th style="padding: 10px 8px; border: 1px solid #e2e8f0; color:#334155;">Total Value (PTR)</th>
                                 </tr>
                             </thead>
                             <tbody>
                 `;
 
                 if (datasets.length === 0) {
-                    html += `<tr><td colspan="8" style="padding: 12px; text-align: center; border: 1px solid #e2e8f0; color:#64748b; font-style: italic;">No stock records found for current filters.</td></tr>`;
+                    html += `<tr><td colspan="9" style="padding: 12px; text-align: center; border: 1px solid #e2e8f0; color:#64748b; font-style: italic;">No stock records found for current filters.</td></tr>`;
                 } else {
                     datasets.forEach((i, idx) => {
                         let qtyStyle = i.qty <= 0 ? 'color:#e11d48;font-weight:bold;' : (i.qty <= 15 ? 'color:#ea580c;font-weight:bold;' : 'font-weight:bold;');
@@ -1131,6 +1132,7 @@
                                 <td style="padding: 8px; border: 1px solid #e2e8f0; ${qtyStyle}">${parseFloat(Number(i.qty).toFixed(2))}</td>
                                 <td style="padding: 8px; border: 1px solid #e2e8f0; color:#475569;">${Number(i.purchase).toFixed(2)}</td>
                                 <td style="padding: 8px; border: 1px solid #e2e8f0; color:#475569;">${Number(i.selling).toFixed(2)}</td>
+                                <td style="padding: 8px; border: 1px solid #e2e8f0; font-weight:bold; color:#0f766e;">${((i.qty / (i.unitQty || 1)) * i.purchase).toFixed(2)}</td>
                             </tr>
                         `;
                     });
@@ -1153,10 +1155,11 @@
             static exportInventoryCSV() {
                 const db = SystemStorage.read();
                 let csvContent = "data:text/csv;charset=utf-8,";
-                csvContent += "Medicine Type,Medicine Name,Supplier,Expiry Date,Total Qty,PTR (Purchase),MRP (Selling),Stock Status\n";
+                csvContent += "Medicine Type,Medicine Name,Supplier,Expiry Date,Total Qty,PTR (Purchase),MRP (Selling),Total Value (PTR),Stock Status\n";
                 db.inventory.forEach(i => {
                     let status = (i.qty <= 0) ? "Depleted" : (i.qty <= 15 ? "Low Level" : "In Stock");
-                    let row = `"${i.type || ''}","${i.name}","${i.supplier || ''}","${i.expiry}","${i.qty}","${i.purchase}","${i.selling}","${status}"`;
+                    let totalVal = ((i.qty / (i.unitQty || 1)) * i.purchase).toFixed(2);
+                    let row = `"${i.type || ''}","${i.name}","${i.supplier || ''}","${i.expiry}","${i.qty}","${i.purchase}","${i.selling}","${totalVal}","${status}"`;
                     csvContent += row + "\r\n";
                 });
                 const encodedUri = encodeURI(csvContent);
@@ -1206,7 +1209,7 @@
                 }
 
                 if(datasets.length === 0) {
-                    container.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400 italic font-medium">No matching medicine batches found in this layer context.</td></tr>`;
+                    container.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-400 italic font-medium">No matching medicine batches found in this layer context.</td></tr>`;
                     return;
                 }
 
@@ -1214,6 +1217,8 @@
                     let statusBadge = `<span class="bg-emerald-50 text-emerald-700 text-xs px-2.5 py-1 rounded-xl font-bold">In Stock</span>`;
                     if (i.qty <= 15) statusBadge = `<span class="bg-rose-50 text-rose-700 text-xs px-2.5 py-1 rounded-xl font-bold">Low Level</span>`;
                     if (i.qty <= 0) statusBadge = `<span class="bg-slate-200 text-slate-700 text-xs px-2.5 py-1 rounded-xl font-bold">Depleted</span>`;
+                    
+                    const totalPTRValue = (i.qty / (i.unitQty || 1)) * i.purchase;
 
                     const tr = document.createElement('tr');
                     tr.className = "border-b border-slate-200 hover:bg-slate-50/50 text-slate-600 font-medium transition-colors text-xs";
@@ -1226,6 +1231,7 @@
                         <td class="p-4 font-bold text-slate-700 font-mono">${i.expiry}</td>
                         <td class="p-4 text-center font-black text-slate-800">${parseFloat(Number(i.qty).toFixed(2))} total units</td>
                         <td class="p-4 text-right leading-relaxed font-semibold">PTR: <span class="text-slate-500">₹${Number(i.purchase).toFixed(2)}</span><br><span class="text-slate-900 font-black">MRP: ₹${Number(i.selling).toFixed(2)}</span></td>
+                        <td class="p-4 text-right font-black text-teal-700">₹${totalPTRValue.toFixed(2)}</td>
                         <td class="p-4 text-center">${statusBadge}</td>
                         <td class="p-4 text-right space-x-1 whitespace-nowrap">
                             <button onclick="UI.editInventoryRecord('${i.id}')" title="Edit Stock Item" class="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold text-xs rounded-xl transition-all cursor-pointer"><i class="fa-solid fa-pen-to-square"></i></button>
