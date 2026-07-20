@@ -492,45 +492,74 @@
             }
 
             static sharePatientPrescriptionWhatsApp(patientId) {
-                const { clinic, patient, visits } = this.getPatientExportData(patientId);
+                const db = SystemStorage.read();
+                const { clinic, patient } = this.getPatientExportData(patientId);
                 if (!patient) return;
-                const historyText = visits.length
-                    ? visits.map((visit, index) => {
-                        let vitalsStr = visit.vitals && (visit.vitals.bp || visit.vitals.pulse || visit.vitals.spo2 || visit.vitals.rbs) 
-                            ? `Vitals: BP: ${visit.vitals.bp||'--'} | PR: ${visit.vitals.pulse||'--'} | SpO2: ${visit.vitals.spo2||'--'} | RBS: ${visit.vitals.rbs||'--'}` 
-                            : '';
-                        let treatStr = visit.treatmentType && visit.treatmentType !== 'None'
-                            ? `Treatment (${visit.treatmentType}): \n${visit.treatmentPlan || 'N/A'}` : '';
-
-                        return [
-                            `${index + 1}. Date: ${visit.date}`,
-                            vitalsStr,
-                            `Complaint: ${visit.complaint || 'Not recorded'}`,
-                            `Diagnosis: ${visit.diagnosis || 'Not recorded'}`,
-                            treatStr,
-                            `Prescription: \n${visit.prescription || 'No prescription saved'}`
-                        ].filter(Boolean).join('\n')
-                    }).join('\n\n')
-                    : 'No consultation history available.';
                 
-                const message = [
-                    clinic.name || 'Clinic Name',
-                    clinic.address || 'Clinic Address',
-                    `Mobile: ${clinic.mobile || 'Not set'}`,
-                    `Reg. No.: ${clinic.regno || 'Not set'}`,
-                    `Doctor: ${clinic.doctor || 'Not set'}`,
-                    '',
-                    `Patient: ${patient.name} (${patient.id})`,
-                    `Mobile: ${patient.mobile || 'Not recorded'}`,
-                    `Age: ${patient.ageVal} ${patient.ageUnit || ''}`,
-                    `Weight: ${patient.weight ? patient.weight + ' kg' : 'Not recorded'}`,
-                    `Address: ${patient.address || 'Not recorded'}`,
-                    `History/Allergies: ${patient.allergies || 'None recorded'}`,
-                    '',
-                    'Complaint History & Prescriptions (MediPilot System)',
-                    historyText
-                ].join('\n');
-                window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+                let useEsign = false;
+                if ((clinic.esignBase64 || clinic.estampBase64) && clinic.esignPin) {
+                    const pin = prompt("Enter Security Passcode to attach E-Sign & Stamp for WhatsApp PDF (Leave blank for normal PDF):");
+                    if (pin !== null && pin !== "") {
+                        if (pin === clinic.esignPin) {
+                            useEsign = true;
+                        } else {
+                            alert("Incorrect Passcode! Generating PDF without signature/stamp.");
+                        }
+                    }
+                }
+
+                const html = this.buildPatientPrescriptionHTML(patientId, useEsign);
+                const wrapper = document.createElement('div');
+                wrapper.innerHTML = html;
+                const node = wrapper.firstElementChild;
+                document.body.appendChild(node);
+                
+                const fileName = `${patient.name.replace(/\s+/g, '_')}_prescription.pdf`;
+                const opt = {
+                    margin: 0.3,
+                    filename: fileName,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true },
+                    jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+                };
+
+                const msgText = `Hello ${patient.name},\nHere is your prescription from ${clinic.name || 'our clinic'}. Please find the attached PDF document.`;
+                let mobileNum = patient.mobile ? patient.mobile.replace(/\D/g, '') : '';
+                if(mobileNum.length === 10) mobileNum = '91' + mobileNum; // Add India country code automatically if 10 digits
+
+                html2pdf().set(opt).from(node).toPdf().get('pdf').then(function(pdf) {
+                    const pdfBlob = pdf.output('blob');
+                    node.remove(); // Cleanup DOM
+                    
+                    const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
+                    
+                    // Web Share API (Works natively on Mobile Devices)
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        navigator.share({
+                            files: [file],
+                            title: 'Prescription PDF',
+                            text: msgText
+                        }).catch(err => console.log('Share error:', err));
+                    } else {
+                        // Desktop Fallback: Download file automatically and open WhatsApp Web
+                        alert("Direct PDF sharing to WhatsApp is supported mainly on Mobile phones. The PDF will now be downloaded to your device. Please attach it manually in the WhatsApp chat.");
+                        
+                        const url = URL.createObjectURL(pdfBlob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = fileName;
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+                        URL.revokeObjectURL(url);
+                        
+                        const waUrl = mobileNum ? `https://wa.me/${mobileNum}?text=${encodeURIComponent(msgText)}` : `https://wa.me/?text=${encodeURIComponent(msgText)}`;
+                        window.open(waUrl, '_blank');
+                    }
+                }).catch(err => {
+                    console.error('PDF Generation Error:', err);
+                    if(node) node.remove();
+                });
             }
 
             static initializeApplicationRuntime() {
@@ -1590,10 +1619,13 @@
                 const db = SystemStorage.read();
                 
                 const newId = `PT-${Math.floor(9000 + Math.random() * 999)}`;
+                const pName = document.getElementById('p-name').value.trim();
+                const pMobile = document.getElementById('p-mobile').value.trim();
+
                 const payload = {
                     id: newId,
-                    name: document.getElementById('p-name').value.trim(),
-                    mobile: document.getElementById('p-mobile').value.trim(),
+                    name: pName,
+                    mobile: pMobile,
                     ageVal: parseInt(document.getElementById('p-age-val').value) || 0,
                     ageUnit: document.getElementById('p-age-unit').value,
                     weight: parseFloat(document.getElementById('p-weight').value) || null,
@@ -1607,6 +1639,18 @@
                 this.closeModal('modal-patient');
                 document.getElementById('form-patient').reset();
                 alert(`Patient registration committed safely (System Reference: ${newId}).`);
+
+                // WHATSAPP WELCOME MESSAGE AUTO SEND
+                const clinicName = db.clinicProfile?.name || 'our clinic';
+                const msgText = `Hello ${pName},\nWelcome to ${clinicName}!\nYour Patient Registration Number is: ${newId}\nPlease keep this number safe for future visits.`;
+                
+                let mobileNum = pMobile.replace(/\D/g, '');
+                if(mobileNum.length === 10) mobileNum = '91' + mobileNum; // auto-append India code
+                
+                if (mobileNum) {
+                    const waUrl = `https://wa.me/${mobileNum}?text=${encodeURIComponent(msgText)}`;
+                    window.open(waUrl, '_blank');
+                }
             }
 
             static initiateVisitModal(patientId) {
