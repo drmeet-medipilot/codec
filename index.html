@@ -84,8 +84,7 @@
 <section class="erp-section space-y-6" id="mod-dashboard">
 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between border-b border-slate-200 pb-5 gap-4">
 <div>
-<h2 class="text-3xl font-black tracking-tight text-slate-900" id="dashboard-greeting">Clinic Management System</h2>
-<p class="text-xs font-medium text-slate-500 mt-0.5">Clinic Management System • Real-time localized metrics compiled safely inside browser application environments.</p>
+<h2 class="text-3xl font-black tracking-tight animated-heading pb-1" id="dashboard-greeting">Clinic Management System</h2>
 </div>
 <div class="flex flex-col sm:flex-row items-center gap-3 self-start lg:self-end">
 <select class="text-xs font-bold bg-white px-3 py-2.5 border border-slate-200 rounded-xl text-teal-800 shadow-xs focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition cursor-pointer" id="dashboard-timeframe" onchange="UI.handleTimeframeChange()">
@@ -170,8 +169,7 @@
 <section class="erp-section hidden space-y-6" id="mod-patients">
 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-5 gap-4">
 <div>
-<h2 class="text-3xl font-black text-slate-900">Patient Registry</h2>
-<p class="text-xs font-medium text-slate-500 mt-0.5">Comprehensive diagnostic profiling, vitals matrix mapping, and clinical history ledger.</p>
+<h2 class="text-3xl font-black animated-heading pb-1">Patient Registry</h2>
 </div>
 <button class="px-5 py-2.5 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-teal-700/20 active:scale-[0.98] self-start cursor-pointer flex items-center" onclick="UI.openPatientModal()">
 <i class="fa-solid fa-user-plus mr-2"></i>Register New Patient
@@ -193,7 +191,7 @@
 <th class="p-4">Age Profile</th>
 <th class="p-4">Weight Baseline</th>
 <th class="p-4 text-center">Consultations</th>
-<th class="p-4 text-right">Operations Terminal</th>
+<th class="p-4 text-center">Operations Terminal</th>
 </tr>
 </thead>
 <tbody id="patients-table-body">
@@ -204,8 +202,7 @@
 </section>
 <section class="erp-section hidden space-y-6" id="mod-billing">
 <div class="border-b border-slate-200 pb-5">
-<h2 class="text-3xl font-black text-slate-900">Clinic Billing</h2>
-<p class="text-xs font-medium text-slate-500 mt-0.5">Generate customized system invoices and instant UPI string payment QR codes.</p>
+<h2 class="text-3xl font-black animated-heading pb-1">Clinic Billing</h2>
 </div>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
 <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
@@ -262,8 +259,7 @@
 </section>
 <section class="erp-section hidden space-y-6" id="mod-otc">
 <div class="border-b border-slate-200 pb-5">
-<h2 class="text-3xl font-black text-slate-900">OTC Sale</h2>
-<p class="text-xs font-medium text-slate-500 mt-0.5">Direct non-prescription counter checkout modules. Automatic ledger integration and inventory deduction engines.</p>
+<h2 class="text-3xl font-black animated-heading pb-1">OTC Sale</h2>
 </div>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
 <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
@@ -335,8 +331,7 @@
 <section class="erp-section hidden space-y-6" id="mod-inventory">
 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-5 gap-4">
 <div>
-<h2 class="text-3xl font-black text-slate-900">Stock Management</h2>
-<p class="text-xs font-medium text-slate-500 mt-0.5">Dynamic pharmaceutical index matrices, low-tier metric alarms, and supplier correlation mappings.</p>
+<h2 class="text-3xl font-black animated-heading pb-1">Stock Management</h2>
 </div>
 <!-- FIXED RESPONSIVE BUTTONS FOR STOCK MANAGEMENT -->
 <div class="flex gap-2 items-center self-start flex-nowrap w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0 hide-scroll">
@@ -428,8 +423,7 @@
 <section class="erp-section hidden space-y-6" id="mod-finance">
 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-5 gap-4">
 <div>
-<h2 class="text-3xl font-black text-slate-900">Accounts &amp; Ledger</h2>
-<p class="text-xs font-medium text-slate-500 mt-0.5">Real-time localized ledger calculations comparing inbound service charges with operational outflows.</p>
+<h2 class="text-3xl font-black animated-heading pb-1">Accounts &amp; Ledger</h2>
 </div>
 <div class="flex gap-2.5 self-start flex-wrap">
 <button class="px-4 py-2.5 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer flex items-center active:scale-[0.97]" onclick="UI.openCreditsModal()">
@@ -479,8 +473,7 @@
 </section>
 <section class="erp-section hidden space-y-6" id="mod-backup">
 <div class="border-b border-slate-200 pb-5">
-<h2 class="text-3xl font-black text-slate-900">System Crypt Vault</h2>
-<p class="text-xs font-medium text-slate-500 mt-0.5">Export structured data cache layer files natively. Ensure 100% data sovereignty via offline parameters.</p>
+<h2 class="text-3xl font-black animated-heading pb-1">System Crypt Vault</h2>
 </div>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
@@ -511,8 +504,7 @@
 <!-- NEW SETTINGS SECTION -->
 <section class="erp-section hidden space-y-6" id="mod-settings">
 <div class="border-b border-slate-200 pb-5">
-<h2 class="text-3xl font-black text-slate-900">Clinic Settings</h2>
-<p class="text-xs font-medium text-slate-500 mt-0.5">Configure clinic profile for professional prescription printing.</p>
+<h2 class="text-3xl font-black animated-heading pb-1">Clinic Settings</h2>
 </div>
 <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm max-w-3xl">
 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -539,6 +531,22 @@
 <div>
 <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Registration Number</label>
 <input class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800" id="clinic-regno" placeholder="e.g. G-12345" type="text"/>
+</div>
+<!-- E-SIGN CONFIGURATION AREA -->
+<div class="md:col-span-2 pt-4 border-t border-slate-100 mt-2">
+<h3 class="font-bold text-sm text-slate-800 mb-3"><i class="fa-solid fa-signature text-teal-600 mr-2"></i>E-Signature Configuration</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+<div>
+<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Upload Signature</label>
+<input accept="image/*" class="w-full p-2 border border-slate-200 rounded-xl bg-slate-50 text-sm font-medium file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100 cursor-pointer" id="clinic-esign-file" type="file"/>
+<input id="clinic-esign-base64" type="hidden"/>
+<img class="mt-2 h-12 object-contain hidden border border-slate-200 rounded bg-white p-1" id="esign-preview" src=""/>
+</div>
+<div>
+<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">E-Sign Passcode (PIN)</label>
+<input class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800" id="clinic-esign-pin" placeholder="Enter passcode to lock signature" type="password"/>
+</div>
+</div>
 </div>
 <div class="md:col-span-2 pt-3">
 <button class="px-5 py-3 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white font-bold rounded-xl shadow-md transition-all cursor-pointer active:scale-[0.99] flex items-center justify-center w-full md:w-auto" onclick="UI.saveClinicProfile()">
@@ -647,14 +655,16 @@
 <div class="border border-slate-200 p-4 rounded-xl bg-slate-50/50 space-y-3 shadow-inner">
 <div class="flex justify-between items-center">
 <label class="block text-xs font-black text-slate-600 uppercase tracking-wider">Stat In-Clinic Treatment</label>
-<select class="p-1.5 text-xs border border-slate-200 rounded-lg bg-white focus:outline-none font-bold text-teal-700" id="v-treatment-type" onchange="UI.toggleTreatment()">
+<select class="p-1.5 text-xs border border-slate-200 rounded-lg bg-white focus:outline-none font-bold text-teal-700 cursor-pointer" id="v-treatment-type" onchange="UI.toggleTreatment()">
 <option value="None">None</option>
-<option value="Injection">Injection Protocol</option>
-<option value="Drip">Intravenous Drip Fluid</option>
+<option value="Injection">Injection</option>
+<option value="Drip">IV Drip Fluid</option>
+<option value="Dressing">Dressing</option>
+<option value="Stitches">Stitches</option>
 </select>
 </div>
 <div class="hidden space-y-3 pt-3 border-t border-slate-200" id="treatment-container">
-<div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-3" id="treatment-med-controls">
 <div class="md:col-span-1">
 <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Med Type Filter</label>
 <select class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-semibold" id="v-treatment-med-type" onchange="UI.filterVisitMedicineOptions('v-treatment-medicine', this.value)">
@@ -681,13 +691,19 @@
 <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Dose Volume</label>
 <input class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-semibold" id="v-treatment-qty" placeholder="e.g. 1 Amp / 1 Vial" type="text"/>
 </div>
-<div class="md:col-span-4 flex justify-end">
+</div>
+<div class="hidden grid grid-cols-1 md:grid-cols-4 gap-3" id="stitches-container">
+<div class="md:col-span-2">
+<label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Number of Stitches</label>
+<input class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-semibold" id="v-stitches-count" placeholder="e.g. 5" type="number"/>
+</div>
+</div>
+<div class="flex justify-end mt-2">
 <button class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs rounded-xl transition-all shadow-xs flex items-center cursor-pointer" onclick="UI.addTreatmentToPrescription()" type="button">
 <i class="fa-solid fa-plus mr-1"></i> Add to Treatment Plan
-                                    </button>
+                                </button>
 </div>
-</div>
-<textarea class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none text-xs font-semibold font-mono text-slate-700" id="v-treatment-plan" placeholder="Administered treatments will map visually in this block space..." rows="2"></textarea>
+<textarea class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none text-xs font-semibold font-mono text-slate-700 mt-2" id="v-treatment-plan" placeholder="Administered treatments will map visually in this block space..." rows="2"></textarea>
 </div>
 </div>
 <div class="border border-slate-200 p-4 rounded-xl bg-slate-50/50 space-y-3 shadow-inner">
@@ -847,7 +863,7 @@
 <hr class="border-slate-100 my-1"/>
 </div>
 <div class="sm:col-span-2">
-<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Package Type &amp; Units per Strip/Piece *</label>
+<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Package Type &amp; Units per Pkg *</label>
 <div class="flex space-x-2">
 <select class="w-1/2 p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-bold text-slate-700" id="m-unit-type">
 <option value="Strip">Strip</option>

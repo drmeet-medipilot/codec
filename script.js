@@ -70,7 +70,7 @@
                     finance: [],
                     credits: [],
                     suppliers: [],
-                    clinicProfile: { name: '', address: '', mobile: '', regno: '', doctor: '', degree: '' },
+                    clinicProfile: { name: '', address: '', mobile: '', regno: '', doctor: '', degree: '', esignBase64: '', esignPin: '' },
                     metadata: { initializedAt: new Date().toISOString(), softwareVersion: "2026.7.4 (Cloud Vault)" }
                 };
             }
@@ -173,8 +173,8 @@
                 
                 const greetingEl = document.getElementById('dashboard-greeting');
                 if (greetingEl) {
-                    // Update header if replacing static string dynamically, but leaving as is logically
-                    greetingEl.innerText = `${greeting}, ${finalName}`;
+                    // Custom formatting to keep title but no tag lines
+                    greetingEl.innerText = `Clinic Management System`;
                 }
             }
 
@@ -282,12 +282,25 @@
                     'clinic-mobile': clinic.mobile || '',
                     'clinic-regno': clinic.regno || '',
                     'clinic-doctor': clinic.doctor || '',
-                    'clinic-degree': clinic.degree || ''
+                    'clinic-degree': clinic.degree || '',
+                    'clinic-esign-base64': clinic.esignBase64 || '',
+                    'clinic-esign-pin': clinic.esignPin || ''
                 };
                 Object.entries(map).forEach(([id, value]) => {
                     const el = document.getElementById(id);
                     if (el) el.value = value;
                 });
+
+                const preview = document.getElementById('esign-preview');
+                if (preview) {
+                    if (clinic.esignBase64) {
+                        preview.src = clinic.esignBase64;
+                        preview.classList.remove('hidden');
+                    } else {
+                        preview.src = '';
+                        preview.classList.add('hidden');
+                    }
+                }
             }
 
             static saveClinicProfile() {
@@ -298,10 +311,12 @@
                     mobile: document.getElementById('clinic-mobile')?.value.trim() || '',
                     regno: document.getElementById('clinic-regno')?.value.trim() || '',
                     doctor: document.getElementById('clinic-doctor')?.value.trim() || '',
-                    degree: document.getElementById('clinic-degree')?.value.trim() || ''
+                    degree: document.getElementById('clinic-degree')?.value.trim() || '',
+                    esignBase64: document.getElementById('clinic-esign-base64')?.value || '',
+                    esignPin: document.getElementById('clinic-esign-pin')?.value || ''
                 };
                 SystemStorage.write(db);
-                alert('Clinic profile details saved successfully.');
+                alert('Clinic profile & E-Signature details saved successfully.');
             }
 
             static getPatientExportData(patientId) {
@@ -311,7 +326,7 @@
                 return { clinic: db.clinicProfile || {}, patient, visits };
             }
 
-            static buildPatientPrescriptionHTML(patientId) {
+            static buildPatientPrescriptionHTML(patientId, useEsign = false) {
                 const { clinic, patient, visits } = this.getPatientExportData(patientId);
                 if (!patient) return '';
                 const latestVisit = visits.length ? visits[visits.length - 1] : null;
@@ -336,6 +351,16 @@
                         <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:#0f766e;text-transform:uppercase;margin-bottom:5px;">Administered ${latestVisit.treatmentType}</div>
                         <div style="min-height:40px;border:1px solid #cbd5e1;border-radius:10px;padding:10px 12px;font-size:14px;line-height:1.6;background:#fef2f2;white-space:pre-wrap;">${latestVisit.treatmentPlan || 'No records'}</div>
                     </div>` : '';
+
+                let signatureHtml = `<div style="font-size:12px;color:#64748b;margin-top:25px;">Authorized Signatory</div>`;
+                if (useEsign && clinic.esignBase64) {
+                    signatureHtml = `
+                        <div style="margin-top:5px;">
+                            <img src="${clinic.esignBase64}" style="height:45px; object-fit:contain; margin-bottom:2px;" />
+                            <div style="font-size:11px;color:#64748b;font-weight:bold;">Digitally Signed</div>
+                        </div>
+                    `;
+                }
 
                 return `
                     <div id="patient-export-sheet" style="font-family:'Arial',sans-serif;background:#ffffff;color:#0f172a;width:100%;box-sizing:border-box;">
@@ -378,7 +403,7 @@
                                     <div style="font-size:11px;color:#64748b;max-width:60%;">This prescription is generated from clinic records via MediPilot. Please review medicines before printing.</div>
                                     <div style="min-width:210px;text-align:center;">
                                         <div style="border-top:1px solid #334155;padding-top:8px;font-size:13px;font-weight:700;color:#0f172a;">${docName}</div>
-                                        <div style="font-size:12px;color:#64748b;">Authorized Signatory</div>
+                                        ${signatureHtml}
                                     </div>
                                 </div>
                             </div>
@@ -388,7 +413,22 @@
             }
 
             static printPatientPrescription(patientId) {
-                const html = this.buildPatientPrescriptionHTML(patientId);
+                const db = SystemStorage.read();
+                const clinic = db.clinicProfile || {};
+                let useEsign = false;
+                
+                if (clinic.esignBase64 && clinic.esignPin) {
+                    const pin = prompt("Enter E-Sign Passcode to attach signature (Leave blank to print normally):");
+                    if (pin !== null && pin !== "") {
+                        if (pin === clinic.esignPin) {
+                            useEsign = true;
+                        } else {
+                            alert("Incorrect Passcode! Printing without signature.");
+                        }
+                    }
+                }
+
+                const html = this.buildPatientPrescriptionHTML(patientId, useEsign);
                 if (!html) return;
                 const printArea = document.getElementById('print-area');
                 printArea.innerHTML = html;
@@ -398,7 +438,23 @@
             static exportPatientPrescriptionPDF(patientId) {
                 const { patient } = this.getPatientExportData(patientId);
                 if (!patient) return;
-                const html = this.buildPatientPrescriptionHTML(patientId);
+                
+                const db = SystemStorage.read();
+                const clinic = db.clinicProfile || {};
+                let useEsign = false;
+                
+                if (clinic.esignBase64 && clinic.esignPin) {
+                    const pin = prompt("Enter E-Sign Passcode to attach signature (Leave blank to generate normally):");
+                    if (pin !== null && pin !== "") {
+                        if (pin === clinic.esignPin) {
+                            useEsign = true;
+                        } else {
+                            alert("Incorrect Passcode! Generating PDF without signature.");
+                        }
+                    }
+                }
+
+                const html = this.buildPatientPrescriptionHTML(patientId, useEsign);
                 const wrapper = document.createElement('div');
                 wrapper.innerHTML = html;
                 const node = wrapper.firstElementChild;
@@ -483,6 +539,23 @@
 
                 document.getElementById('dash-date').innerText = new Date().toLocaleDateString('en-IN', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
                 document.getElementById('patient-search').addEventListener('input', (e) => UI.renderPatientsGrid(e.target.value));
+
+                const esignFile = document.getElementById('clinic-esign-file');
+                if(esignFile) {
+                    esignFile.addEventListener('change', function(e) {
+                        const file = e.target.files[0];
+                        if(file) {
+                            const reader = new FileReader();
+                            reader.onload = function(evt) {
+                                document.getElementById('clinic-esign-base64').value = evt.target.result;
+                                const preview = document.getElementById('esign-preview');
+                                preview.src = evt.target.result;
+                                preview.classList.remove('hidden');
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    });
+                }
 
                 this.loadClinicProfile();
                 this.triggerGlobalAuditRefresh();
@@ -785,12 +858,14 @@
                         <td class="p-4 text-xs font-semibold text-slate-700">${p.ageVal} ${p.ageUnit}</td>
                         <td class="p-4 text-xs font-bold text-teal-700">${p.weight ? p.weight + ' kg' : '--'}</td>
                         <td class="p-4 text-center"><button onclick="UI.viewPatientConsultations('${p.id}')" class="bg-slate-100 hover:bg-teal-50 text-slate-700 hover:text-teal-700 font-bold px-3 py-1 rounded-full text-[11px] transition-all cursor-pointer">${visitsCount} Prescriptions</button></td>
-                        <td class="p-4 text-right space-x-1 whitespace-nowrap">
-                            <button onclick="UI.initiateVisitModal('${p.id}')" title="Clinical Notes" class="px-2.5 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 font-bold text-xs rounded-xl transition-all cursor-pointer"><i class="fa-solid fa-notes-medical"></i></button>
-                            <button onclick="UI.editLatestPrescription('${p.id}')" title="Edit Prescription" class="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold text-xs rounded-xl transition-all cursor-pointer"><i class="fa-solid fa-pen-to-square"></i></button>
-                            <button onclick="UI.sharePatientPrescriptionWhatsApp('${p.id}')" title="Share WhatsApp" class="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs rounded-xl transition-all cursor-pointer"><i class="fa-brands fa-whatsapp"></i></button>
-                            <button onclick="UI.printPatientPrescription('${p.id}')" title="Print Prescription" class="px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-xl transition-all cursor-pointer"><i class="fa-solid fa-print"></i></button>
-                            <button onclick="UI.deletePatientRecord('${p.id}')" title="Delete Profile" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-xs rounded-xl transition-all cursor-pointer"><i class="fa-solid fa-trash-can"></i></button>
+                        <td class="p-4 align-middle">
+                            <div class="flex justify-center items-center gap-1.5 flex-wrap">
+                                <button onclick="UI.initiateVisitModal('${p.id}')" title="Clinical Notes" class="px-2.5 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 font-bold text-xs rounded-xl transition-all cursor-pointer"><i class="fa-solid fa-notes-medical"></i></button>
+                                <button onclick="UI.editLatestPrescription('${p.id}')" title="Edit Prescription" class="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold text-xs rounded-xl transition-all cursor-pointer"><i class="fa-solid fa-pen-to-square"></i></button>
+                                <button onclick="UI.sharePatientPrescriptionWhatsApp('${p.id}')" title="Share WhatsApp" class="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs rounded-xl transition-all cursor-pointer"><i class="fa-brands fa-whatsapp"></i></button>
+                                <button onclick="UI.printPatientPrescription('${p.id}')" title="Print Prescription" class="px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-xl transition-all cursor-pointer"><i class="fa-solid fa-print"></i></button>
+                                <button onclick="UI.deletePatientRecord('${p.id}')" title="Delete Profile" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-xs rounded-xl transition-all cursor-pointer"><i class="fa-solid fa-trash-can"></i></button>
+                            </div>
                         </td>
                     `;
                     container.appendChild(tr);
@@ -1499,6 +1574,7 @@
                 document.getElementById('v-prescription').value = "";
                 document.getElementById('v-treatment-plan').value = "";
                 document.getElementById('v-treatment-qty').value = "";
+                document.getElementById('v-stitches-count').value = "";
                 
                 this.toggleRBS();
                 this.toggleTreatment();
@@ -1536,29 +1612,55 @@
             static toggleTreatment() {
                 const type = document.getElementById('v-treatment-type').value;
                 const container = document.getElementById('treatment-container');
+                const medControls = document.getElementById('treatment-med-controls');
+                const stitchesContainer = document.getElementById('stitches-container');
+                
                 if(container) {
-                    if(type !== 'None') container.classList.remove('hidden');
-                    else container.classList.add('hidden');
+                    if(type !== 'None') {
+                        container.classList.remove('hidden');
+                        
+                        if (type === 'Stitches') {
+                            if(medControls) medControls.classList.add('hidden');
+                            if(stitchesContainer) stitchesContainer.classList.remove('hidden');
+                        } else if (type === 'Dressing') {
+                            if(medControls) medControls.classList.add('hidden');
+                            if(stitchesContainer) stitchesContainer.classList.add('hidden');
+                        } else {
+                            if(medControls) medControls.classList.remove('hidden');
+                            if(stitchesContainer) stitchesContainer.classList.add('hidden');
+                        }
+                    } else {
+                        container.classList.add('hidden');
+                    }
                 }
             }
 
             static addTreatmentToPrescription() {
-                const medSelect = document.getElementById('v-treatment-medicine');
-                const qtyInput = document.getElementById('v-treatment-qty');
+                const type = document.getElementById('v-treatment-type').value;
+                let line = "";
                 const planArea = document.getElementById('v-treatment-plan');
 
-                if(!medSelect.value || !qtyInput.value) {
-                    alert("Please map both target stock parameters and volume counts first.");
-                    return;
+                if (type === 'Stitches') {
+                    const count = document.getElementById('v-stitches-count').value;
+                    if (!count) { alert("Please enter the number of stitches."); return; }
+                    line = `[Stat Administered] Stitches -- Count: ${count}`;
+                    document.getElementById('v-stitches-count').value = "";
+                } else if (type === 'Dressing') {
+                    line = `[Stat Administered] Dressing`;
+                } else {
+                    const medSelect = document.getElementById('v-treatment-medicine');
+                    const qtyInput = document.getElementById('v-treatment-qty');
+                    if(!medSelect.value || !qtyInput.value) {
+                        alert("Please map both target stock parameters and volume counts first.");
+                        return;
+                    }
+                    line = `[Stat Administered] ${medSelect.value} -- Vol/Dose: ${qtyInput.value}`;
+                    this.pendingStockDeductions.push({ name: medSelect.value, qty: 1 });
+                    medSelect.selectedIndex = 0;
+                    qtyInput.value = "";
                 }
-
-                const line = `[Stat Administered] ${medSelect.value} -- Vol/Dose: ${qtyInput.value}`;
+                
                 planArea.value = planArea.value ? planArea.value + "\n" + line : line;
-                
-                this.pendingStockDeductions.push({ name: medSelect.value, qty: 1 });
-                
-                medSelect.selectedIndex = 0;
-                qtyInput.value = "";
             }
 
             static addMedicineToPrescription() {
