@@ -67,9 +67,6 @@
 <button class="nav-link w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-600 rounded-xl hover:bg-slate-50 transition-all cursor-pointer" data-target="finance">
 <i class="fa-solid fa-wallet w-5 text-center text-base"></i> <span>Accounts &amp; Ledger</span>
 </button>
-<button class="nav-link w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-600 rounded-xl hover:bg-slate-50 transition-all cursor-pointer" data-target="backup">
-<i class="fa-solid fa-database w-5 text-center text-base"></i> <span>System Crypt Vault</span>
-</button>
 <button class="nav-link w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-600 rounded-xl hover:bg-slate-50 transition-all cursor-pointer" data-target="settings">
 <i class="fa-solid fa-gear w-5 text-center text-base"></i> <span>Clinic Settings</span>
 </button>
@@ -468,36 +465,6 @@
 <span class="text-slate-700">Net Retained Cash Profit:</span>
 <span class="text-teal-700" id="fin-net-profit">₹0.00</span>
 </div>
-</div>
-</div>
-</div>
-</section>
-<section class="erp-section hidden space-y-6" id="mod-backup">
-<div class="border-b border-slate-200 pb-5">
-<h2 class="text-3xl font-black animated-heading pb-1">System Crypt Vault</h2>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-<div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-<div class="flex items-center space-x-3 text-emerald-700">
-<i class="fa-solid fa-file-export text-2xl"></i>
-<h3 class="font-bold text-base text-slate-800">Export Offline JSON Database Vault</h3>
-</div>
-<p class="text-xs text-slate-500 leading-relaxed font-medium">Extracts entire dataset layers including patient registration maps, past prescriptions vectors, and inventory indices into text payload packages.</p>
-<button class="px-4 py-3 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white rounded-xl text-xs font-bold transition-all flex items-center space-x-2 shadow-md shadow-emerald-600/10 cursor-pointer active:scale-[0.98]" onclick="SystemStorage.exportDatabaseVault()">
-<i class="fa-solid fa-download"></i><span>Generate and Download Backup Vault</span>
-</button>
-</div>
-<div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-<div class="flex items-center space-x-3 text-rose-700">
-<i class="fa-solid fa-file-import text-2xl"></i>
-<h3 class="font-bold text-base text-slate-800">Restore/Import System Structure</h3>
-</div>
-<p class="text-xs text-slate-500 leading-relaxed font-medium"><strong class="text-rose-600">CRITICAL ERROR RISK:</strong> This overwrite transaction fully deletes the local cache runtime layer. Input valid text blocks only.</p>
-<div class="space-y-3">
-<textarea class="w-full p-3 border border-slate-200 rounded-xl font-mono text-xs bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-rose-500/20 transition-all" id="import-json-payload" placeholder="Paste structure serialization text lines here..." rows="3"></textarea>
-<button class="px-4 py-3 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 text-white rounded-xl text-xs font-bold transition-all flex items-center space-x-2 shadow-md shadow-rose-600/10 cursor-pointer active:scale-[0.98]" onclick="SystemStorage.importDatabaseVault()">
-<i class="fa-solid fa-triangle-exclamation"></i><span>Overwrite Local Caches Now</span>
-</button>
 </div>
 </div>
 </div>
@@ -998,6 +965,6 @@
 </div>
 <div class="hidden font-mono text-sm bg-white text-slate-900 w-full max-w-full" id="print-area">
 </div>
-
+<script></script>
 <script src="script.js"></script></body>
 </html>
