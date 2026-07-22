@@ -5,8 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>MediPilot - Clinic Management System</title>
-<!-- Reverted to Tailwind v3 CDN for instant loading speeds -->
-<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -23,11 +22,11 @@
 </div>
 </div>
 <h2 class="text-2xl font-extrabold text-slate-900 text-center mb-1 tracking-tight">MediPilot Admin Panel</h2>
-<p class="text-xs text-slate-500 text-center mb-6 font-medium" id="login-status-msg">Secure Cloud Authentication - Enter Credentials</p>
+<p class="text-xs text-slate-500 text-center mb-6 font-medium">Secure Cloud Authentication - Enter Credentials</p>
 <div class="space-y-4">
 <input class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600 transition-all font-medium text-sm" id="login-user" placeholder="Clinic Email Address" type="email"/>
 <input class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600 transition-all font-medium text-sm" id="login-pass" placeholder="Secure Password (Min 6 chars)" type="password"/>
-<button class="w-full py-3 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white font-bold rounded-xl transition-all duration-200 shadow-lg shadow-teal-700/20 hover:shadow-teal-700/30 active:scale-[0.99] text-sm cursor-pointer" id="btn-login" onclick="processLogin()">Login to Dashboard</button>
+<button class="w-full py-3 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white font-bold rounded-xl transition-all duration-200 shadow-lg shadow-teal-700/20 hover:shadow-teal-700/30 active:scale-[0.99] text-sm cursor-pointer" onclick="processLogin()">Login to Dashboard</button>
 <button class="w-full py-3 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-all active:scale-[0.98] text-sm cursor-pointer mt-3" onclick="processRegister()">Register New Clinic Account</button>
 </div>
 </div>
@@ -479,7 +478,7 @@
 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
 <div class="md:col-span-2">
 <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Clinic Name</label>
-<input class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800" id="clinic-name" placeholder="e.g. Astha Clinic" type="text"/>
+<input class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800" id="clinic-name" placeholder="e.g. CareSuite Multi-Specialty Clinic" type="text"/>
 </div>
 <div class="md:col-span-2">
 <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Clinic Address</label>
@@ -629,7 +628,7 @@
 </div>
 <div class="border border-slate-200 p-4 rounded-xl bg-slate-50/50 space-y-3 shadow-inner">
 <div class="flex justify-between items-center">
-<label class="block text-xs font-black text-slate-600 uppercase tracking-wider">In-Clinic Treatment</label>
+<label class="block text-xs font-black text-slate-600 uppercase tracking-wider">Stat In-Clinic Treatment</label>
 <select class="p-1.5 text-xs border border-slate-200 rounded-lg bg-white focus:outline-none font-bold text-teal-700 cursor-pointer" id="v-treatment-type" onchange="UI.toggleTreatment()">
 <option value="None">None</option>
 <option value="Injection">Injection</option>
@@ -660,7 +659,7 @@
 </div>
 <div class="md:col-span-2">
 <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Target Compound stock</label>
-<select class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-semibold" id="v-treatment-medicine" onchange="UI.handleTreatmentMedicineChange()"></select>
+<select class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-semibold" id="v-treatment-medicine"></select>
 </div>
 <div class="md:col-span-1">
 <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Dose Volume</label>
@@ -678,7 +677,7 @@
 <i class="fa-solid fa-plus mr-1"></i> Add to Treatment Plan
                                 </button>
 </div>
-<textarea class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none text-xs font-semibold font-mono text-slate-700 mt-2" id="v-treatment-plan" placeholder="In-Clinic Treatments will map visually in this block space..." rows="2"></textarea>
+<textarea class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none text-xs font-semibold font-mono text-slate-700 mt-2" id="v-treatment-plan" placeholder="Administered treatments will map visually in this block space..." rows="2"></textarea>
 </div>
 </div>
 <div class="border border-slate-200 p-4 rounded-xl bg-slate-50/50 space-y-3 shadow-inner">
@@ -737,7 +736,7 @@
 </div>
 <div class="col-span-2 md:col-span-1">
 <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Duration Cycle</label>
-<input class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-semibold" id="v-duration" placeholder="e.g. 5" type="text"/>
+<input class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-semibold" id="v-duration" placeholder="e.g. 5 days" type="text"/>
 </div>
 <div class="col-span-2 md:col-span-4 flex justify-end">
 <button class="px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 font-bold text-xs rounded-xl transition-all shadow-xs flex items-center cursor-pointer" onclick="UI.addMedicineToPrescription()" type="button">
@@ -966,6 +965,6 @@
 </div>
 <div class="hidden font-mono text-sm bg-white text-slate-900 w-full max-w-full" id="print-area">
 </div>
-
+<script></script>
 <script src="script.js"></script></body>
 </html>

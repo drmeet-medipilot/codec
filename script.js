@@ -7,56 +7,19 @@
         const supabaseApp = window.supabase.createClient(supabaseUrl, supabaseKey);
         let currentUser = null;
 
-        // INIT SESSION ON LOAD - FIXED RACE CONDITION
-        window.addEventListener('DOMContentLoaded', async () => {
-            const overlay = document.getElementById('login-overlay');
-            const msg = document.getElementById('login-status-msg');
-            msg.innerText = "Checking secure session...";
-            
-            try {
-                const { data: { session }, error } = await supabaseApp.auth.getSession();
-                if (error) throw error;
-                
-                if (session) {
-                    currentUser = session.user;
-                    msg.innerText = "Syncing with Cloud Vault...";
-                    await SystemStorage.syncFromCloud();
-                    overlay.classList.add('hidden');
-                } else {
-                    msg.innerText = "Secure Cloud Authentication - Enter Credentials";
-                }
-            } catch(err) {
-                console.error("Session fetch error:", err);
-                msg.innerText = "Connection error. Please check your internet.";
-            } finally {
-                // VERY IMPORTANT: Initialize UI safely AFTER cloud data is loaded
-                UI.initializeApplicationRuntime();
-            }
-        });
-
         // LOGIN LOGIC
         async function processLogin() {
             const u = document.getElementById('login-user').value.trim();
             const p = document.getElementById('login-pass').value.trim();
             if (!u || !p) { alert('Mherbani kari Email ane Password lakho'); return; }
             
-            const btn = document.getElementById('btn-login');
-            const origText = btn.innerText;
-            btn.innerText = "Authenticating...";
-            
-            try {
-                const { data, error } = await supabaseApp.auth.signInWithPassword({ email: u, password: p });
-                if (error) {
-                    alert("Login Failed: " + error.message);
-                } else {
-                    currentUser = data.user;
-                    btn.innerText = "Syncing Cloud Data...";
-                    await SystemStorage.syncFromCloud();
-                    document.getElementById('login-overlay').classList.add('hidden');
-                    UI.triggerGlobalAuditRefresh(); // Ensure UI displays fresh data
-                }
-            } finally {
-                btn.innerText = origText;
+            const { data, error } = await supabaseApp.auth.signInWithPassword({ email: u, password: p });
+            if (error) {
+                alert("Login Failed: " + error.message);
+            } else {
+                currentUser = data.user;
+                document.getElementById('login-overlay').classList.add('hidden');
+                await SystemStorage.syncFromCloud();
             }
         }
 
@@ -72,9 +35,8 @@
             } else {
                 alert("Registration Successful! Welcome to MediPilot Cloud.");
                 currentUser = data.user;
-                await SystemStorage.syncFromCloud();
                 document.getElementById('login-overlay').classList.add('hidden');
-                UI.triggerGlobalAuditRefresh();
+                await SystemStorage.syncFromCloud();
             }
         }
         
@@ -83,6 +45,16 @@
             await supabaseApp.auth.signOut();
             window.location.reload(); 
         }
+
+        // INIT SESSION ON LOAD
+        window.addEventListener('DOMContentLoaded', async () => {
+            const { data: { session } } = await supabaseApp.auth.getSession();
+            if (session) {
+                currentUser = session.user;
+                document.getElementById('login-overlay').classList.add('hidden');
+                await SystemStorage.syncFromCloud();
+            }
+        });
 
         /**
          * CLOUD VAULT SYSTEM (JSONB ENGINE)
@@ -110,26 +82,17 @@
                 return this.cache;
             }
 
-            // ADDED ASYNC AND ERROR HANDLING FOR CLOUD SAVES
-            static async write(payload) {
+            static write(payload) {
                 this.cache = payload;
                 UI.triggerGlobalAuditRefresh();
                 
                 if(currentUser) {
-                    try {
-                        const { error } = await supabaseApp.from('clinic_vault').upsert({
-                            clinic_id: currentUser.id,
-                            data: payload
-                        }, { onConflict: 'clinic_id' });
-
-                        if(error) {
-                            console.error("Cloud Sync Error:", error);
-                            alert("⚠️ Warning: Data could not be saved to the cloud. Error: " + error.message);
-                        }
-                    } catch(err) {
-                        console.error("Cloud Save Exception:", err);
-                        alert("⚠️ Network error: Could not save to cloud.");
-                    }
+                    supabaseApp.from('clinic_vault').upsert({
+                        clinic_id: currentUser.id,
+                        data: payload
+                    }, { onConflict: 'clinic_id' }).then(({error}) => {
+                        if(error) console.error("Cloud Sync Error:", error);
+                    });
                 }
             }
 
@@ -139,17 +102,13 @@
                     const { data, error } = await supabaseApp.from('clinic_vault')
                         .select('data').eq('clinic_id', currentUser.id).single();
                     
-                    if (error && error.code !== 'PGRST116') {
-                        // PGRST116 is "No rows found". Any other error is a real issue.
-                        console.error("Cloud Fetch Error:", error);
-                    }
-                    
                     if (data && data.data) {
                         this.cache = data.data;
                     } else {
                         this.cache = this.initializeEmptySchema();
                         await supabaseApp.from('clinic_vault').insert([{ clinic_id: currentUser.id, data: this.cache }]);
                     }
+                    UI.triggerGlobalAuditRefresh();
                 } catch (e) {
                     console.error("Cloud Fetch Failed", e);
                 }
@@ -277,14 +236,7 @@
                 const db = SystemStorage.read();
                 const inventory = Array.isArray(db.inventory) ? [...db.inventory].sort((a, b) => (a.name || '').localeCompare(b.name || '')) : [];
                 
-                const standardTypes = ["Tablet", "Capsule", "Syrup", "Ointment", "Drop", "Vial", "Ampule", "SN", "Lotion", "Sachet", "Nab"];
-                
-                const filtered = filterType === 'ALL' ? inventory : inventory.filter(i => {
-                    if (filterType === 'Other') {
-                        return !standardTypes.includes(i.type);
-                    }
-                    return i.type === filterType;
-                });
+                const filtered = filterType === 'ALL' ? inventory : inventory.filter(i => i.type === filterType);
                 
                 const optionsHtml = '<option value="" data-type="" data-unitqty="">Select medicine from stock</option>' + 
                     filtered.map(item => `<option value="${item.name}" data-type="${item.type || ''}" data-unitqty="${item.unitQty || 1}">${item.name}</option>`).join('');
@@ -293,8 +245,6 @@
                 
                 if (selectId === 'v-medicine') {
                     this.handlePrescriptionMedicineChange();
-                } else if (selectId === 'v-treatment-medicine') {
-                    this.handleTreatmentMedicineChange();
                 }
             }
 
@@ -319,24 +269,6 @@
                     if(mlContainer) mlContainer.classList.remove('hidden');
                 } else if (directQtyTypes.includes(type)) {
                     if(directQtyContainer) directQtyContainer.classList.remove('hidden');
-                }
-            }
-
-            static handleTreatmentMedicineChange() {
-                const select = document.getElementById('v-treatment-medicine');
-                const qtyInput = document.getElementById('v-treatment-qty');
-                
-                if(!select || !qtyInput) return;
-                
-                const option = select.options[select.selectedIndex];
-                const type = option ? option.dataset.type : '';
-                
-                if (type === 'Ampule') {
-                    qtyInput.placeholder = "e.g. 1 (Outputs: 1 Amp)";
-                } else if (type === 'Vial') {
-                    qtyInput.placeholder = "e.g. 3 (Outputs: 3 ML)";
-                } else {
-                    qtyInput.placeholder = "e.g. 1 Amp / 1 Vial";
                 }
             }
 
@@ -428,7 +360,7 @@
 
                 const treatmentHtml = latestVisit?.treatmentType && latestVisit.treatmentType !== 'None' ? `
                     <div style="margin-bottom:12px;">
-                        <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:#0f766e;text-transform:uppercase;margin-bottom:5px;">In-Clinic Treatment</div>
+                        <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:#0f766e;text-transform:uppercase;margin-bottom:5px;">Administered ${latestVisit.treatmentType}</div>
                         <div style="min-height:40px;border:1px solid #cbd5e1;border-radius:10px;padding:10px 12px;font-size:14px;line-height:1.6;background:#fef2f2;white-space:pre-wrap;">${latestVisit.treatmentPlan || 'No records'}</div>
                     </div>` : '';
 
@@ -901,7 +833,7 @@
                     
                     if (manualAmount > 0 && upiId) {
                         qrContainer.classList.remove('hidden');
-                        const upiString = `upi://pay?pa=${upiId}&pn=Astha%20Clinic&am=${manualAmount.toFixed(2)}&cu=INR`;
+                        const upiString = `upi://pay?pa=${upiId}&pn=CareSuite%20Clinic&am=${manualAmount.toFixed(2)}&cu=INR`;
                         displayAmount.innerText = manualAmount.toFixed(2);
                         qrDiv.innerHTML = "";
 
@@ -1040,7 +972,7 @@
                     
                     let treatHtml = visit.treatmentType && visit.treatmentType !== 'None' ? `
                         <div class="mt-2">
-                            <div class="text-[10px] font-extrabold uppercase tracking-wide text-rose-600 mb-1">In-Clinic Treatment</div>
+                            <div class="text-[10px] font-extrabold uppercase tracking-wide text-rose-600 mb-1">Administered ${visit.treatmentType}</div>
                             <div class="text-rose-700 bg-rose-50/60 p-2.5 rounded-xl text-xs font-mono font-medium whitespace-pre-wrap border border-rose-100">${visit.treatmentPlan || 'N/A'}</div>
                         </div>` : '';
 
@@ -1625,7 +1557,7 @@
                     displayAmount.innerText = amt.toFixed(2);
                     qrDiv.innerHTML = "";
                     
-                    const upiString = `upi://pay?pa=${upiId}&pn=Astha%20Clinic&am=${amt.toFixed(2)}&cu=INR`;
+                    const upiString = `upi://pay?pa=${upiId}&pn=CareSuite%20Clinic&am=${amt.toFixed(2)}&cu=INR`;
                     if(typeof QRCode !== 'undefined') {
                         this.qrCodeInstance = new QRCode(qrDiv, {
                             text: upiString,
@@ -1746,7 +1678,6 @@
                 }
 
                 this.handlePrescriptionMedicineChange(); 
-                this.handleTreatmentMedicineChange();
                 this.pendingStockDeductions = [];
 
                 this.openModal('modal-visit');
@@ -1803,10 +1734,10 @@
                 if (type === 'Stitches') {
                     const count = document.getElementById('v-stitches-count').value;
                     if (!count) { alert("Please enter the number of stitches."); return; }
-                    line = `Stitches -- Count: ${count}`;
+                    line = `[Stat Administered] Stitches -- Count: ${count}`;
                     document.getElementById('v-stitches-count').value = "";
                 } else if (type === 'Dressing') {
-                    line = `Dressing`;
+                    line = `[Stat Administered] Dressing`;
                 } else {
                     const medSelect = document.getElementById('v-treatment-medicine');
                     const qtyInput = document.getElementById('v-treatment-qty');
@@ -1814,22 +1745,9 @@
                         alert("Please map both target stock parameters and volume counts first.");
                         return;
                     }
+                    line = `[Stat Administered] ${medSelect.value} -- Vol/Dose: ${qtyInput.value}`;
                     
-                    const medOption = medSelect.options[medSelect.selectedIndex];
-                    const medType = medOption ? medOption.dataset.type : '';
-                    const rawQty = qtyInput.value;
-                    let numericVal = parseFloat(rawQty);
-                    if (isNaN(numericVal)) numericVal = 1;
-                    
-                    if (medType === 'Ampule') {
-                        line = `[In-Clinic Treatment] ${medSelect.value} -- Dose: ${numericVal} Amp`;
-                    } else if (medType === 'Vial') {
-                        line = `[In-Clinic Treatment] ${medSelect.value} -- Dose: ${numericVal} ML`;
-                    } else {
-                        line = `[In-Clinic Treatment] ${medSelect.value} -- Vol/Dose: ${rawQty}`;
-                    }
-                    
-                    let deductQty = numericVal;
+                    let deductQty = parseFloat(qtyInput.value) || 1;
                     this.pendingStockDeductions.push({ name: medSelect.value, qty: deductQty });
                     medSelect.selectedIndex = 0;
                     qtyInput.value = "";
@@ -1856,36 +1774,9 @@
                 const isVial = medOption.dataset.type === 'Vial';
                 const unitQty = parseFloat(medOption.dataset.unitqty) || 1;
                 
-                let prefix = "";
-                const typeMap = {
-                    'tablet': 'Tab',
-                    'capsule': 'Cap',
-                    'syrup': 'Sy',
-                    'ointment': 'Oint',
-                    'drop': 'drop',
-                    'nab': 'nab'
-                };
-                let rawType = medOption.dataset.type;
-                if (rawType) {
-                    let lowerType = rawType.toLowerCase();
-                    prefix = typeMap[lowerType] ? typeMap[lowerType] : rawType;
-                    prefix += " - "; 
-                }
-                let displayMedName = prefix + medSelect.value;
-
                 let line = "";
                 let calculatedUnits = 10;
-                
-                let durationText = durInput.value.trim();
-                if (durationText) {
-                    if (/^\d+$/.test(durationText)) {
-                        durationText += " days";
-                    }
-                } else {
-                    durationText = "As directed";
-                }
-
-                const durMatch = durationText.match(/\d+/);
+                const durMatch = (durInput.value || '').match(/\d+/);
                 const days = durMatch ? (parseInt(durMatch[0]) || 1) : 1;
                 let dailyCount = 2;
                 if(doseSelect.value === '1-1-1') dailyCount = 3;
@@ -1899,19 +1790,19 @@
                         alert("Please enter a valid Dose (ML) for this Vial prescription.");
                         return;
                     }
-                    line = `${displayMedName} -- ${mlDose} ML per dose -- ${doseSelect.value} -- ${mealSelect.value} -- ${durationText}`;
+                    line = `${medSelect.value} -- ${mlDose} ML per dose -- ${doseSelect.value} -- ${mealSelect.value} -- ${durInput.value || 'As directed'}`;
                     const totalMLNeeded = mlDose * dailyCount * days;
-                    calculatedUnits = totalMLNeeded; 
+                    calculatedUnits = totalMLNeeded; // FIXED: Direct ML Minus
                 } else if (directQtyTypes.includes(medOption.dataset.type)) {
                     const directQty = parseFloat(directQtyInput.value) || 0;
                     if(directQty <= 0) {
                         alert("Please enter a valid Qty Given for this medicine type.");
                         return;
                     }
-                    line = `${displayMedName} -- ${doseSelect.value} -- ${mealSelect.value} -- ${durationText} -- [Qty Dispensed: ${directQty}]`;
+                    line = `${medSelect.value} -- ${doseSelect.value} -- ${mealSelect.value} -- ${durInput.value || 'As directed'} -- [Qty Dispensed: ${directQty}]`;
                     calculatedUnits = directQty;
                 } else {
-                    line = `${displayMedName} -- ${doseSelect.value} -- ${mealSelect.value} -- ${durationText}`;
+                    line = `${medSelect.value} -- ${doseSelect.value} -- ${mealSelect.value} -- ${durInput.value || 'As directed'}`;
                     calculatedUnits = days * dailyCount;
                 }
 
@@ -2055,4 +1946,7 @@
                 });
             }
         }
+
+        // Initialize Runtime Sequence on View Ready State
+        window.addEventListener('DOMContentLoaded', () => UI.initializeApplicationRuntime());
     
