@@ -12,7 +12,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<link href="css/style.css" rel="stylesheet"/></head>
+<link href="style.css" rel="stylesheet"/></head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col md:flex-row antialiased">
 <div class="fixed inset-0 z-[9999] bg-slate-100 flex items-center justify-center p-4 backdrop-blur-md" id="login-overlay">
 <div class="bg-white p-8 rounded-2xl shadow-2xl border border-slate-200 w-full max-w-sm transform transition-all duration-300">
@@ -28,7 +28,6 @@
 <input class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600 transition-all font-medium text-sm" id="login-pass" placeholder="Secure Password (Min 6 chars)" type="password"/>
 <button class="w-full py-3 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white font-bold rounded-xl transition-all duration-200 shadow-lg shadow-teal-700/20 hover:shadow-teal-700/30 active:scale-[0.99] text-sm cursor-pointer" onclick="processLogin()">Login to Dashboard</button>
 <button class="w-full py-3 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-all active:scale-[0.98] text-sm cursor-pointer mt-3" onclick="processRegister()">Register New Clinic Account</button>
-<button class="w-full py-2 bg-transparent text-teal-600 font-bold hover:underline transition-all text-xs cursor-pointer mt-1" onclick="UI.skipLoginForLocal()">Skip &amp; Use Offline Local Storage</button>
 </div>
 </div>
 </div>
@@ -967,5 +966,5 @@
 <div class="hidden font-mono text-sm bg-white text-slate-900 w-full max-w-full" id="print-area">
 </div>
 
-<script src="js/script.js"></script></body>
+<script src="script.js"></script></body>
 </html>
