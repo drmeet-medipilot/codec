@@ -1752,10 +1752,13 @@
                     const medOption = medSelect.options[medSelect.selectedIndex];
                     const medType = medOption ? medOption.dataset.type : '';
                     let suffix = "";
+                    
+                    // Modifying the suffix condition based on user request
                     if(medType === 'Ampule') suffix = " Ampule";
                     else if(medType === 'Vial') suffix = " ML";
+                    else if(medType === 'SN' || medType === 'Other') suffix = " piece";
 
-                    lineContent = `${medSelect.value} -- Dose: ${qtyInput.value}${suffix}`;
+                    lineContent = `${medSelect.value} -- ${qtyInput.value}${suffix}`;
                     
                     let deductQty = parseFloat(qtyInput.value) || 1;
                     this.pendingStockDeductions.push({ name: medSelect.value, qty: deductQty });
@@ -1767,6 +1770,7 @@
                 const nextNum = currentText ? currentText.split('\n').length + 1 : 1;
                 const finalLine = `${nextNum}. ${lineContent}`;
                 
+                // Writing to planArea strictly. Not appending to rxArea here.
                 planArea.value = currentText ? currentText + "\n" + finalLine : finalLine;
             }
 
