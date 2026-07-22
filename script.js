@@ -57,7 +57,7 @@
         });
 
         /**
-         * CLOUD VAULT SYSTEM (JSONB ENGINE)
+         * CLOUD VAULT SYSTEM (JSONB ENGINE) - NO OFFLINE FALLBACK
          */
         class SystemStorage {
             static cache = null;
@@ -98,12 +98,14 @@
 
             static async syncFromCloud() {
                 if(!currentUser) return;
+                
                 try {
                     const { data, error } = await supabaseApp.from('clinic_vault')
                         .select('data').eq('clinic_id', currentUser.id).single();
                     
                     if (data && data.data) {
                         this.cache = data.data;
+                        if (!this.cache.clinicProfile) this.cache.clinicProfile = this.initializeEmptySchema().clinicProfile;
                     } else {
                         this.cache = this.initializeEmptySchema();
                         await supabaseApp.from('clinic_vault').insert([{ clinic_id: currentUser.id, data: this.cache }]);
@@ -119,7 +121,7 @@
                 const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.read(), null, 2));
                 const downloadAnchor = document.createElement('a');
                 downloadAnchor.setAttribute("href", dataStr);
-                downloadAnchor.setAttribute("download", `MediPilot_Cloud_Vault_${new Date().toISOString().split('T')[0]}.json`);
+                downloadAnchor.setAttribute("download", `MediPilot_Vault_Backup_${new Date().toISOString().split('T')[0]}.json`);
                 document.body.appendChild(downloadAnchor);
                 downloadAnchor.click();
                 downloadAnchor.remove();
@@ -242,7 +244,7 @@
                 let filtered = inventory;
                 if (filterType !== 'ALL') {
                     if (filterType === 'Other') {
-                        filtered = inventory.filter(i => !standardTypes.includes(i.type));
+                        filtered = inventory.filter(i => i.type === 'Other' || !standardTypes.includes(i.type));
                     } else {
                         filtered = inventory.filter(i => i.type === filterType);
                     }
@@ -277,7 +279,7 @@
                 
                 if (type === 'Vial') {
                     if(mlContainer) mlContainer.classList.remove('hidden');
-                } else if (directQtyTypes.includes(type)) {
+                } else if (directQtyTypes.includes(type) || !['Tablet', 'Capsule', 'Ampule'].includes(type)) {
                     if(directQtyContainer) directQtyContainer.classList.remove('hidden');
                 }
             }
@@ -338,7 +340,7 @@
                     esignPin: document.getElementById('clinic-esign-pin')?.value || ''
                 };
                 SystemStorage.write(db);
-                alert('Clinic profile & E-Security details saved successfully.');
+                alert('Clinic profile & E-Security details saved successfully to the cloud.');
             }
 
             static getPatientExportData(patientId) {
@@ -660,7 +662,7 @@
             static triggerGlobalAuditRefresh() {
                 const db = SystemStorage.read();
                 
-                this.loadClinicProfile();
+                // Moved loadClinicProfile OUT of the sync cycle to happen unconditionally
                 this.renderGreeting(); 
 
                 const timeframe = document.getElementById('dashboard-timeframe')?.value || 'TODAY';
@@ -1745,6 +1747,8 @@
                 } else {
                     const medSelect = document.getElementById('v-treatment-medicine');
                     const qtyInput = document.getElementById('v-treatment-qty');
+                    const filterSelect = document.getElementById('v-treatment-med-type');
+                    
                     if(!medSelect.value || !qtyInput.value) {
                         alert("Please map both target stock parameters and volume counts first.");
                         return;
@@ -1752,11 +1756,13 @@
                     
                     const medOption = medSelect.options[medSelect.selectedIndex];
                     const medType = medOption ? medOption.dataset.type : '';
+                    const filterType = filterSelect ? filterSelect.value : '';
+                    
                     let suffix = "";
                     
-                    if(medType === 'Ampule') suffix = " Ampule";
-                    else if(medType === 'Vial') suffix = " ML";
-                    else if(medType === 'SN' || medType === 'Other') suffix = " piece";
+                    if(medType === 'Ampule' || filterType === 'Ampule') suffix = " Ampule";
+                    else if(medType === 'Vial' || filterType === 'Vial') suffix = " ML";
+                    else if(medType === 'SN' || filterType === 'SN' || medType === 'Other' || filterType === 'Other' || !['Tablet', 'Capsule', 'Syrup', 'Ointment', 'Drop', 'Vial', 'Ampule', 'Lotion', 'Sachet', 'Nab'].includes(medType)) suffix = " piece";
 
                     lineContent = `${medSelect.value} -- ${qtyInput.value}${suffix}`;
                     
