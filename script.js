@@ -1,6 +1,6 @@
 
         // =========================================================================
-        // 1. SUPABASE CLOUD ENGINE (Ahiya URL ane Key nakho)
+        // 1. SUPABASE CLOUD ENGINE
         // =========================================================================
         const supabaseUrl = 'https://mhquthxfsjnakymtaizp.supabase.co'; 
         const supabaseKey = 'sb_publishable_S_GEAd5Y35gqI0Dgz0XNEQ_VNKimiUY';
@@ -46,13 +46,36 @@
             window.location.reload(); 
         }
 
-        // INIT SESSION ON LOAD
+        // INIT SESSION ON LOAD & AUTO-REFRESH FIX
         window.addEventListener('DOMContentLoaded', async () => {
-            const { data: { session } } = await supabaseApp.auth.getSession();
-            if (session) {
-                currentUser = session.user;
-                document.getElementById('login-overlay').classList.add('hidden');
-                await SystemStorage.syncFromCloud();
+            // Actively listen for session changes/timeouts
+            supabaseApp.auth.onAuthStateChange((event, session) => {
+                if (event === 'SIGNED_OUT' || !session) {
+                    currentUser = null;
+                    document.getElementById('login-overlay').classList.remove('hidden');
+                } else if (session) {
+                    currentUser = session.user;
+                }
+            });
+
+            try {
+                const { data: { session }, error } = await supabaseApp.auth.getSession();
+                if (error) {
+                    console.error("Session Error:", error);
+                    alert("⚠️ Session expired or invalid. Please log in again.");
+                    document.getElementById('login-overlay').classList.remove('hidden');
+                    return;
+                }
+                
+                if (session) {
+                    currentUser = session.user;
+                    document.getElementById('login-overlay').classList.add('hidden');
+                    await SystemStorage.syncFromCloud();
+                } else {
+                    document.getElementById('login-overlay').classList.remove('hidden');
+                }
+            } catch (err) {
+                console.error("Auth Init Error:", err);
             }
         });
 
@@ -82,6 +105,7 @@
                 return this.cache;
             }
 
+            // ADDED ERROR HANDLING & VISIBILITY
             static write(payload) {
                 this.cache = payload;
                 UI.triggerGlobalAuditRefresh();
@@ -91,26 +115,42 @@
                         clinic_id: currentUser.id,
                         data: payload
                     }, { onConflict: 'clinic_id' }).then(({error}) => {
-                        if(error) console.error("Cloud Sync Error:", error);
+                        if(error) {
+                            console.error("Cloud Sync Error:", error);
+                            alert("⚠️ CRITICAL ERROR: Data NOT saved to cloud! " + error.message);
+                        }
+                    }).catch(err => {
+                        console.error("Network Error:", err);
+                        alert("⚠️ CRITICAL ERROR: Network failure while saving to Cloud! " + err.message);
                     });
+                } else {
+                    alert("⚠️ WARNING: You are logged out! Data is NOT saving to the cloud.");
+                    document.getElementById('login-overlay').classList.remove('hidden');
                 }
             }
 
+            // ADDED ERROR HANDLING & VISIBILITY
             static async syncFromCloud() {
                 if(!currentUser) return;
                 try {
                     const { data, error } = await supabaseApp.from('clinic_vault')
                         .select('data').eq('clinic_id', currentUser.id).single();
                     
+                    if (error && error.code !== 'PGRST116') {
+                        console.error("Cloud Fetch Failed", error);
+                        alert("⚠️ Error loading data from cloud: " + error.message);
+                    }
+
                     if (data && data.data) {
                         this.cache = data.data;
                     } else {
                         this.cache = this.initializeEmptySchema();
-                        await supabaseApp.from('clinic_vault').insert([{ clinic_id: currentUser.id, data: this.cache }]);
+                        await supabaseApp.from('clinic_vault').upsert({ clinic_id: currentUser.id, data: this.cache }, { onConflict: 'clinic_id' });
                     }
                     UI.triggerGlobalAuditRefresh();
                 } catch (e) {
-                    console.error("Cloud Fetch Failed", e);
+                    console.error("Cloud Fetch Exception", e);
+                    alert("⚠️ Could not fetch data from cloud. Check your internet connection.");
                 }
             }
 
@@ -1056,7 +1096,6 @@
                 this.renderInventoryGrid(SystemStorage.read(), this.currentInventoryFilter);
             }
 
-            // NEW FUNCTION: Print Inventory Stock
             static printInventoryStock() {
                 const db = SystemStorage.read();
                 let datasets = db.inventory;

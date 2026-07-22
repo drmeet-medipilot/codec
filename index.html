@@ -5,13 +5,15 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>MediPilot - Clinic Management System</title>
+<!-- Preconnect to CDNs to significantly speed up loading times -->
+<link crossorigin="" href="https://cdn.jsdelivr.net" rel="preconnect"/>
+<link crossorigin="" href="https://cdnjs.cloudflare.com" rel="preconnect"/>
+<link crossorigin="" href="https://mhquthxfsjnakymtaizp.supabase.co" rel="preconnect"/>
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<!-- Core Supabase library loaded in head to handle authentication immediately -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <link href="style.css" rel="stylesheet"/></head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col md:flex-row antialiased">
 <div class="fixed inset-0 z-[9999] bg-slate-100 flex items-center justify-center p-4 backdrop-blur-md" id="login-overlay">
@@ -330,7 +332,6 @@
 <div>
 <h2 class="text-3xl font-black animated-heading pb-1">Stock Management</h2>
 </div>
-<!-- FIXED RESPONSIVE BUTTONS FOR STOCK MANAGEMENT -->
 <div class="flex gap-2 items-center self-start flex-nowrap w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0 hide-scroll">
 <button class="px-3 sm:px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-indigo-700/20 active:scale-[0.98] cursor-pointer flex items-center shrink-0" onclick="UI.printInventoryStock()">
 <i class="fa-solid fa-print sm:mr-2"></i><span class="hidden sm:inline">Print Stock</span>
@@ -469,7 +470,6 @@
 </div>
 </div>
 </section>
-<!-- NEW SETTINGS SECTION -->
 <section class="erp-section hidden space-y-6" id="mod-settings">
 <div class="border-b border-slate-200 pb-5">
 <h2 class="text-3xl font-black animated-heading pb-1">Clinic Settings</h2>
@@ -500,7 +500,6 @@
 <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Registration Number</label>
 <input class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800" id="clinic-regno" placeholder="e.g. G-12345" type="text"/>
 </div>
-<!-- E-SIGN & E-STAMP CONFIGURATION AREA -->
 <div class="md:col-span-2 pt-4 border-t border-slate-100 mt-2">
 <h3 class="font-bold text-sm text-slate-800 mb-3"><i class="fa-solid fa-signature text-teal-600 mr-2"></i>E-Signature &amp; E-Stamp Configuration</h3>
 <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -965,6 +964,10 @@
 </div>
 <div class="hidden font-mono text-sm bg-white text-slate-900 w-full max-w-full" id="print-area">
 </div>
+<!-- MOVED HEAVY SCRIPTS TO BOTTOM TO UNBLOCK PAGE LOAD -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <script src="script.js"></script></body>
 </html>
