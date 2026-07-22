@@ -57,7 +57,7 @@
         });
 
         /**
-         * CLOUD VAULT SYSTEM (JSONB ENGINE)
+         * CLOUD VAULT SYSTEM (JSONB ENGINE & OFFLINE LOCALSTORAGE FALLBACK)
          */
         class SystemStorage {
             static cache = null;
@@ -71,21 +71,43 @@
                     credits: [],
                     suppliers: [],
                     clinicProfile: { name: '', address: '', mobile: '', regno: '', doctor: '', degree: '', esignBase64: '', estampBase64: '', esignPin: '' },
-                    metadata: { initializedAt: new Date().toISOString(), softwareVersion: "2026.7.4 (Cloud Vault)" }
+                    metadata: { initializedAt: new Date().toISOString(), softwareVersion: "2026.7.4 (Local+Cloud Vault)" }
                 };
             }
 
             static read() {
                 if (!this.cache) {
-                    this.cache = this.initializeEmptySchema();
+                    const localData = localStorage.getItem('MediPilot_LocalVault');
+                    if (localData) {
+                        try {
+                            this.cache = JSON.parse(localData);
+                            // Verify required objects exist to prevent breaking changes on older stored JSONs
+                            if (!this.cache.clinicProfile) {
+                                this.cache.clinicProfile = this.initializeEmptySchema().clinicProfile;
+                            }
+                        } catch (e) {
+                            this.cache = this.initializeEmptySchema();
+                        }
+                    } else {
+                        this.cache = this.initializeEmptySchema();
+                    }
                 }
                 return this.cache;
             }
 
             static write(payload) {
                 this.cache = payload;
+                
+                // Write locally for immediate persist offline
+                try {
+                    localStorage.setItem('MediPilot_LocalVault', JSON.stringify(payload));
+                } catch(e) {
+                    console.error("Local save failed", e);
+                }
+
                 UI.triggerGlobalAuditRefresh();
                 
+                // Then try to upload to cloud asynchronously if logged in
                 if(currentUser) {
                     supabaseApp.from('clinic_vault').upsert({
                         clinic_id: currentUser.id,
@@ -97,21 +119,34 @@
             }
 
             static async syncFromCloud() {
-                if(!currentUser) return;
+                if(!currentUser) {
+                    // Fallback directly to local read if unauthenticated
+                    this.read();
+                    UI.loadClinicProfile();
+                    UI.triggerGlobalAuditRefresh();
+                    return;
+                }
+                
                 try {
                     const { data, error } = await supabaseApp.from('clinic_vault')
                         .select('data').eq('clinic_id', currentUser.id).single();
                     
                     if (data && data.data) {
                         this.cache = data.data;
+                        if (!this.cache.clinicProfile) this.cache.clinicProfile = this.initializeEmptySchema().clinicProfile;
+                        localStorage.setItem('MediPilot_LocalVault', JSON.stringify(this.cache));
                     } else {
-                        this.cache = this.initializeEmptySchema();
+                        // Attempt to upload existing local cache into the new cloud vault
+                        this.cache = this.read(); 
                         await supabaseApp.from('clinic_vault').insert([{ clinic_id: currentUser.id, data: this.cache }]);
                     }
                     UI.loadClinicProfile();
                     UI.triggerGlobalAuditRefresh();
                 } catch (e) {
-                    console.error("Cloud Fetch Failed", e);
+                    console.error("Cloud Fetch Failed, defaulting to local cache", e);
+                    this.read();
+                    UI.loadClinicProfile();
+                    UI.triggerGlobalAuditRefresh();
                 }
             }
 
@@ -119,7 +154,7 @@
                 const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.read(), null, 2));
                 const downloadAnchor = document.createElement('a');
                 downloadAnchor.setAttribute("href", dataStr);
-                downloadAnchor.setAttribute("download", `MediPilot_Cloud_Vault_${new Date().toISOString().split('T')[0]}.json`);
+                downloadAnchor.setAttribute("download", `MediPilot_Vault_Backup_${new Date().toISOString().split('T')[0]}.json`);
                 document.body.appendChild(downloadAnchor);
                 downloadAnchor.click();
                 downloadAnchor.remove();
@@ -140,6 +175,13 @@
             static currentInventoryFilter = null;
             static pendingStockDeductions = [];
             static otcCart = []; 
+
+            static skipLoginForLocal() {
+                document.getElementById('login-overlay').classList.add('hidden');
+                SystemStorage.read();
+                this.loadClinicProfile();
+                this.triggerGlobalAuditRefresh();
+            }
 
             static parseIndianDate(dateStr) {
                 if(!dateStr) return new Date(0);
@@ -242,7 +284,7 @@
                 let filtered = inventory;
                 if (filterType !== 'ALL') {
                     if (filterType === 'Other') {
-                        filtered = inventory.filter(i => !standardTypes.includes(i.type));
+                        filtered = inventory.filter(i => i.type === 'Other' || !standardTypes.includes(i.type));
                     } else {
                         filtered = inventory.filter(i => i.type === filterType);
                     }
@@ -277,7 +319,8 @@
                 
                 if (type === 'Vial') {
                     if(mlContainer) mlContainer.classList.remove('hidden');
-                } else if (directQtyTypes.includes(type)) {
+                } else if (directQtyTypes.includes(type) || !['Tablet', 'Capsule', 'Ampule'].includes(type)) {
+                    // Includes 'Other' and any custom named categories
                     if(directQtyContainer) directQtyContainer.classList.remove('hidden');
                 }
             }
@@ -1745,6 +1788,8 @@
                 } else {
                     const medSelect = document.getElementById('v-treatment-medicine');
                     const qtyInput = document.getElementById('v-treatment-qty');
+                    const filterSelect = document.getElementById('v-treatment-med-type');
+                    
                     if(!medSelect.value || !qtyInput.value) {
                         alert("Please map both target stock parameters and volume counts first.");
                         return;
@@ -1752,11 +1797,13 @@
                     
                     const medOption = medSelect.options[medSelect.selectedIndex];
                     const medType = medOption ? medOption.dataset.type : '';
+                    const filterType = filterSelect ? filterSelect.value : '';
+                    
                     let suffix = "";
                     
-                    if(medType === 'Ampule') suffix = " Ampule";
-                    else if(medType === 'Vial') suffix = " ML";
-                    else if(medType === 'SN' || medType === 'Other') suffix = " piece";
+                    if(medType === 'Ampule' || filterType === 'Ampule') suffix = " Ampule";
+                    else if(medType === 'Vial' || filterType === 'Vial') suffix = " ML";
+                    else if(medType === 'SN' || filterType === 'SN' || medType === 'Other' || filterType === 'Other' || !['Tablet', 'Capsule', 'Syrup', 'Ointment', 'Drop', 'Vial', 'Ampule', 'Lotion', 'Sachet', 'Nab'].includes(medType)) suffix = " piece";
 
                     lineContent = `${medSelect.value} -- ${qtyInput.value}${suffix}`;
                     
