@@ -7,6 +7,16 @@
         const supabaseApp = window.supabase.createClient(supabaseUrl, supabaseKey);
         let currentUser = null;
 
+        // ORIGINAL STABLE AUTH LOGIC
+        window.addEventListener('DOMContentLoaded', async () => {
+            const { data: { session } } = await supabaseApp.auth.getSession();
+            if (session) {
+                currentUser = session.user;
+                document.getElementById('login-overlay').classList.add('hidden');
+                await SystemStorage.syncFromCloud();
+            }
+        });
+
         // LOGIN LOGIC
         async function processLogin() {
             const u = document.getElementById('login-user').value.trim();
@@ -45,16 +55,6 @@
             await supabaseApp.auth.signOut();
             window.location.reload(); 
         }
-
-        // INIT SESSION ON LOAD
-        window.addEventListener('DOMContentLoaded', async () => {
-            const { data: { session } } = await supabaseApp.auth.getSession();
-            if (session) {
-                currentUser = session.user;
-                document.getElementById('login-overlay').classList.add('hidden');
-                await SystemStorage.syncFromCloud();
-            }
-        });
 
         /**
          * CLOUD VAULT SYSTEM (JSONB ENGINE)
@@ -236,7 +236,14 @@
                 const db = SystemStorage.read();
                 const inventory = Array.isArray(db.inventory) ? [...db.inventory].sort((a, b) => (a.name || '').localeCompare(b.name || '')) : [];
                 
-                const filtered = filterType === 'ALL' ? inventory : inventory.filter(i => i.type === filterType);
+                const standardTypes = ["Tablet", "Capsule", "Syrup", "Ointment", "Drop", "Vial", "Ampule", "SN", "Lotion", "Sachet", "Nab"];
+                
+                const filtered = filterType === 'ALL' ? inventory : inventory.filter(i => {
+                    if (filterType === 'Other') {
+                        return !standardTypes.includes(i.type);
+                    }
+                    return i.type === filterType;
+                });
                 
                 const optionsHtml = '<option value="" data-type="" data-unitqty="">Select medicine from stock</option>' + 
                     filtered.map(item => `<option value="${item.name}" data-type="${item.type || ''}" data-unitqty="${item.unitQty || 1}">${item.name}</option>`).join('');
@@ -245,6 +252,8 @@
                 
                 if (selectId === 'v-medicine') {
                     this.handlePrescriptionMedicineChange();
+                } else if (selectId === 'v-treatment-medicine') {
+                    this.handleTreatmentMedicineChange();
                 }
             }
 
@@ -269,6 +278,24 @@
                     if(mlContainer) mlContainer.classList.remove('hidden');
                 } else if (directQtyTypes.includes(type)) {
                     if(directQtyContainer) directQtyContainer.classList.remove('hidden');
+                }
+            }
+
+            static handleTreatmentMedicineChange() {
+                const select = document.getElementById('v-treatment-medicine');
+                const qtyInput = document.getElementById('v-treatment-qty');
+                
+                if(!select || !qtyInput) return;
+                
+                const option = select.options[select.selectedIndex];
+                const type = option ? option.dataset.type : '';
+                
+                if (type === 'Ampule') {
+                    qtyInput.placeholder = "e.g. 1 (Outputs: 1 Amp)";
+                } else if (type === 'Vial') {
+                    qtyInput.placeholder = "e.g. 3 (Outputs: 3 ML)";
+                } else {
+                    qtyInput.placeholder = "e.g. 1 Amp / 1 Vial";
                 }
             }
 
@@ -360,7 +387,7 @@
 
                 const treatmentHtml = latestVisit?.treatmentType && latestVisit.treatmentType !== 'None' ? `
                     <div style="margin-bottom:12px;">
-                        <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:#0f766e;text-transform:uppercase;margin-bottom:5px;">Administered ${latestVisit.treatmentType}</div>
+                        <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:#0f766e;text-transform:uppercase;margin-bottom:5px;">In-Clinic Treatment</div>
                         <div style="min-height:40px;border:1px solid #cbd5e1;border-radius:10px;padding:10px 12px;font-size:14px;line-height:1.6;background:#fef2f2;white-space:pre-wrap;">${latestVisit.treatmentPlan || 'No records'}</div>
                     </div>` : '';
 
@@ -833,7 +860,7 @@
                     
                     if (manualAmount > 0 && upiId) {
                         qrContainer.classList.remove('hidden');
-                        const upiString = `upi://pay?pa=${upiId}&pn=CareSuite%20Clinic&am=${manualAmount.toFixed(2)}&cu=INR`;
+                        const upiString = `upi://pay?pa=${upiId}&pn=Astha%20Clinic&am=${manualAmount.toFixed(2)}&cu=INR`;
                         displayAmount.innerText = manualAmount.toFixed(2);
                         qrDiv.innerHTML = "";
 
@@ -897,11 +924,11 @@
                 this.routeToTab('dashboard');
             }
 
+            // OPTIMIZED PATIENT RENDERING TO PREVENT FREEZE
             static renderPatientsGrid(filterTerm = "") {
                 const db = SystemStorage.read();
                 const container = document.getElementById('patients-table-body');
                 if(!container) return;
-                container.innerHTML = "";
 
                 const filtered = db.patients.filter(p => 
                     p.name.toLowerCase().includes(filterTerm.toLowerCase()) || 
@@ -914,32 +941,39 @@
                     return;
                 }
 
-                filtered.forEach(p => {
-                    const visitsCount = db.visits.filter(v => v.patientId === p.id).length;
-                    const tr = document.createElement('tr');
-                    tr.className = "border-b border-slate-200 hover:bg-slate-50/50 font-medium text-slate-600 transition-colors";
-                    tr.innerHTML = `
-                        <td class="p-4 font-mono font-bold text-slate-900 text-xs">${p.id}</td>
-                        <td class="p-4">
-                            <div class="font-bold text-slate-800">${p.name}</div>
-                            <div class="text-[11px] text-slate-400 font-medium">Address: ${p.address || 'Not Recorded'}</div>
-                            <div class="text-[11px] text-slate-400 font-medium">History/Allergies: ${p.allergies || 'None recorded'}</div>
-                        </td>
-                        <td class="p-4 text-xs font-semibold text-slate-700">${p.ageVal} ${p.ageUnit}</td>
-                        <td class="p-4 text-xs font-bold text-teal-700">${p.weight ? p.weight + ' kg' : '--'}</td>
-                        <td class="p-4 text-center"><button onclick="UI.viewPatientConsultations('${p.id}')" class="bg-slate-100 hover:bg-teal-50 text-slate-700 hover:text-teal-700 font-bold px-3 py-1 rounded-full text-[11px] transition-all cursor-pointer">${visitsCount} Prescriptions</button></td>
-                        <td class="p-4 align-middle">
-                            <div class="flex justify-center items-center gap-1.5 flex-wrap">
-                                <button onclick="UI.initiateVisitModal('${p.id}')" title="Clinical Notes" class="px-2.5 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 font-bold text-xs rounded-xl transition-all cursor-pointer"><i class="fa-solid fa-notes-medical"></i></button>
-                                <button onclick="UI.editLatestPrescription('${p.id}')" title="Edit Prescription" class="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold text-xs rounded-xl transition-all cursor-pointer"><i class="fa-solid fa-pen-to-square"></i></button>
-                                <button onclick="UI.sharePatientPrescriptionWhatsApp('${p.id}')" title="Share WhatsApp" class="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs rounded-xl transition-all cursor-pointer"><i class="fa-brands fa-whatsapp"></i></button>
-                                <button onclick="UI.printPatientPrescription('${p.id}')" title="Print Prescription" class="px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-xl transition-all cursor-pointer"><i class="fa-solid fa-print"></i></button>
-                                <button onclick="UI.deletePatientRecord('${p.id}')" title="Delete Profile" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-xs rounded-xl transition-all cursor-pointer"><i class="fa-solid fa-trash-can"></i></button>
-                            </div>
-                        </td>
-                    `;
-                    container.appendChild(tr);
+                // O(V) calculation to prevent loop freezing with large databases
+                const visitCounts = {};
+                db.visits.forEach(v => {
+                    visitCounts[v.patientId] = (visitCounts[v.patientId] || 0) + 1;
                 });
+
+                const html = filtered.map(p => {
+                    const visitsCount = visitCounts[p.id] || 0;
+                    return `
+                        <tr class="border-b border-slate-200 hover:bg-slate-50/50 font-medium text-slate-600 transition-colors">
+                            <td class="p-4 font-mono font-bold text-slate-900 text-xs">${p.id}</td>
+                            <td class="p-4">
+                                <div class="font-bold text-slate-800">${p.name}</div>
+                                <div class="text-[11px] text-slate-400 font-medium">Address: ${p.address || 'Not Recorded'}</div>
+                                <div class="text-[11px] text-slate-400 font-medium">History/Allergies: ${p.allergies || 'None recorded'}</div>
+                            </td>
+                            <td class="p-4 text-xs font-semibold text-slate-700">${p.ageVal} ${p.ageUnit}</td>
+                            <td class="p-4 text-xs font-bold text-teal-700">${p.weight ? p.weight + ' kg' : '--'}</td>
+                            <td class="p-4 text-center"><button onclick="UI.viewPatientConsultations('${p.id}')" class="bg-slate-100 hover:bg-teal-50 text-slate-700 hover:text-teal-700 font-bold px-3 py-1 rounded-full text-[11px] transition-all cursor-pointer">${visitsCount} Prescriptions</button></td>
+                            <td class="p-4 align-middle">
+                                <div class="flex justify-center items-center gap-1.5 flex-wrap">
+                                    <button onclick="UI.initiateVisitModal('${p.id}')" title="Clinical Notes" class="px-2.5 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 font-bold text-xs rounded-xl transition-all cursor-pointer"><i class="fa-solid fa-notes-medical"></i></button>
+                                    <button onclick="UI.editLatestPrescription('${p.id}')" title="Edit Prescription" class="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold text-xs rounded-xl transition-all cursor-pointer"><i class="fa-solid fa-pen-to-square"></i></button>
+                                    <button onclick="UI.sharePatientPrescriptionWhatsApp('${p.id}')" title="Share WhatsApp" class="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs rounded-xl transition-all cursor-pointer"><i class="fa-brands fa-whatsapp"></i></button>
+                                    <button onclick="UI.printPatientPrescription('${p.id}')" title="Print Prescription" class="px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-xl transition-all cursor-pointer"><i class="fa-solid fa-print"></i></button>
+                                    <button onclick="UI.deletePatientRecord('${p.id}')" title="Delete Profile" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-xs rounded-xl transition-all cursor-pointer"><i class="fa-solid fa-trash-can"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+                
+                container.innerHTML = html;
             }
 
             static viewPatientConsultations(patientId) {
@@ -972,7 +1006,7 @@
                     
                     let treatHtml = visit.treatmentType && visit.treatmentType !== 'None' ? `
                         <div class="mt-2">
-                            <div class="text-[10px] font-extrabold uppercase tracking-wide text-rose-600 mb-1">Administered ${visit.treatmentType}</div>
+                            <div class="text-[10px] font-extrabold uppercase tracking-wide text-rose-600 mb-1">In-Clinic Treatment</div>
                             <div class="text-rose-700 bg-rose-50/60 p-2.5 rounded-xl text-xs font-mono font-medium whitespace-pre-wrap border border-rose-100">${visit.treatmentPlan || 'N/A'}</div>
                         </div>` : '';
 
@@ -1171,10 +1205,10 @@
                 link.remove();
             }
 
+            // OPTIMIZED INVENTORY RENDERING
             static renderInventoryGrid(db, filter = null) {
                 const container = document.getElementById('inventory-table-body');
                 if(!container) return;
-                container.innerHTML = "";
 
                 let datasets = db.inventory;
                 
@@ -1213,33 +1247,34 @@
                     return;
                 }
 
-                datasets.forEach(i => {
+                const html = datasets.map(i => {
                     let statusBadge = `<span class="bg-emerald-50 text-emerald-700 text-xs px-2.5 py-1 rounded-xl font-bold">In Stock</span>`;
                     if (i.qty <= 15) statusBadge = `<span class="bg-rose-50 text-rose-700 text-xs px-2.5 py-1 rounded-xl font-bold">Low Level</span>`;
                     if (i.qty <= 0) statusBadge = `<span class="bg-slate-200 text-slate-700 text-xs px-2.5 py-1 rounded-xl font-bold">Depleted</span>`;
                     
                     const totalPTRValue = (i.qty / (i.unitQty || 1)) * i.purchase;
 
-                    const tr = document.createElement('tr');
-                    tr.className = "border-b border-slate-200 hover:bg-slate-50/50 text-slate-600 font-medium transition-colors text-xs";
-                    tr.innerHTML = `
-                        <td class="p-4">
-                            <div class="font-bold text-slate-800 text-sm"><span class="text-teal-600 mr-1.5">[${i.type || 'N/A'}]</span>${i.name}</div>
-                            <div class="text-[11px] text-slate-400 font-medium mt-0.5">Unit: ${i.unitType || 'Pkg'} • ${i.unitQty ? i.unitQty + ' Units/Pkg' : ''}</div>
-                        </td>
-                        <td class="p-4 text-slate-500 font-semibold">${i.supplier || 'N/A'}</td>
-                        <td class="p-4 font-bold text-slate-700 font-mono">${i.expiry}</td>
-                        <td class="p-4 text-center font-black text-slate-800">${parseFloat(Number(i.qty).toFixed(2))} total units</td>
-                        <td class="p-4 text-right leading-relaxed font-semibold">PTR: <span class="text-slate-500">₹${Number(i.purchase).toFixed(2)}</span><br><span class="text-slate-900 font-black">MRP: ₹${Number(i.selling).toFixed(2)}</span></td>
-                        <td class="p-4 text-right font-black text-teal-700">₹${totalPTRValue.toFixed(2)}</td>
-                        <td class="p-4 text-center">${statusBadge}</td>
-                        <td class="p-4 text-right space-x-1 whitespace-nowrap">
-                            <button onclick="UI.editInventoryRecord('${i.id}')" title="Edit Stock Item" class="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold text-xs rounded-xl transition-all cursor-pointer"><i class="fa-solid fa-pen-to-square"></i></button>
-                            <button onclick="UI.deleteInventoryRecord('${i.id}')" title="Delete Stock Item" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-xs rounded-xl transition-all cursor-pointer"><i class="fa-solid fa-trash-can"></i></button>
-                        </td>
+                    return `
+                        <tr class="border-b border-slate-200 hover:bg-slate-50/50 text-slate-600 font-medium transition-colors text-xs">
+                            <td class="p-4">
+                                <div class="font-bold text-slate-800 text-sm"><span class="text-teal-600 mr-1.5">[${i.type || 'N/A'}]</span>${i.name}</div>
+                                <div class="text-[11px] text-slate-400 font-medium mt-0.5">Unit: ${i.unitType || 'Pkg'} • ${i.unitQty ? i.unitQty + ' Units/Pkg' : ''}</div>
+                            </td>
+                            <td class="p-4 text-slate-500 font-semibold">${i.supplier || 'N/A'}</td>
+                            <td class="p-4 font-bold text-slate-700 font-mono">${i.expiry}</td>
+                            <td class="p-4 text-center font-black text-slate-800">${parseFloat(Number(i.qty).toFixed(2))} total units</td>
+                            <td class="p-4 text-right leading-relaxed font-semibold">PTR: <span class="text-slate-500">₹${Number(i.purchase).toFixed(2)}</span><br><span class="text-slate-900 font-black">MRP: ₹${Number(i.selling).toFixed(2)}</span></td>
+                            <td class="p-4 text-right font-black text-teal-700">₹${totalPTRValue.toFixed(2)}</td>
+                            <td class="p-4 text-center">${statusBadge}</td>
+                            <td class="p-4 text-right space-x-1 whitespace-nowrap">
+                                <button onclick="UI.editInventoryRecord('${i.id}')" title="Edit Stock Item" class="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold text-xs rounded-xl transition-all cursor-pointer"><i class="fa-solid fa-pen-to-square"></i></button>
+                                <button onclick="UI.deleteInventoryRecord('${i.id}')" title="Delete Stock Item" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-xs rounded-xl transition-all cursor-pointer"><i class="fa-solid fa-trash-can"></i></button>
+                            </td>
+                        </tr>
                     `;
-                    container.appendChild(tr);
-                });
+                }).join('');
+                
+                container.innerHTML = html;
             }
 
             static deleteInventoryRecord(id) {
@@ -1467,10 +1502,10 @@
                 alert("Supplier pipeline directory synchronized successfully.");
             }
 
+            // OPTIMIZED FINANCE RENDERING
             static renderFinanceLedgerGrid(db) {
                 const container = document.getElementById('finance-ledger-body');
                 if(!container) return;
-                container.innerHTML = "";
 
                 const timeframe = document.getElementById('dashboard-timeframe')?.value || 'TODAY';
                 const filtered = db.finance.filter(f => this.isDateInTimeframe(f.date, timeframe));
@@ -1489,18 +1524,19 @@
                     return;
                 }
 
-                sorted.forEach((f, index) => {
-                    const tr = document.createElement('tr');
-                    tr.className = "border-b border-slate-100 hover:bg-slate-50/50 text-slate-600 font-semibold font-mono";
-                    tr.innerHTML = `
-                        <td class="p-3 text-slate-500 text-[11px]">${f.date}</td>
-                        <td class="p-3 font-sans text-slate-700 text-xs font-bold">${f.category}</td>
-                        <td class="p-3 text-slate-400 text-[11px]">${f.ref}</td>
-                        <td class="p-3 text-right text-xs ${f.type === 'INFLOW' ? 'text-emerald-600 font-bold' : 'text-rose-600 font-bold'}">${f.type === 'INFLOW' ? '+' : '-'}₹${Number(f.amount).toFixed(2)}</td>
-                        <td class="p-3 text-right font-sans"><button onclick="UI.deleteFinanceLine(${index})" class="text-rose-400 hover:text-rose-600 transition-colors cursor-pointer text-xs"><i class="fa-solid fa-trash-can"></i></button></td>
+                const html = sorted.map((f, index) => {
+                    return `
+                        <tr class="border-b border-slate-100 hover:bg-slate-50/50 text-slate-600 font-semibold font-mono">
+                            <td class="p-3 text-slate-500 text-[11px]">${f.date}</td>
+                            <td class="p-3 font-sans text-slate-700 text-xs font-bold">${f.category}</td>
+                            <td class="p-3 text-slate-400 text-[11px]">${f.ref}</td>
+                            <td class="p-3 text-right text-xs ${f.type === 'INFLOW' ? 'text-emerald-600 font-bold' : 'text-rose-600 font-bold'}">${f.type === 'INFLOW' ? '+' : '-'}₹${Number(f.amount).toFixed(2)}</td>
+                            <td class="p-3 text-right font-sans"><button onclick="UI.deleteFinanceLine(${index})" class="text-rose-400 hover:text-rose-600 transition-colors cursor-pointer text-xs"><i class="fa-solid fa-trash-can"></i></button></td>
+                        </tr>
                     `;
-                    container.appendChild(tr);
-                });
+                }).join('');
+                
+                container.innerHTML = html;
             }
 
             static deleteFinanceLine(idx) {
@@ -1557,7 +1593,7 @@
                     displayAmount.innerText = amt.toFixed(2);
                     qrDiv.innerHTML = "";
                     
-                    const upiString = `upi://pay?pa=${upiId}&pn=CareSuite%20Clinic&am=${amt.toFixed(2)}&cu=INR`;
+                    const upiString = `upi://pay?pa=${upiId}&pn=Astha%20Clinic&am=${amt.toFixed(2)}&cu=INR`;
                     if(typeof QRCode !== 'undefined') {
                         this.qrCodeInstance = new QRCode(qrDiv, {
                             text: upiString,
@@ -1678,6 +1714,7 @@
                 }
 
                 this.handlePrescriptionMedicineChange(); 
+                this.handleTreatmentMedicineChange();
                 this.pendingStockDeductions = [];
 
                 this.openModal('modal-visit');
@@ -1734,10 +1771,10 @@
                 if (type === 'Stitches') {
                     const count = document.getElementById('v-stitches-count').value;
                     if (!count) { alert("Please enter the number of stitches."); return; }
-                    line = `[Stat Administered] Stitches -- Count: ${count}`;
+                    line = `Stitches -- Count: ${count}`;
                     document.getElementById('v-stitches-count').value = "";
                 } else if (type === 'Dressing') {
-                    line = `[Stat Administered] Dressing`;
+                    line = `Dressing`;
                 } else {
                     const medSelect = document.getElementById('v-treatment-medicine');
                     const qtyInput = document.getElementById('v-treatment-qty');
@@ -1745,9 +1782,22 @@
                         alert("Please map both target stock parameters and volume counts first.");
                         return;
                     }
-                    line = `[Stat Administered] ${medSelect.value} -- Vol/Dose: ${qtyInput.value}`;
                     
-                    let deductQty = parseFloat(qtyInput.value) || 1;
+                    const medOption = medSelect.options[medSelect.selectedIndex];
+                    const medType = medOption ? medOption.dataset.type : '';
+                    const rawQty = qtyInput.value;
+                    let numericVal = parseFloat(rawQty);
+                    if (isNaN(numericVal)) numericVal = 1;
+                    
+                    if (medType === 'Ampule') {
+                        line = `[In-Clinic Treatment] ${medSelect.value} -- Dose: ${numericVal} Amp`;
+                    } else if (medType === 'Vial') {
+                        line = `[In-Clinic Treatment] ${medSelect.value} -- Dose: ${numericVal} ML`;
+                    } else {
+                        line = `[In-Clinic Treatment] ${medSelect.value} -- Vol/Dose: ${rawQty}`;
+                    }
+                    
+                    let deductQty = numericVal;
                     this.pendingStockDeductions.push({ name: medSelect.value, qty: deductQty });
                     medSelect.selectedIndex = 0;
                     qtyInput.value = "";
@@ -1774,179 +1824,28 @@
                 const isVial = medOption.dataset.type === 'Vial';
                 const unitQty = parseFloat(medOption.dataset.unitqty) || 1;
                 
+                let prefix = "";
+                const typeMap = {
+                    'tablet': 'Tab',
+                    'capsule': 'Cap',
+                    'syrup': 'Sy',
+                    'ointment': 'Oint',
+                    'drop': 'drop',
+                    'nab': 'nab'
+                };
+                let rawType = medOption.dataset.type;
+                if (rawType) {
+                    let lowerType = rawType.toLowerCase();
+                    prefix = typeMap[lowerType] ? typeMap[lowerType] : rawType;
+                    prefix += " - "; 
+                }
+                let displayMedName = prefix + medSelect.value;
+
                 let line = "";
                 let calculatedUnits = 10;
-                const durMatch = (durInput.value || '').match(/\d+/);
-                const days = durMatch ? (parseInt(durMatch[0]) || 1) : 1;
-                let dailyCount = 2;
-                if(doseSelect.value === '1-1-1') dailyCount = 3;
-                if(['1-0-0','0-1-0','0-0-1'].includes(doseSelect.value)) dailyCount = 1;
-
-                const directQtyTypes = ['Syrup', 'Ointment', 'Drop', 'Lotion', 'Sachet', 'Nab', 'Other'];
-
-                if(isVial) {
-                    const mlDose = parseFloat(mlInput.value) || 0;
-                    if(mlDose <= 0) {
-                        alert("Please enter a valid Dose (ML) for this Vial prescription.");
-                        return;
-                    }
-                    line = `${medSelect.value} -- ${mlDose} ML per dose -- ${doseSelect.value} -- ${mealSelect.value} -- ${durInput.value || 'As directed'}`;
-                    const totalMLNeeded = mlDose * dailyCount * days;
-                    calculatedUnits = totalMLNeeded; // FIXED: Direct ML Minus
-                } else if (directQtyTypes.includes(medOption.dataset.type)) {
-                    const directQty = parseFloat(directQtyInput.value) || 0;
-                    if(directQty <= 0) {
-                        alert("Please enter a valid Qty Given for this medicine type.");
-                        return;
-                    }
-                    line = `${medSelect.value} -- ${doseSelect.value} -- ${mealSelect.value} -- ${durInput.value || 'As directed'} -- [Qty Dispensed: ${directQty}]`;
-                    calculatedUnits = directQty;
-                } else {
-                    line = `${medSelect.value} -- ${doseSelect.value} -- ${mealSelect.value} -- ${durInput.value || 'As directed'}`;
-                    calculatedUnits = days * dailyCount;
-                }
-
-                rxArea.value = rxArea.value ? rxArea.value + "\n" + line : line;
                 
-                this.pendingStockDeductions.push({ name: medSelect.value, qty: calculatedUnits });
-
-                medSelect.selectedIndex = 0;
-                durInput.value = "";
-                mlInput.value = "";
-                directQtyInput.value = "";
-                this.handlePrescriptionMedicineChange(); 
-            }
-
-            static handleVisitSubmit(e) {
-                e.preventDefault();
-                const db = SystemStorage.read();
-                const pId = document.getElementById('v-patient-id').value;
-
-                const visitPayload = {
-                    id: `VST-${Math.floor(10000 + Math.random() * 90000)}`,
-                    patientId: pId,
-                    date: new Date().toLocaleDateString('en-IN'),
-                    complaint: document.getElementById('v-complaint').value.trim(),
-                    diagnosis: document.getElementById('v-diagnosis').value.trim(),
-                    vitals: {
-                        bp: document.getElementById('v-bp').value.trim(),
-                        pulse: document.getElementById('v-pulse').value.trim(),
-                        spo2: document.getElementById('v-spo2').value.trim(),
-                        rbs: document.getElementById('v-rbs-check').checked ? document.getElementById('v-rbs').value.trim() : ""
-                    },
-                    treatmentType: document.getElementById('v-treatment-type').value,
-                    treatmentPlan: document.getElementById('v-treatment-plan').value.trim(),
-                    prescription: document.getElementById('v-prescription').value.trim()
-                };
-
-                // Apply structural deductions to stock cache layers
-                this.pendingStockDeductions.forEach(deduction => {
-                    const invItem = db.inventory.find(i => i.name === deduction.name);
-                    if(invItem) {
-                        invItem.qty = Math.max(0, invItem.qty - deduction.qty);
-                    }
-                });
-
-                db.visits.push(visitPayload);
-                SystemStorage.write(db);
-
-                this.closeModal('modal-visit');
-                alert("Clinical prescription block locked and recorded safely.");
-            }
-
-            static editLatestPrescription(patientId) {
-                const db = SystemStorage.read();
-                const visits = db.visits.filter(v => v.patientId === patientId);
-                if(!visits.length) {
-                    alert("No localized clinical files are linked to this record yet.");
-                    return;
-                }
-                const latest = visits[visits.length - 1];
-                
-                this.initiateVisitModal(patientId);
-                
-                document.getElementById('v-complaint').value = latest.complaint || '';
-                document.getElementById('v-diagnosis').value = latest.diagnosis || '';
-                document.getElementById('v-bp').value = latest.vitals?.bp || '';
-                document.getElementById('v-pulse').value = latest.vitals?.pulse || '';
-                document.getElementById('v-spo2').value = latest.vitals?.spo2 || '';
-                
-                if(latest.vitals?.rbs) {
-                    document.getElementById('v-rbs-check').checked = true;
-                    this.toggleRBS();
-                    document.getElementById('v-rbs').value = latest.vitals.rbs;
-                }
-
-                document.getElementById('v-treatment-type').value = latest.treatmentType || 'None';
-                this.toggleTreatment();
-                document.getElementById('v-treatment-plan').value = latest.treatmentPlan || '';
-                document.getElementById('v-prescription').value = latest.prescription || '';
-                
-                // Pop the last element off to overwrite seamlessly on submission
-                db.visits.pop();
-                SystemStorage.write(db);
-            }
-
-            static renderAnalyticsMatrixCharts(revenue, expenses) {
-                const ctx = document.getElementById('chart-revenue');
-                if(!ctx) return;
-
-                if (this.activeCharts['revenue']) {
-                    this.activeCharts['revenue'].destroy();
-                }
-
-                this.activeCharts['revenue'] = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Inbound Operational Fees', 'Overhead Expenses Drain'],
-                        datasets: [{
-                            data: [revenue, expenses],
-                            backgroundColor: ['rgba(13, 148, 136, 0.85)', 'rgba(244, 63, 94, 0.85)'],
-                            borderColor: ['rgb(13, 148, 136)', 'rgb(244, 63, 94)'],
-                            borderWidth: 1.5,
-                            borderRadius: 8
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } }
-                    }
-                });
-            }
-
-            static renderDashboardRecentPatients(db, filteredVisits) {
-                const container = document.getElementById('dash-recent-patients');
-                if(!container) return;
-                container.innerHTML = "";
-
-                const sortedVisits = [...filteredVisits].sort((a,b) => this.parseIndianDate(b.date) - this.parseIndianDate(a.date)).slice(0, 5);
-
-                if(sortedVisits.length === 0) {
-                    container.innerHTML = `<div class="text-xs text-slate-400 italic py-4 font-medium text-center">No client logs mapped inside this chronological frame.</div>`;
-                    return;
-                }
-
-                sortedVisits.forEach(v => {
-                    const patient = db.patients.find(p => p.id === v.patientId) || { name: "Unknown Case" };
-                    const item = document.createElement('div');
-                    item.className = "flex justify-between items-center p-3 bg-slate-50 border border-slate-100 rounded-xl hover:bg-slate-100/50 transition-all text-xs";
-                    item.innerHTML = `
-                        <div class="text-left">
-                            <div class="font-bold text-slate-800 text-sm">${patient.name}</div>
-                            <div class="text-slate-400 mt-0.5 font-semibold">Diagnosis: ${v.diagnosis}</div>
-                        </div>
-                        <div class="text-right font-medium">
-                            <span class="text-teal-700 font-bold block">${v.date}</span>
-                            <button onclick="UI.printPatientPrescription('${v.patientId}')" class="text-[10px] text-slate-500 hover:text-teal-700 underline font-bold transition-colors cursor-pointer mt-0.5">Print Sheet</button>
-                        </div>
-                    `;
-                    container.appendChild(item);
-                });
-            }
-        }
-
-        // Initialize Runtime Sequence on View Ready State
-        window.addEventListener('DOMContentLoaded', () => UI.initializeApplicationRuntime());
-    
+                let durationText = durInput.value.trim();
+                if (durationText) {
+                    if (/^\d+$/.test(durationText)) {
+                        durationText += " days";
+                    }I seem to be encountering an error. Can I try something else for you?
