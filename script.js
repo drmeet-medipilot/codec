@@ -7,19 +7,56 @@
         const supabaseApp = window.supabase.createClient(supabaseUrl, supabaseKey);
         let currentUser = null;
 
+        // INIT SESSION ON LOAD - FIXED RACE CONDITION
+        window.addEventListener('DOMContentLoaded', async () => {
+            const overlay = document.getElementById('login-overlay');
+            const msg = document.getElementById('login-status-msg');
+            msg.innerText = "Checking secure session...";
+            
+            try {
+                const { data: { session }, error } = await supabaseApp.auth.getSession();
+                if (error) throw error;
+                
+                if (session) {
+                    currentUser = session.user;
+                    msg.innerText = "Syncing with Cloud Vault...";
+                    await SystemStorage.syncFromCloud();
+                    overlay.classList.add('hidden');
+                } else {
+                    msg.innerText = "Secure Cloud Authentication - Enter Credentials";
+                }
+            } catch(err) {
+                console.error("Session fetch error:", err);
+                msg.innerText = "Connection error. Please check your internet.";
+            } finally {
+                // VERY IMPORTANT: Initialize UI safely AFTER cloud data is loaded
+                UI.initializeApplicationRuntime();
+            }
+        });
+
         // LOGIN LOGIC
         async function processLogin() {
             const u = document.getElementById('login-user').value.trim();
             const p = document.getElementById('login-pass').value.trim();
             if (!u || !p) { alert('Mherbani kari Email ane Password lakho'); return; }
             
-            const { data, error } = await supabaseApp.auth.signInWithPassword({ email: u, password: p });
-            if (error) {
-                alert("Login Failed: " + error.message);
-            } else {
-                currentUser = data.user;
-                document.getElementById('login-overlay').classList.add('hidden');
-                await SystemStorage.syncFromCloud();
+            const btn = document.getElementById('btn-login');
+            const origText = btn.innerText;
+            btn.innerText = "Authenticating...";
+            
+            try {
+                const { data, error } = await supabaseApp.auth.signInWithPassword({ email: u, password: p });
+                if (error) {
+                    alert("Login Failed: " + error.message);
+                } else {
+                    currentUser = data.user;
+                    btn.innerText = "Syncing Cloud Data...";
+                    await SystemStorage.syncFromCloud();
+                    document.getElementById('login-overlay').classList.add('hidden');
+                    UI.triggerGlobalAuditRefresh(); // Ensure UI displays fresh data
+                }
+            } finally {
+                btn.innerText = origText;
             }
         }
 
@@ -35,8 +72,9 @@
             } else {
                 alert("Registration Successful! Welcome to MediPilot Cloud.");
                 currentUser = data.user;
-                document.getElementById('login-overlay').classList.add('hidden');
                 await SystemStorage.syncFromCloud();
+                document.getElementById('login-overlay').classList.add('hidden');
+                UI.triggerGlobalAuditRefresh();
             }
         }
         
@@ -45,16 +83,6 @@
             await supabaseApp.auth.signOut();
             window.location.reload(); 
         }
-
-        // INIT SESSION ON LOAD
-        window.addEventListener('DOMContentLoaded', async () => {
-            const { data: { session } } = await supabaseApp.auth.getSession();
-            if (session) {
-                currentUser = session.user;
-                document.getElementById('login-overlay').classList.add('hidden');
-                await SystemStorage.syncFromCloud();
-            }
-        });
 
         /**
          * CLOUD VAULT SYSTEM (JSONB ENGINE)
@@ -82,17 +110,26 @@
                 return this.cache;
             }
 
-            static write(payload) {
+            // ADDED ASYNC AND ERROR HANDLING FOR CLOUD SAVES
+            static async write(payload) {
                 this.cache = payload;
                 UI.triggerGlobalAuditRefresh();
                 
                 if(currentUser) {
-                    supabaseApp.from('clinic_vault').upsert({
-                        clinic_id: currentUser.id,
-                        data: payload
-                    }, { onConflict: 'clinic_id' }).then(({error}) => {
-                        if(error) console.error("Cloud Sync Error:", error);
-                    });
+                    try {
+                        const { error } = await supabaseApp.from('clinic_vault').upsert({
+                            clinic_id: currentUser.id,
+                            data: payload
+                        }, { onConflict: 'clinic_id' });
+
+                        if(error) {
+                            console.error("Cloud Sync Error:", error);
+                            alert("⚠️ Warning: Data could not be saved to the cloud. Error: " + error.message);
+                        }
+                    } catch(err) {
+                        console.error("Cloud Save Exception:", err);
+                        alert("⚠️ Network error: Could not save to cloud.");
+                    }
                 }
             }
 
@@ -102,13 +139,17 @@
                     const { data, error } = await supabaseApp.from('clinic_vault')
                         .select('data').eq('clinic_id', currentUser.id).single();
                     
+                    if (error && error.code !== 'PGRST116') {
+                        // PGRST116 is "No rows found". Any other error is a real issue.
+                        console.error("Cloud Fetch Error:", error);
+                    }
+                    
                     if (data && data.data) {
                         this.cache = data.data;
                     } else {
                         this.cache = this.initializeEmptySchema();
                         await supabaseApp.from('clinic_vault').insert([{ clinic_id: currentUser.id, data: this.cache }]);
                     }
-                    UI.triggerGlobalAuditRefresh();
                 } catch (e) {
                     console.error("Cloud Fetch Failed", e);
                 }
@@ -1780,7 +1821,6 @@
                     let numericVal = parseFloat(rawQty);
                     if (isNaN(numericVal)) numericVal = 1;
                     
-                    // Specific logic for Ampule & Vial text formatting
                     if (medType === 'Ampule') {
                         line = `[In-Clinic Treatment] ${medSelect.value} -- Dose: ${numericVal} Amp`;
                     } else if (medType === 'Vial') {
@@ -1816,7 +1856,6 @@
                 const isVial = medOption.dataset.type === 'Vial';
                 const unitQty = parseFloat(medOption.dataset.unitqty) || 1;
                 
-                // --- CUSTOM PREFIX LOGIC LOGIC ---
                 let prefix = "";
                 const typeMap = {
                     'tablet': 'Tab',
@@ -1833,12 +1872,10 @@
                     prefix += " - "; 
                 }
                 let displayMedName = prefix + medSelect.value;
-                // ---------------------------------
 
                 let line = "";
                 let calculatedUnits = 10;
                 
-                // Parse duration string to automatically append " days" if only a number is provided
                 let durationText = durInput.value.trim();
                 if (durationText) {
                     if (/^\d+$/.test(durationText)) {
@@ -2018,7 +2055,4 @@
                 });
             }
         }
-
-        // Initialize Runtime Sequence on View Ready State
-        window.addEventListener('DOMContentLoaded', () => UI.initializeApplicationRuntime());
     
