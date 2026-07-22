@@ -7,6 +7,27 @@
         const supabaseApp = window.supabase.createClient(supabaseUrl, supabaseKey);
         let currentUser = null;
 
+        function showSupabaseError(message) {
+            const banner = document.getElementById('supabase-error-banner');
+            const text = document.getElementById('supabase-error-text');
+            if (banner && text) {
+                text.innerText = message;
+                banner.classList.remove('hidden');
+            }
+        }
+
+        async function verifyDatabaseIsAwake() {
+            try {
+                // Ping the database specifically to see if it is asleep or blocking
+                const { data, error } = await supabaseApp.from('clinic_vault').select('clinic_id').limit(1);
+                if (error && error.code !== 'PGRST116') {
+                    showSupabaseError(`Supabase Alert: ${error.message} - Please check your Supabase Dashboard.`);
+                }
+            } catch (err) {
+                showSupabaseError("Network disconnected or Supabase project is entirely paused.");
+            }
+        }
+
         // LOGIN LOGIC
         async function processLogin() {
             const u = document.getElementById('login-user').value.trim();
@@ -19,6 +40,7 @@
             } else {
                 currentUser = data.user;
                 document.getElementById('login-overlay').classList.add('hidden');
+                await verifyDatabaseIsAwake();
                 await SystemStorage.syncFromCloud();
             }
         }
@@ -36,6 +58,7 @@
                 alert("Registration Successful! Welcome to MediPilot Cloud.");
                 currentUser = data.user;
                 document.getElementById('login-overlay').classList.add('hidden');
+                await verifyDatabaseIsAwake();
                 await SystemStorage.syncFromCloud();
             }
         }
@@ -62,7 +85,7 @@
                 const { data: { session }, error } = await supabaseApp.auth.getSession();
                 if (error) {
                     console.error("Session Error:", error);
-                    alert("⚠️ Session expired or invalid. Please log in again.");
+                    showSupabaseError("Session expired or invalid. Please log in again.");
                     document.getElementById('login-overlay').classList.remove('hidden');
                     return;
                 }
@@ -70,6 +93,7 @@
                 if (session) {
                     currentUser = session.user;
                     document.getElementById('login-overlay').classList.add('hidden');
+                    await verifyDatabaseIsAwake();
                     await SystemStorage.syncFromCloud();
                 } else {
                     document.getElementById('login-overlay').classList.remove('hidden');
@@ -94,7 +118,7 @@
                     credits: [],
                     suppliers: [],
                     clinicProfile: { name: '', address: '', mobile: '', regno: '', doctor: '', degree: '', esignBase64: '', estampBase64: '', esignPin: '' },
-                    metadata: { initializedAt: new Date().toISOString(), softwareVersion: "2026.7.4 (Cloud Vault)" }
+                    metadata: { initializedAt: new Date().toISOString(), softwareVersion: "2026.7.4 (Cloud Vault V3)" }
                 };
             }
 
@@ -105,7 +129,7 @@
                 return this.cache;
             }
 
-            // ADDED ERROR HANDLING & VISIBILITY
+            // ADDED EXTREME ERROR HANDLING & VISIBILITY
             static write(payload) {
                 this.cache = payload;
                 UI.triggerGlobalAuditRefresh();
@@ -117,19 +141,18 @@
                     }, { onConflict: 'clinic_id' }).then(({error}) => {
                         if(error) {
                             console.error("Cloud Sync Error:", error);
-                            alert("⚠️ CRITICAL ERROR: Data NOT saved to cloud! " + error.message);
+                            showSupabaseError("CRITICAL SAVE ERROR: " + error.message);
                         }
                     }).catch(err => {
                         console.error("Network Error:", err);
-                        alert("⚠️ CRITICAL ERROR: Network failure while saving to Cloud! " + err.message);
+                        showSupabaseError("CRITICAL NETWORK ERROR: Could not save to Cloud!");
                     });
                 } else {
-                    alert("⚠️ WARNING: You are logged out! Data is NOT saving to the cloud.");
+                    showSupabaseError("You are logged out! Data is NOT saving to the cloud.");
                     document.getElementById('login-overlay').classList.remove('hidden');
                 }
             }
 
-            // ADDED ERROR HANDLING & VISIBILITY
             static async syncFromCloud() {
                 if(!currentUser) return;
                 try {
@@ -138,7 +161,7 @@
                     
                     if (error && error.code !== 'PGRST116') {
                         console.error("Cloud Fetch Failed", error);
-                        alert("⚠️ Error loading data from cloud: " + error.message);
+                        showSupabaseError("Load Error: " + error.message);
                     }
 
                     if (data && data.data) {
@@ -150,7 +173,7 @@
                     UI.triggerGlobalAuditRefresh();
                 } catch (e) {
                     console.error("Cloud Fetch Exception", e);
-                    alert("⚠️ Could not fetch data from cloud. Check your internet connection.");
+                    showSupabaseError("Could not fetch data from cloud. Check your internet connection.");
                 }
             }
 

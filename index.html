@@ -6,16 +6,23 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>MediPilot - Clinic Management System</title>
 <!-- Preconnect to CDNs to significantly speed up loading times -->
-<link crossorigin="" href="https://cdn.jsdelivr.net" rel="preconnect"/>
+<link crossorigin="" href="https://cdn.tailwindcss.com" rel="preconnect"/>
 <link crossorigin="" href="https://cdnjs.cloudflare.com" rel="preconnect"/>
 <link crossorigin="" href="https://mhquthxfsjnakymtaizp.supabase.co" rel="preconnect"/>
-<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<!-- Swapped to Tailwind v3 CDN for instant, stable loading on Vercel -->
+<script src="https://cdn.tailwindcss.com"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
 <!-- Core Supabase library loaded in head to handle authentication immediately -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <link href="style.css" rel="stylesheet"/></head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col md:flex-row antialiased">
+<!-- Supabase Diagnostic Error Banner -->
+<div class="hidden fixed top-0 left-0 w-full bg-rose-600 text-white p-4 z-[10000] shadow-xl text-center font-bold text-sm" id="supabase-error-banner">
+<i class="fa-solid fa-triangle-exclamation mr-2"></i>
+<span id="supabase-error-text">Database Connection Error</span>
+<button class="ml-4 px-3 py-1 bg-rose-800 rounded hover:bg-rose-900 transition text-xs" onclick="document.getElementById('supabase-error-banner').classList.add('hidden')">Dismiss</button>
+</div>
 <div class="fixed inset-0 z-[9999] bg-slate-100 flex items-center justify-center p-4 backdrop-blur-md" id="login-overlay">
 <div class="bg-white p-8 rounded-2xl shadow-2xl border border-slate-200 w-full max-w-sm transform transition-all duration-300">
 <div class="flex justify-center mb-6">
