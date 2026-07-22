@@ -5,8 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>MediPilot - Clinic Management System</title>
-<!-- Using stable Tailwind CDN for instant load times -->
-<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -23,11 +22,11 @@
 </div>
 </div>
 <h2 class="text-2xl font-extrabold text-slate-900 text-center mb-1 tracking-tight">MediPilot Admin Panel</h2>
-<p class="text-xs text-slate-500 text-center mb-6 font-medium" id="login-status-msg">Secure Cloud Authentication - Enter Credentials</p>
+<p class="text-xs text-slate-500 text-center mb-6 font-medium">Secure Cloud Authentication - Enter Credentials</p>
 <div class="space-y-4">
 <input class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600 transition-all font-medium text-sm" id="login-user" placeholder="Clinic Email Address" type="email"/>
 <input class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600 transition-all font-medium text-sm" id="login-pass" placeholder="Secure Password (Min 6 chars)" type="password"/>
-<button class="w-full py-3 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white font-bold rounded-xl transition-all duration-200 shadow-lg shadow-teal-700/20 hover:shadow-teal-700/30 active:scale-[0.99] text-sm cursor-pointer" id="btn-login" onclick="processLogin()">Login to Dashboard</button>
+<button class="w-full py-3 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white font-bold rounded-xl transition-all duration-200 shadow-lg shadow-teal-700/20 hover:shadow-teal-700/30 active:scale-[0.99] text-sm cursor-pointer" onclick="processLogin()">Login to Dashboard</button>
 <button class="w-full py-3 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-all active:scale-[0.98] text-sm cursor-pointer mt-3" onclick="processRegister()">Register New Clinic Account</button>
 </div>
 </div>
@@ -159,14 +158,16 @@
 </div>
 <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-start">
 <h3 class="font-bold text-sm text-slate-700 mb-4 border-b border-slate-100 pb-2 flex items-center"><i class="fa-solid fa-clock-rotate-left text-teal-600 mr-2"></i>Recent Patient Consultations</h3>
-<div class="space-y-4 overflow-y-auto w-full max-h-[300px] pr-1" id="dash-recent-patients"></div>
+<div class="space-y-4 overflow-y-auto w-full max-h-[300px] pr-1" id="dash-recent-patients">
+</div>
 </div>
 </div>
 </section>
-<!-- Other sections (Patients, Billing, OTC, Inventory, Finance, Settings) -->
 <section class="erp-section hidden space-y-6" id="mod-patients">
 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-5 gap-4">
-<div><h2 class="text-3xl font-black animated-heading pb-1">Patient Registry</h2></div>
+<div>
+<h2 class="text-3xl font-black animated-heading pb-1">Patient Registry</h2>
+</div>
 <button class="px-5 py-2.5 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-teal-700/20 active:scale-[0.98] self-start cursor-pointer flex items-center" onclick="UI.openPatientModal()">
 <i class="fa-solid fa-user-plus mr-2"></i>Register New Patient
                 </button>
@@ -190,19 +191,23 @@
 <th class="p-4 text-center">Operations Terminal</th>
 </tr>
 </thead>
-<tbody id="patients-table-body"></tbody>
+<tbody id="patients-table-body">
+</tbody>
 </table>
 </div>
 </div>
 </section>
 <section class="erp-section hidden space-y-6" id="mod-billing">
-<div class="border-b border-slate-200 pb-5"><h2 class="text-3xl font-black animated-heading pb-1">Clinic Billing</h2></div>
+<div class="border-b border-slate-200 pb-5">
+<h2 class="text-3xl font-black animated-heading pb-1">Clinic Billing</h2>
+</div>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
 <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
 <h3 class="font-bold text-base text-slate-800 border-b border-slate-100 pb-2 flex items-center"><i class="fa-solid fa-file-invoice text-teal-600 mr-2"></i>Invoice</h3>
 <div>
 <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Select Patient</label>
-<select class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all font-medium" id="bill-patient-id"></select>
+<select class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all font-medium" id="bill-patient-id">
+</select>
 </div>
 <div>
 <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">System Reference Code</label>
@@ -231,6 +236,7 @@
 <i class="fa-solid fa-building-columns text-slate-400 mr-2.5"></i>
 <input class="w-full py-2.5 text-sm bg-transparent focus:outline-none text-slate-700 font-bold" id="clinic-upi-id" oninput="UI.renderUPIQR();" placeholder="Enter Clinic UPI ID" type="text" value="yourclinic@okicici"/>
 </div>
+<p class="text-[9px] font-medium text-slate-400 mt-1.5">Ensure precision configurations. Erroneous addresses interrupt transaction validations.</p>
 </div>
 <div class="hidden flex flex-col items-center justify-center pt-2 w-full animate-fade-in" id="upi-qr-container">
 <div class="bg-gradient-to-r from-teal-700 to-slate-800 text-white px-5 py-2.5 rounded-t-xl w-64 text-center font-bold text-xs tracking-wide">
@@ -239,6 +245,7 @@
 <div class="bg-white p-4 border border-t-0 border-slate-200 rounded-b-xl shadow-md flex justify-center w-64 h-64">
 <div class="flex items-center justify-center w-full h-full" id="qrcode"></div>
 </div>
+<p class="text-[10px] font-bold text-slate-400 mt-4 uppercase tracking-wider"><i class="fa-solid fa-qrcode mr-1 text-teal-600"></i> Interoperable UPI Interface Matrix</p>
 </div>
 <div class="flex flex-col items-center justify-center py-16 text-slate-400 text-center" id="qr-placeholder">
 <i class="fa-solid fa-qrcode text-6xl mb-4 text-slate-200 animate-pulse"></i>
@@ -248,26 +255,33 @@
 </div>
 </section>
 <section class="erp-section hidden space-y-6" id="mod-otc">
-<div class="border-b border-slate-200 pb-5"><h2 class="text-3xl font-black animated-heading pb-1">OTC Sale</h2></div>
+<div class="border-b border-slate-200 pb-5">
+<h2 class="text-3xl font-black animated-heading pb-1">OTC Sale</h2>
+</div>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
 <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
 <h3 class="font-bold text-base text-slate-800 border-b border-slate-100 pb-2 flex items-center"><i class="fa-solid fa-cart-shopping text-teal-600 mr-2"></i>Active Dispensing Cart</h3>
 <div class="flex items-end gap-3">
 <div class="flex-1">
 <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Select Medicine</label>
-<select class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all font-medium" id="otc-medicine-select"></select>
+<select class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all font-medium" id="otc-medicine-select">
+</select>
 </div>
 <div class="w-24">
 <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Qty</label>
 <input class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-black text-center focus:outline-none focus:ring-2 focus:ring-teal-500/20 text-slate-800" id="otc-qty" min="1" type="number" value="1"/>
 </div>
-<button class="px-5 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white font-bold rounded-xl transition-all shadow-md shadow-teal-700/10 h-11 cursor-pointer active:scale-[0.96] text-xs uppercase tracking-wide" onclick="UI.addOTCToCart()">Add</button>
+<button class="px-5 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white font-bold rounded-xl transition-all shadow-md shadow-teal-700/10 h-11 cursor-pointer active:scale-[0.96] text-xs uppercase tracking-wide" onclick="UI.addOTCToCart()">
+                            Add
+                        </button>
 </div>
 <div class="border border-slate-200 rounded-xl overflow-hidden mt-4">
 <table class="w-full text-left border-collapse text-sm">
 <thead>
 <tr class="bg-slate-50 text-slate-400 uppercase font-extrabold text-[10px] tracking-wider border-b border-slate-200">
-<th class="p-3">Item Descriptor</th><th class="p-3 text-center">Quantity</th><th class="p-3 text-center">Actions</th>
+<th class="p-3">Item Descriptor</th>
+<th class="p-3 text-center">Quantity</th>
+<th class="p-3 text-center">Actions</th>
 </tr>
 </thead>
 <tbody id="otc-cart-body">
@@ -284,7 +298,8 @@
 <div class="w-full space-y-2">
 <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Payment Mode</label>
 <select class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none font-medium" id="otc-payment-mode" onchange="UI.renderOTCUPIQR()">
-<option value="Cash">Cash</option><option value="UPI">UPI</option>
+<option value="Cash">Cash</option>
+<option value="UPI">UPI</option>
 </select>
 </div>
 <div class="w-full border-b border-slate-100 pb-3 hidden mt-1" id="otc-upi-config-area">
@@ -312,7 +327,10 @@
 </section>
 <section class="erp-section hidden space-y-6" id="mod-inventory">
 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-5 gap-4">
-<div><h2 class="text-3xl font-black animated-heading pb-1">Stock Management</h2></div>
+<div>
+<h2 class="text-3xl font-black animated-heading pb-1">Stock Management</h2>
+</div>
+<!-- FIXED RESPONSIVE BUTTONS FOR STOCK MANAGEMENT -->
 <div class="flex gap-2 items-center self-start flex-nowrap w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0 hide-scroll">
 <button class="px-3 sm:px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-indigo-700/20 active:scale-[0.98] cursor-pointer flex items-center shrink-0" onclick="UI.printInventoryStock()">
 <i class="fa-solid fa-print sm:mr-2"></i><span class="hidden sm:inline">Print Stock</span>
@@ -355,6 +373,7 @@
 <div class="h-10 w-10 bg-teal-600/50 text-white rounded-xl flex items-center justify-center text-base shadow-inner"><i class="fa-solid fa-truck-field"></i></div>
 </button>
 </div>
+<!-- SEARCH AND FILTER SECTION FOR INVENTORY -->
 <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row gap-4 items-center">
 <div class="relative flex-1 w-full">
 <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-slate-400 text-sm"></i>
@@ -393,14 +412,17 @@
 <th class="p-4 text-right">Actions</th>
 </tr>
 </thead>
-<tbody id="inventory-table-body"></tbody>
+<tbody id="inventory-table-body">
+</tbody>
 </table>
 </div>
 </div>
 </section>
 <section class="erp-section hidden space-y-6" id="mod-finance">
 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-5 gap-4">
-<div><h2 class="text-3xl font-black animated-heading pb-1">Accounts &amp; Ledger</h2></div>
+<div>
+<h2 class="text-3xl font-black animated-heading pb-1">Accounts &amp; Ledger</h2>
+</div>
 <div class="flex gap-2.5 self-start flex-wrap">
 <button class="px-4 py-2.5 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer flex items-center active:scale-[0.97]" onclick="UI.openCreditsModal()">
 <i class="fa-solid fa-hand-holding-dollar mr-2"></i>Credit
@@ -416,32 +438,47 @@
 <table class="w-full text-left border-collapse text-xs">
 <thead>
 <tr class="bg-slate-50 text-slate-500 uppercase font-bold text-[10px] tracking-wider border-b border-slate-200">
-<th class="p-3">Timestamp</th><th class="p-3">Category Parameters</th><th class="p-3">Reference Allocation</th><th class="p-3 text-right">Delta Vector Value</th><th class="p-3 text-right">Action</th>
+<th class="p-3">Timestamp</th>
+<th class="p-3">Category Parameters</th>
+<th class="p-3">Reference Allocation</th>
+<th class="p-3 text-right">Delta Vector Value</th>
+<th class="p-3 text-right">Action</th>
 </tr>
 </thead>
-<tbody id="finance-ledger-body"></tbody>
+<tbody id="finance-ledger-body">
+</tbody>
 </table>
 </div>
 <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
 <h3 class="font-bold text-sm text-slate-700 border-b border-slate-100 pb-2 flex items-center"><i class="fa-solid fa-chart-pie text-teal-600 mr-2"></i>Balance Sheet Summary</h3>
 <div class="space-y-3.5 text-xs font-medium">
-<div class="flex justify-between"><span class="text-slate-500">Gross Operational Inflows:</span><span class="font-black text-emerald-600" id="fin-gross-in">+₹0.00</span></div>
-<div class="flex justify-between"><span class="text-slate-500">Gross Overhead Drain:</span><span class="font-black text-rose-600" id="fin-gross-out">-₹0.00</span></div>
+<div class="flex justify-between">
+<span class="text-slate-500">Gross Operational Inflows:</span>
+<span class="font-black text-emerald-600" id="fin-gross-in">+₹0.00</span>
+</div>
+<div class="flex justify-between">
+<span class="text-slate-500">Gross Overhead Drain:</span>
+<span class="font-black text-rose-600" id="fin-gross-out">-₹0.00</span>
+</div>
 <hr class="border-slate-100"/>
 <div class="flex justify-between text-sm font-black bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-<span class="text-slate-700">Net Retained Cash Profit:</span><span class="text-teal-700" id="fin-net-profit">₹0.00</span>
+<span class="text-slate-700">Net Retained Cash Profit:</span>
+<span class="text-teal-700" id="fin-net-profit">₹0.00</span>
 </div>
 </div>
 </div>
 </div>
 </section>
+<!-- NEW SETTINGS SECTION -->
 <section class="erp-section hidden space-y-6" id="mod-settings">
-<div class="border-b border-slate-200 pb-5"><h2 class="text-3xl font-black animated-heading pb-1">Clinic Settings</h2></div>
+<div class="border-b border-slate-200 pb-5">
+<h2 class="text-3xl font-black animated-heading pb-1">Clinic Settings</h2>
+</div>
 <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm max-w-3xl">
 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
 <div class="md:col-span-2">
 <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Clinic Name</label>
-<input class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800" id="clinic-name" placeholder="e.g. Astha Clinic" type="text"/>
+<input class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800" id="clinic-name" placeholder="e.g. CareSuite Multi-Specialty Clinic" type="text"/>
 </div>
 <div class="md:col-span-2">
 <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Clinic Address</label>
@@ -463,6 +500,7 @@
 <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Registration Number</label>
 <input class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800" id="clinic-regno" placeholder="e.g. G-12345" type="text"/>
 </div>
+<!-- E-SIGN & E-STAMP CONFIGURATION AREA -->
 <div class="md:col-span-2 pt-4 border-t border-slate-100 mt-2">
 <h3 class="font-bold text-sm text-slate-800 mb-3"><i class="fa-solid fa-signature text-teal-600 mr-2"></i>E-Signature &amp; E-Stamp Configuration</h3>
 <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -493,7 +531,6 @@
 </div>
 </section>
 </main>
-<!-- Modals -->
 <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print" id="modal-patient">
 <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh] transform transition-all border border-slate-200 animate-zoom-in">
 <div class="bg-gradient-to-r from-teal-800 to-teal-950 p-4 text-white flex justify-between items-center">
@@ -515,14 +552,17 @@
 <div class="flex space-x-2">
 <input class="w-2/3 p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-bold" id="p-age-val" min="0" oninput="UI.handleAgeChange()" required="" type="number"/>
 <select class="w-1/3 p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-bold" id="p-age-unit" onchange="UI.handleAgeChange()">
-<option value="Years">Years</option><option value="Months">Months</option>
+<option value="Years">Years</option>
+<option value="Months">Months</option>
 </select>
 </div>
 </div>
 <div>
 <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Sex *</label>
 <select class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-bold" id="p-gender" required="">
-<option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option>
+<option value="Male">Male</option>
+<option value="Female">Female</option>
+<option value="Other">Other</option>
 </select>
 </div>
 <div class="hidden" id="p-weight-container">
@@ -535,10 +575,10 @@
 </div>
 <div class="sm:col-span-2">
 <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Remarks - BP/Sugar/Allergy</label>
-<textarea class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all" id="p-allergies" placeholder="Penicillin sensitivity, diabetic metrics..." rows="2"></textarea>
+<textarea class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all" id="p-allergies" placeholder="Penicillin sensitivity, diabetic metrics, systemic hypertension histories..." rows="2"></textarea>
 </div>
 <div class="sm:col-span-2 pt-2">
-<button class="w-full py-3 bg-gradient-to-r from-teal-700 to-teal-800 text-white font-bold rounded-xl shadow-md transition-all cursor-pointer active:scale-[0.99]" type="submit">Save New Patient</button>
+<button class="w-full py-3 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white font-bold rounded-xl shadow-md transition-all cursor-pointer active:scale-[0.99]" type="submit">Save New Patient</button>
 </div>
 </form>
 </div>
@@ -568,15 +608,15 @@
 <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
 <div>
 <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">BP (mmHg)</label>
-<input class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-bold" id="v-bp" placeholder="e.g. 120/80" type="text"/>
+<input class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/10 font-bold" id="v-bp" placeholder="e.g. 120/80" type="text"/>
 </div>
 <div>
 <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Pulse (bpm)</label>
-<input class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-bold" id="v-pulse" placeholder="e.g. 72" type="text"/>
+<input class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/10 font-bold" id="v-pulse" placeholder="e.g. 72" type="text"/>
 </div>
 <div>
 <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">SpO2 (%)</label>
-<input class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-bold" id="v-spo2" placeholder="e.g. 98" type="text"/>
+<input class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/10 font-bold" id="v-spo2" placeholder="e.g. 98" type="text"/>
 </div>
 <div>
 <label class="flex items-center space-x-2 text-[10px] font-bold text-slate-500 uppercase mb-1 cursor-pointer select-none">
@@ -586,12 +626,15 @@
 </div>
 </div>
 </div>
-<!-- In-Clinic Treatment Area -->
 <div class="border border-slate-200 p-4 rounded-xl bg-slate-50/50 space-y-3 shadow-inner">
 <div class="flex justify-between items-center">
-<label class="block text-xs font-black text-slate-600 uppercase tracking-wider">In-Clinic Treatment</label>
+<label class="block text-xs font-black text-slate-600 uppercase tracking-wider">Stat In-Clinic Treatment</label>
 <select class="p-1.5 text-xs border border-slate-200 rounded-lg bg-white focus:outline-none font-bold text-teal-700 cursor-pointer" id="v-treatment-type" onchange="UI.toggleTreatment()">
-<option value="None">None</option><option value="Injection">Injection</option><option value="Drip">IV Drip Fluid</option><option value="Dressing">Dressing</option><option value="Stitches">Stitches</option>
+<option value="None">None</option>
+<option value="Injection">Injection</option>
+<option value="Drip">IV Drip Fluid</option>
+<option value="Dressing">Dressing</option>
+<option value="Stitches">Stitches</option>
 </select>
 </div>
 <div class="hidden space-y-3 pt-3 border-t border-slate-200" id="treatment-container">
@@ -599,12 +642,24 @@
 <div class="md:col-span-1">
 <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Med Type Filter</label>
 <select class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-semibold" id="v-treatment-med-type" onchange="UI.filterVisitMedicineOptions('v-treatment-medicine', this.value)">
-<option value="ALL">All Types</option><option value="Tablet">Tablet</option><option value="Capsule">Capsule</option><option value="Syrup">Syrup</option><option value="Ointment">Ointment</option><option value="Drop">Drop</option><option value="Vial">Vial</option><option value="Ampule">Ampule</option><option value="SN">SN</option><option value="Lotion">Lotion</option><option value="Sachet">Sachet</option><option value="Nab">Nab</option><option value="Other">Other</option>
+<option value="ALL">All Types</option>
+<option value="Tablet">Tablet</option>
+<option value="Capsule">Capsule</option>
+<option value="Syrup">Syrup</option>
+<option value="Ointment">Ointment</option>
+<option value="Drop">Drop</option>
+<option value="Vial">Vial</option>
+<option value="Ampule">Ampule</option>
+<option value="SN">SN</option>
+<option value="Lotion">Lotion</option>
+<option value="Sachet">Sachet</option>
+<option value="Nab">Nab</option>
+<option value="Other">Other</option>
 </select>
 </div>
 <div class="md:col-span-2">
 <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Target Compound stock</label>
-<select class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-semibold" id="v-treatment-medicine" onchange="UI.handleTreatmentMedicineChange()"></select>
+<select class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-semibold" id="v-treatment-medicine"></select>
 </div>
 <div class="md:col-span-1">
 <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Dose Volume</label>
@@ -622,17 +677,28 @@
 <i class="fa-solid fa-plus mr-1"></i> Add to Treatment Plan
                                 </button>
 </div>
-<textarea class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none text-xs font-semibold font-mono text-slate-700 mt-2" id="v-treatment-plan" placeholder="In-Clinic Treatments will map visually in this block space..." rows="2"></textarea>
+<textarea class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none text-xs font-semibold font-mono text-slate-700 mt-2" id="v-treatment-plan" placeholder="Administered treatments will map visually in this block space..." rows="2"></textarea>
 </div>
 </div>
-<!-- Prescription Directives Matrix -->
 <div class="border border-slate-200 p-4 rounded-xl bg-slate-50/50 space-y-3 shadow-inner">
 <label class="block text-xs font-black text-slate-600 uppercase tracking-wider">Prescription Architecture &amp; Stock Auto Deductions</label>
 <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
 <div class="col-span-2 md:col-span-1">
 <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Med Type Filter</label>
 <select class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-semibold" id="v-rx-med-type" onchange="UI.filterVisitMedicineOptions('v-medicine', this.value)">
-<option value="ALL">All Types</option><option value="Tablet">Tablet</option><option value="Capsule">Capsule</option><option value="Syrup">Syrup</option><option value="Ointment">Ointment</option><option value="Drop">Drop</option><option value="Vial">Vial</option><option value="Ampule">Ampule</option><option value="SN">SN</option><option value="Lotion">Lotion</option><option value="Sachet">Sachet</option><option value="Nab">Nab</option><option value="Other">Other</option>
+<option value="ALL">All Types</option>
+<option value="Tablet">Tablet</option>
+<option value="Capsule">Capsule</option>
+<option value="Syrup">Syrup</option>
+<option value="Ointment">Ointment</option>
+<option value="Drop">Drop</option>
+<option value="Vial">Vial</option>
+<option value="Ampule">Ampule</option>
+<option value="SN">SN</option>
+<option value="Lotion">Lotion</option>
+<option value="Sachet">Sachet</option>
+<option value="Nab">Nab</option>
+<option value="Other">Other</option>
 </select>
 </div>
 <div class="col-span-2 md:col-span-3">
@@ -650,18 +716,27 @@
 <div class="col-span-2 md:col-span-1">
 <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Frequency Matrix</label>
 <select class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-bold text-slate-700" id="v-dose">
-<option value="1-0-1">1-0-1</option><option value="1-1-1">1-1-1</option><option value="1-0-0">1-0-0</option><option value="0-1-0">0-1-0</option><option value="0-0-1">0-0-1</option><option value="1/2-1/2-1/2">1/2-1/2-1/2</option><option value="1/2-0-1/2">1/2-0-1/2</option><option value="1-0-1/2">1-0-1/2</option><option value="1/2-0-1">1/2-0-1</option>
+<option value="1-0-1">1-0-1</option>
+<option value="1-1-1">1-1-1</option>
+<option value="1-0-0">1-0-0</option>
+<option value="0-1-0">0-1-0</option>
+<option value="0-0-1">0-0-1</option>
+<option value="1/2-1/2-1/2">1/2-1/2-1/2</option>
+<option value="1/2-0-1/2">1/2-0-1/2</option>
+<option value="1-0-1/2">1-0-1/2</option>
+<option value="1/2-0-1">1/2-0-1</option>
 </select>
 </div>
 <div class="col-span-2 md:col-span-1">
 <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Meal Relationship</label>
 <select class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-bold text-slate-700" id="v-meal">
-<option value="After meal">After meal</option><option value="Before meal">Before meal</option>
+<option value="After meal">After meal</option>
+<option value="Before meal">Before meal</option>
 </select>
 </div>
 <div class="col-span-2 md:col-span-1">
 <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Duration Cycle</label>
-<input class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-semibold" id="v-duration" placeholder="e.g. 5" type="text"/>
+<input class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-semibold" id="v-duration" placeholder="e.g. 5 days" type="text"/>
 </div>
 <div class="col-span-2 md:col-span-4 flex justify-end">
 <button class="px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 font-bold text-xs rounded-xl transition-all shadow-xs flex items-center cursor-pointer" onclick="UI.addMedicineToPrescription()" type="button">
@@ -675,7 +750,7 @@
 <i class="fa-solid fa-circle-info mr-2.5 mt-0.5 text-amber-600 text-sm"></i> Note: This console process writes strictly into clinical record registries. To compute invoice billing protocols, trigger the "Generate Bill" module manually.
                     </div>
 <div class="pt-2 space-y-2">
-<button class="w-full py-3 bg-gradient-to-r from-teal-700 to-teal-800 text-white font-bold rounded-xl shadow-md transition-all cursor-pointer active:scale-[0.99]" type="submit">Save Clinical Prescription Record</button>
+<button class="w-full py-3 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white font-bold rounded-xl shadow-md transition-all cursor-pointer active:scale-[0.99]" type="submit">Save Clinical Prescription Record</button>
 <button class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl transition-all cursor-pointer text-xs active:scale-[0.99]" onclick="document.getElementById('visit-scroll-area').scrollTo({top: 0, behavior: 'smooth'})" type="button"><i class="fa-solid fa-arrow-up mr-1.5"></i>Back to Top</button>
 </div>
 </form>
@@ -691,7 +766,9 @@
 </div>
 <button class="text-white/80 hover:text-white text-xl cursor-pointer" onclick="UI.closeModal('modal-consultations')"><i class="fa-solid fa-xmark"></i></button>
 </div>
-<div class="p-5 max-h-[75vh] overflow-y-auto bg-slate-50"><div class="space-y-4" id="consultations-history-list"></div></div>
+<div class="p-5 max-h-[75vh] overflow-y-auto bg-slate-50">
+<div class="space-y-4" id="consultations-history-list"></div>
+</div>
 </div>
 </div>
 <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print" id="modal-medicine">
@@ -706,7 +783,19 @@
 <div class="sm:col-span-2">
 <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Medicine Type *</label>
 <select class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-700 cursor-pointer" id="m-type" onchange="UI.handleMedTypeChange()" required="">
-<option disabled="" selected="" value="">Select Type</option><option value="Tablet">Tablet</option><option value="Capsule">Capsule</option><option value="Syrup">Syrup</option><option value="Ointment">Ointment</option><option value="Drop">Drop</option><option value="Vial">Vial</option><option value="Ampule">Ampule</option><option value="SN">SN</option><option value="Lotion">Lotion</option><option value="Sachet">Sachet</option><option value="Nab">Nab</option><option value="Other">Other</option>
+<option disabled="" selected="" value="">Select Type</option>
+<option value="Tablet">Tablet</option>
+<option value="Capsule">Capsule</option>
+<option value="Syrup">Syrup</option>
+<option value="Ointment">Ointment</option>
+<option value="Drop">Drop</option>
+<option value="Vial">Vial</option>
+<option value="Ampule">Ampule</option>
+<option value="SN">SN</option>
+<option value="Lotion">Lotion</option>
+<option value="Sachet">Sachet</option>
+<option value="Nab">Nab</option>
+<option value="Other">Other</option>
 </select>
 </div>
 <div class="sm:col-span-2 hidden" id="m-type-other-container">
@@ -719,25 +808,46 @@
 </div>
 <div>
 <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Medicine Supplier</label>
-<select class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-700" id="m-supplier"></select>
+<select class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-700" id="m-supplier">
+</select>
 </div>
 <div>
 <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Expiry Date (MM-YYYY) *</label>
 <div class="flex space-x-2">
 <select class="w-1/2 p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-bold text-slate-700 cursor-pointer" id="m-expiry-month" required="">
-<option disabled="" selected="" value="">MM</option><option value="01">01 - Jan</option><option value="02">02 - Feb</option><option value="03">03 - Mar</option><option value="04">04 - Apr</option><option value="05">05 - May</option><option value="06">06 - Jun</option><option value="07">07 - Jul</option><option value="08">08 - Aug</option><option value="09">09 - Sep</option><option value="10">10 - Oct</option><option value="11">11 - Nov</option><option value="12">12 - Dec</option>
+<option disabled="" selected="" value="">MM</option>
+<option value="01">01 - Jan</option>
+<option value="02">02 - Feb</option>
+<option value="03">03 - Mar</option>
+<option value="04">04 - Apr</option>
+<option value="05">05 - May</option>
+<option value="06">06 - Jun</option>
+<option value="07">07 - Jul</option>
+<option value="08">08 - Aug</option>
+<option value="09">09 - Sep</option>
+<option value="10">10 - Oct</option>
+<option value="11">11 - Nov</option>
+<option value="12">12 - Dec</option>
 </select>
-<select class="w-1/2 p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-bold text-slate-700 cursor-pointer" id="m-expiry-year" required=""></select>
+<select class="w-1/2 p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-bold text-slate-700 cursor-pointer" id="m-expiry-year" required="">
+</select>
 </div>
 </div>
-<div class="sm:col-span-2"><hr class="border-slate-100 my-1"/></div>
+<div class="sm:col-span-2">
+<hr class="border-slate-100 my-1"/>
+</div>
 <div class="sm:col-span-2">
 <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Package Type &amp; Units per Pkg *</label>
 <div class="flex space-x-2">
 <select class="w-1/2 p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-bold text-slate-700" id="m-unit-type">
-<option value="Strip">Strip</option><option value="ML">ML</option><option value="Box">Box</option><option value="Tray">Tray</option><option value="Pck">Pck</option><option value="Piece">Piece</option>
+<option value="Strip">Strip</option>
+<option value="ML">ML</option>
+<option value="Box">Box</option>
+<option value="Tray">Tray</option>
+<option value="Pck">Pck</option>
+<option value="Piece">Piece</option>
 </select>
-<input class="w-1/2 p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none font-bold text-slate-800" id="m-unit-qty" min="1" oninput="UI.calculateTotalQty()" placeholder="Units per pkg" required="" type="number"/>
+<input class="w-1/2 p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none font-bold text-slate-800" id="m-unit-qty" min="1" oninput="UI.calculateTotalQty()" placeholder="Units per pkg (e.g. 10)" required="" type="number"/>
 </div>
 </div>
 <div>
@@ -767,13 +877,17 @@
 <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print" id="modal-vendors">
 <div class="w-full max-w-3xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden animate-zoom-in">
 <div class="bg-gradient-to-r from-teal-800 to-teal-950 text-white px-5 py-4 flex items-center justify-between">
-<div><h3 class="font-bold text-sm uppercase tracking-wide"><i class="fa-solid fa-truck-field mr-2 text-emerald-400"></i>Supplier Network</h3></div>
+<div>
+<h3 class="font-bold text-sm uppercase tracking-wide"><i class="fa-solid fa-truck-field mr-2 text-emerald-400"></i>Supplier Network</h3>
+</div>
 <div class="flex items-center gap-3">
 <button class="px-3 py-1.5 bg-white text-teal-900 rounded-lg text-xs font-bold hover:bg-slate-50 transition-all shadow-xs cursor-pointer active:scale-[0.96]" onclick="UI.openAddVendorFromNetwork()">Add Supplier</button>
 <button class="text-white/80 hover:text-white text-xl cursor-pointer" onclick="UI.closeModal('modal-vendors')"><i class="fa-solid fa-xmark"></i></button>
 </div>
 </div>
-<div class="p-5 max-h-[75vh] overflow-y-auto bg-slate-50"><div class="space-y-3" id="vendor-network-list"></div></div>
+<div class="p-5 max-h-[75vh] overflow-y-auto bg-slate-50">
+<div class="space-y-3" id="vendor-network-list"></div>
+</div>
 </div>
 </div>
 <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print" id="modal-supplier">
@@ -815,7 +929,11 @@
 <div>
 <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Expense Classification *</label>
 <select class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-rose-500/20 transition-all font-semibold text-slate-700" id="e-category">
-<option value="Clinic Rental System">Clinic Space Rental</option><option value="Staff Payroll &amp; Wages">Staff Wages &amp; Salaries</option><option value="Utility Grid (Power/Net)">Electricity &amp; Internet Grid</option><option value="Medical Disposal / Clinical Overhead">Bio-Waste &amp; Clinic Consumables</option><option value="Miscellaneous Incidental Fees">Miscellaneous Incidental Fees</option>
+<option value="Clinic Rental System">Clinic Space Rental</option>
+<option value="Staff Payroll &amp; Wages">Staff Wages &amp; Salaries</option>
+<option value="Utility Grid (Power/Net)">Electricity &amp; Internet Grid</option>
+<option value="Medical Disposal / Clinical Overhead">Bio-Waste &amp; Clinic Consumables</option>
+<option value="Miscellaneous Incidental Fees">Miscellaneous Incidental Fees</option>
 </select>
 </div>
 <div>
@@ -839,10 +957,14 @@
 <h3 class="font-bold text-sm uppercase tracking-wide"><i class="fa-solid fa-hand-holding-dollar mr-2 text-emerald-400"></i>Credit Logs</h3>
 <button class="text-white/80 hover:text-white text-xl cursor-pointer" onclick="UI.closeModal('modal-credits')"><i class="fa-solid fa-xmark"></i></button>
 </div>
-<div class="p-6 overflow-y-auto bg-slate-100 flex-1"><div class="space-y-4" id="credits-list"></div></div>
+<div class="p-6 overflow-y-auto bg-slate-100 flex-1">
+<div class="space-y-4" id="credits-list">
 </div>
 </div>
-<div class="hidden font-mono text-sm bg-white text-slate-900 w-full max-w-full" id="print-area"></div>
+</div>
+</div>
+<div class="hidden font-mono text-sm bg-white text-slate-900 w-full max-w-full" id="print-area">
+</div>
 
 <script src="script.js"></script></body>
 </html>
