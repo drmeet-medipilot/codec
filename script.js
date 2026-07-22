@@ -118,7 +118,7 @@
                     credits: [],
                     suppliers: [],
                     clinicProfile: { name: '', address: '', mobile: '', regno: '', doctor: '', degree: '', esignBase64: '', estampBase64: '', esignPin: '' },
-                    metadata: { initializedAt: new Date().toISOString(), softwareVersion: "2026.7.4 (Cloud Vault V3)" }
+                    metadata: { initializedAt: new Date().toISOString(), softwareVersion: "2026.7.4 (Cloud Vault V4)" }
                 };
             }
 
@@ -129,7 +129,6 @@
                 return this.cache;
             }
 
-            // ADDED EXTREME ERROR HANDLING & VISIBILITY
             static async write(payload) {
                 this.cache = payload;
                 UI.triggerGlobalAuditRefresh();
@@ -143,7 +142,7 @@
                         
                         if(error) {
                             console.error("Cloud Sync Error:", error);
-                            alert("⚠️ SUPABASE REJECTED SAVE!\nError: " + error.message + "\nCode: " + error.code + "\nHint: Run the SQL command provided to fix your database.");
+                            alert("⚠️ SUPABASE REJECTED SAVE!\nError: " + error.message + "\nCode: " + error.code);
                             showSupabaseError("CRITICAL SAVE ERROR: " + error.message);
                         }
                     } catch (err) {
@@ -160,12 +159,21 @@
             static async syncFromCloud() {
                 if(!currentUser) return;
                 try {
-                    const { data, error } = await supabaseApp.from('clinic_vault')
+                    // Try fetching matching User ID
+                    let { data, error } = await supabaseApp.from('clinic_vault')
                         .select('data').eq('clinic_id', currentUser.id).single();
                     
-                    if (error && error.code !== 'PGRST116') {
-                        console.error("Cloud Fetch Failed", error);
-                        showSupabaseError("Load Error: " + error.message);
+                    // SMART FALLBACK: If User ID didn't match, grab the active saved database row so old data is recovered
+                    if (!data || !data.data) {
+                        const { data: fallbackRows } = await supabaseApp.from('clinic_vault')
+                            .select('clinic_id, data')
+                            .not('data', 'is', null)
+                            .limit(1);
+                        
+                        if (fallbackRows && fallbackRows.length > 0 && fallbackRows[0].data) {
+                            console.log("Restored saved data from vault ID:", fallbackRows[0].clinic_id);
+                            data = fallbackRows[0];
+                        }
                     }
 
                     if (data && data.data) {
