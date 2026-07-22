@@ -1,970 +1,1049 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>MediPilot - Clinic Management System</title>
-<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediPilot - Clinic Management System</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="style.css">
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<link href="style.css" rel="stylesheet"/></head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col md:flex-row antialiased">
-<div class="fixed inset-0 z-[9999] bg-slate-100 flex items-center justify-center p-4 backdrop-blur-md" id="login-overlay">
-<div class="bg-white p-8 rounded-2xl shadow-2xl border border-slate-200 w-full max-w-sm transform transition-all duration-300">
-<div class="flex justify-center mb-6">
-<div class="h-16 w-16 bg-teal-700 rounded-2xl flex items-center justify-center text-white text-3xl shadow-lg shadow-teal-700/30">
-<i class="fa-solid fa-shield-halved"></i>
-</div>
-</div>
-<h2 class="text-2xl font-extrabold text-slate-900 text-center mb-1 tracking-tight">MediPilot Admin Panel</h2>
-<p class="text-xs text-slate-500 text-center mb-6 font-medium">Secure Cloud Authentication - Enter Credentials</p>
-<div class="space-y-4">
-<input class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600 transition-all font-medium text-sm" id="login-user" placeholder="Clinic Email Address" type="email"/>
-<input class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600 transition-all font-medium text-sm" id="login-pass" placeholder="Secure Password (Min 6 chars)" type="password"/>
-<button class="w-full py-3 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white font-bold rounded-xl transition-all duration-200 shadow-lg shadow-teal-700/20 hover:shadow-teal-700/30 active:scale-[0.99] text-sm cursor-pointer" onclick="processLogin()">Login to Dashboard</button>
-<button class="w-full py-3 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-all active:scale-[0.98] text-sm cursor-pointer mt-3" onclick="processRegister()">Register New Clinic Account</button>
-</div>
-</div>
-</div>
-<header class="bg-gradient-to-r from-teal-800 to-slate-900 text-white p-4 flex justify-between items-center md:hidden no-print shadow-md">
-<div class="flex items-center space-x-2">
-<i class="fa-solid fa-circle-h text-2xl text-emerald-400"></i>
-<span class="font-extrabold text-lg tracking-wider uppercase">MediPilot For GP</span>
-</div>
-<button class="text-2xl focus:outline-none p-1 rounded hover:bg-teal-700/50 transition cursor-pointer" id="mobile-menu-btn">
-<i class="fa-solid fa-bars-staggered"></i>
-</button>
-</header>
-<nav class="hidden md:flex flex-col w-full md:w-64 bg-white border-r border-slate-200 no-print shadow-sm z-50 fixed md:relative h-screen" id="sidebar">
-<div class="p-5 border-b border-slate-100 hidden md:flex items-center space-x-3 bg-gradient-to-br from-teal-800 via-teal-900 to-slate-900 text-white shadow-inner">
-<i class="fa-solid fa-compass-dominant text-2xl text-emerald-400 animate-pulse"></i>
-<div>
-<h1 class="font-black text-lg tracking-tight leading-tight">MediPilot</h1>
-<p class="text-[10px] text-teal-300 font-semibold uppercase tracking-wider">© Reserve To Dr.Meet P. Patel</p>
-</div>
-</div>
-<div class="flex-1 overflow-y-auto py-4 space-y-1 px-3">
-<button class="nav-link w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-600 rounded-xl hover:bg-slate-50 transition-all cursor-pointer active-tab" data-target="dashboard">
-<i class="fa-solid fa-chart-pie w-5 text-center text-base"></i> <span>Dashboard</span>
-</button>
-<button class="nav-link w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-600 rounded-xl hover:bg-slate-50 transition-all cursor-pointer" data-target="patients">
-<i class="fa-solid fa-user-injured w-5 text-center text-base"></i> <span>Patient Registry</span>
-</button>
-<button class="nav-link w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-600 rounded-xl hover:bg-slate-50 transition-all cursor-pointer" data-target="billing">
-<i class="fa-solid fa-file-invoice-dollar w-5 text-center text-base"></i> <span>Generate Bill</span>
-</button>
-<button class="nav-link w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-600 rounded-xl hover:bg-slate-50 transition-all cursor-pointer" data-target="otc">
-<i class="fa-solid fa-shop w-5 text-center text-base"></i> <span>OTC Pharmacy</span>
-</button>
-<button class="nav-link w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-600 rounded-xl hover:bg-slate-50 transition-all cursor-pointer" data-target="inventory">
-<i class="fa-solid fa-pills w-5 text-center text-base"></i> <span>Stock Center</span>
-</button>
-<button class="nav-link w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-600 rounded-xl hover:bg-slate-50 transition-all cursor-pointer" data-target="finance">
-<i class="fa-solid fa-wallet w-5 text-center text-base"></i> <span>Accounts &amp; Ledger</span>
-</button>
-<button class="nav-link w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-600 rounded-xl hover:bg-slate-50 transition-all cursor-pointer" data-target="settings">
-<i class="fa-solid fa-gear w-5 text-center text-base"></i> <span>Clinic Settings</span>
-</button>
-</div>
-<div class="border-t border-slate-100 bg-slate-50 p-4">
-<button class="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-white border border-rose-200 text-xs font-bold text-rose-600 rounded-xl hover:bg-rose-50 hover:text-rose-700 transition-all shadow-xs cursor-pointer active:scale-[0.98]" onclick="processLogout()">
-<i class="fa-solid fa-power-off"></i> <span>Secure System Logout</span>
-</button>
-</div>
-</nav>
-<main class="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-8 w-full">
-<section class="erp-section space-y-6" id="mod-dashboard">
-<div class="flex flex-col lg:flex-row lg:items-center lg:justify-between border-b border-slate-200 pb-5 gap-4">
-<div>
-<h2 class="text-3xl font-black tracking-tight animated-heading pb-1" id="dashboard-greeting">Clinic Management System</h2>
-</div>
-<div class="flex flex-col sm:flex-row items-center gap-3 self-start lg:self-end">
-<select class="text-xs font-bold bg-white px-3 py-2.5 border border-slate-200 rounded-xl text-teal-800 shadow-xs focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition cursor-pointer" id="dashboard-timeframe" onchange="UI.handleTimeframeChange()">
-<option selected="" value="TODAY">Today</option>
-<option value="YESTERDAY">Yesterday</option>
-<option value="THIS_WEEK">This Week</option>
-<option value="THIS_MONTH">This Month</option>
-<option value="THIS_YEAR">This Year</option>
-<option value="ALL_TIME">All Time</option>
-<option value="CUSTOM">Custom Range</option>
-</select>
-<div class="hidden flex items-center gap-2 bg-white px-3 py-1.5 border border-slate-200 rounded-xl shadow-xs" id="custom-date-range">
-<input class="text-xs text-slate-600 focus:outline-none cursor-pointer font-medium" id="dash-start-date" onchange="UI.triggerGlobalAuditRefresh()" type="date"/>
-<span class="text-[10px] font-black text-slate-400">TO</span>
-<input class="text-xs text-slate-600 focus:outline-none cursor-pointer font-medium" id="dash-end-date" onchange="UI.triggerGlobalAuditRefresh()" type="date"/>
-</div>
-<div class="text-xs font-bold bg-white px-4 py-2.5 border border-slate-200 rounded-xl text-slate-600 shadow-xs hidden sm:block">
-<i class="fa-regular fa-calendar-days mr-2 text-teal-600"></i><span id="dash-date">--/--/----</span>
-</div>
-</div>
-</div>
-<div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-<h3 class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-4">Action Terminal</h3>
-<div class="grid grid-cols-2 sm:grid-cols-6 gap-3">
-<button class="flex flex-col items-center justify-center p-4 rounded-xl bg-teal-50/70 text-teal-700 border border-teal-100 hover:bg-teal-100/80 transition-all shadow-xs cursor-pointer font-bold active:scale-[0.97]" onclick="UI.openPatientModal()">
-<i class="fa-solid fa-user-plus text-xl mb-2"></i><span class="text-xs">Add Patient</span>
-</button>
-<button class="flex flex-col items-center justify-center p-4 rounded-xl bg-emerald-50/70 text-emerald-700 border border-emerald-100 hover:bg-emerald-100/80 transition-all shadow-xs cursor-pointer font-bold active:scale-[0.97]" onclick="UI.routeToTab('billing')">
-<i class="fa-solid fa-cash-register text-xl mb-2"></i><span class="text-xs">Generate Bill</span>
-</button>
-<button class="flex flex-col items-center justify-center p-4 rounded-xl bg-amber-50/70 text-amber-700 border border-amber-100 hover:bg-amber-100/80 transition-all shadow-xs cursor-pointer font-bold active:scale-[0.97]" onclick="UI.routeToTab('otc')">
-<i class="fa-solid fa-shop text-xl mb-2"></i><span class="text-xs">OTC Sale</span>
-</button>
-<button class="flex flex-col items-center justify-center p-4 rounded-xl bg-sky-50/70 text-sky-700 border border-sky-100 hover:bg-sky-100/80 transition-all shadow-xs cursor-pointer font-bold active:scale-[0.97]" onclick="UI.initMedicineModal()">
-<i class="fa-solid fa-pills text-xl mb-2"></i><span class="text-xs">Add Medicine</span>
-</button>
-<button class="flex flex-col items-center justify-center p-4 rounded-xl bg-rose-50/70 text-rose-700 border border-rose-100 hover:bg-rose-100/80 transition-all shadow-xs cursor-pointer font-bold active:scale-[0.97]" onclick="UI.openModal('modal-expense')">
-<i class="fa-solid fa-receipt text-xl mb-2"></i><span class="text-xs">Log Expense</span>
-</button>
-<button class="flex flex-col items-center justify-center p-4 rounded-xl bg-purple-50/70 text-purple-700 border border-purple-100 hover:bg-purple-100/80 transition-all shadow-xs cursor-pointer font-bold active:scale-[0.97]" onclick="UI.openCreditsModal()">
-<i class="fa-solid fa-hand-holding-dollar text-xl mb-2"></i><span class="text-xs">Credit Logs</span>
-</button>
-</div>
-</div>
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-<div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between transition-all hover:shadow-md">
-<div>
-<p class="text-[11px] font-extrabold tracking-wider uppercase text-slate-400">Total OPD</p>
-<h3 class="text-3xl font-black text-slate-900 mt-1" id="stat-total-patients">0</h3>
-</div>
-<div class="h-14 w-14 bg-teal-50 text-teal-600 rounded-xl flex items-center justify-center text-2xl shadow-inner"><i class="fa-solid fa-user-md"></i></div>
-</div>
-<div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between transition-all hover:shadow-md">
-<div>
-<p class="text-[11px] font-extrabold tracking-wider uppercase text-slate-400">Total Revenue</p>
-<h3 class="text-3xl font-black text-slate-900 mt-1" id="stat-total-revenue">₹0.00</h3>
-</div>
-<div class="h-14 w-14 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-2xl shadow-inner"><i class="fa-solid fa-indian-rupee-sign"></i></div>
-</div>
-<div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between transition-all hover:shadow-md">
-<div>
-<p class="text-[11px] font-extrabold tracking-wider uppercase text-slate-400">Total Stock Amount</p>
-<h3 class="text-3xl font-black text-slate-900 mt-1" id="stat-stock-value">₹0.00</h3>
-</div>
-<div class="h-14 w-14 bg-sky-50 text-sky-600 rounded-xl flex items-center justify-center text-2xl shadow-inner"><i class="fa-solid fa-boxes-packing"></i></div>
-</div>
-</div>
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-<div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
-<h3 class="font-bold text-sm text-slate-700 mb-3 flex items-center"><i class="fa-solid fa-chart-line text-teal-600 mr-2"></i>Revenue vs Expense Flow Chart</h3>
-<div class="relative w-full aspect-video flex items-center justify-center">
-<canvas id="chart-revenue"></canvas>
-</div>
-</div>
-<div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-start">
-<h3 class="font-bold text-sm text-slate-700 mb-4 border-b border-slate-100 pb-2 flex items-center"><i class="fa-solid fa-clock-rotate-left text-teal-600 mr-2"></i>Recent Patient Consultations</h3>
-<div class="space-y-4 overflow-y-auto w-full max-h-[300px] pr-1" id="dash-recent-patients">
-</div>
-</div>
-</div>
-</section>
-<section class="erp-section hidden space-y-6" id="mod-patients">
-<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-5 gap-4">
-<div>
-<h2 class="text-3xl font-black animated-heading pb-1">Patient Registry</h2>
-</div>
-<button class="px-5 py-2.5 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-teal-700/20 active:scale-[0.98] self-start cursor-pointer flex items-center" onclick="UI.openPatientModal()">
-<i class="fa-solid fa-user-plus mr-2"></i>Register New Patient
+
+    <div id="login-overlay" class="fixed inset-0 z-[9999] bg-slate-100 flex items-center justify-center p-4 backdrop-blur-md">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl border border-slate-200 w-full max-w-sm transform transition-all duration-300">
+            <div class="flex justify-center mb-6">
+                <div class="h-16 w-16 bg-teal-700 rounded-2xl flex items-center justify-center text-white text-3xl shadow-lg shadow-teal-700/30">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+            </div>
+            <h2 class="text-2xl font-extrabold text-slate-900 text-center mb-1 tracking-tight">MediPilot Admin Panel</h2>
+            <p class="text-xs text-slate-500 text-center mb-6 font-medium">Secure Cloud Authentication - Enter Credentials</p>
+            <div class="space-y-4">
+                <input id="login-user" type="email" placeholder="Clinic Email Address" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600 transition-all font-medium text-sm">
+                <input id="login-pass" type="password" placeholder="Secure Password (Min 6 chars)" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600 transition-all font-medium text-sm">
+                <button onclick="processLogin()" class="w-full py-3 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white font-bold rounded-xl transition-all duration-200 shadow-lg shadow-teal-700/20 hover:shadow-teal-700/30 active:scale-[0.99] text-sm cursor-pointer">Login to Dashboard</button>
+                <button onclick="processRegister()" class="w-full py-3 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-all active:scale-[0.98] text-sm cursor-pointer mt-3">Register New Clinic Account</button>
+            </div>
+        </div>
+    </div>
+
+    <header class="bg-gradient-to-r from-teal-800 to-slate-900 text-white p-4 flex justify-between items-center md:hidden no-print shadow-md">
+        <div class="flex items-center space-x-2">
+            <i class="fa-solid fa-circle-h text-2xl text-emerald-400"></i>
+            <span class="font-extrabold text-lg tracking-wider uppercase">MediPilot For GP</span>
+        </div>
+        <button id="mobile-menu-btn" class="text-2xl focus:outline-none p-1 rounded hover:bg-teal-700/50 transition cursor-pointer">
+            <i class="fa-solid fa-bars-staggered"></i>
+        </button>
+    </header>
+
+    <nav id="sidebar" class="hidden md:flex flex-col w-full md:w-64 bg-white border-r border-slate-200 no-print shadow-sm z-50 fixed md:relative h-screen">
+        <div class="p-5 border-b border-slate-100 hidden md:flex items-center space-x-3 bg-gradient-to-br from-teal-800 via-teal-900 to-slate-900 text-white shadow-inner">
+            <i class="fa-solid fa-compass-dominant text-2xl text-emerald-400 animate-pulse"></i>
+            <div>
+                <h1 class="font-black text-lg tracking-tight leading-tight">MediPilot</h1>
+                <p class="text-[10px] text-teal-300 font-semibold uppercase tracking-wider">© Reserve To Dr.Meet P. Patel</p>
+            </div>
+        </div>
+        
+        <div class="flex-1 overflow-y-auto py-4 space-y-1 px-3">
+            <button data-target="dashboard" class="nav-link w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-600 rounded-xl hover:bg-slate-50 transition-all cursor-pointer active-tab">
+                <i class="fa-solid fa-chart-pie w-5 text-center text-base"></i> <span>Dashboard</span>
+            </button>
+            <button data-target="patients" class="nav-link w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-600 rounded-xl hover:bg-slate-50 transition-all cursor-pointer">
+                <i class="fa-solid fa-user-injured w-5 text-center text-base"></i> <span>Patient Registry</span>
+            </button>
+            <button data-target="billing" class="nav-link w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-600 rounded-xl hover:bg-slate-50 transition-all cursor-pointer">
+                <i class="fa-solid fa-file-invoice-dollar w-5 text-center text-base"></i> <span>Generate Bill</span>
+            </button>
+            <button data-target="otc" class="nav-link w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-600 rounded-xl hover:bg-slate-50 transition-all cursor-pointer">
+                <i class="fa-solid fa-shop w-5 text-center text-base"></i> <span>OTC Pharmacy</span>
+            </button>
+            <button data-target="inventory" class="nav-link w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-600 rounded-xl hover:bg-slate-50 transition-all cursor-pointer">
+                <i class="fa-solid fa-pills w-5 text-center text-base"></i> <span>Stock Center</span>
+            </button>
+            <button data-target="finance" class="nav-link w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-600 rounded-xl hover:bg-slate-50 transition-all cursor-pointer">
+                <i class="fa-solid fa-wallet w-5 text-center text-base"></i> <span>Accounts & Ledger</span>
+            </button>
+            <button data-target="settings" class="nav-link w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-600 rounded-xl hover:bg-slate-50 transition-all cursor-pointer">
+                <i class="fa-solid fa-gear w-5 text-center text-base"></i> <span>Clinic Settings</span>
+            </button>
+        </div>
+
+        <div class="border-t border-slate-100 bg-slate-50 p-4">
+            <button onclick="processLogout()" class="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-white border border-rose-200 text-xs font-bold text-rose-600 rounded-xl hover:bg-rose-50 hover:text-rose-700 transition-all shadow-xs cursor-pointer active:scale-[0.98]">
+                <i class="fa-solid fa-power-off"></i> <span>Secure System Logout</span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-8 w-full">
+        
+        <section id="mod-dashboard" class="erp-section space-y-6">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between border-b border-slate-200 pb-5 gap-4">
+                <div>
+                    <h2 id="dashboard-greeting" class="text-3xl font-black tracking-tight animated-heading pb-1">Clinic Management System</h2>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row items-center gap-3 self-start lg:self-end">
+                    <select id="dashboard-timeframe" onchange="UI.handleTimeframeChange()" class="text-xs font-bold bg-white px-3 py-2.5 border border-slate-200 rounded-xl text-teal-800 shadow-xs focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition cursor-pointer">
+                        <option value="TODAY" selected>Today</option>
+                        <option value="YESTERDAY">Yesterday</option>
+                        <option value="THIS_WEEK">This Week</option>
+                        <option value="THIS_MONTH">This Month</option>
+                        <option value="THIS_YEAR">This Year</option>
+                        <option value="ALL_TIME">All Time</option>
+                        <option value="CUSTOM">Custom Range</option>
+                    </select>
+                    
+                    <div id="custom-date-range" class="hidden flex items-center gap-2 bg-white px-3 py-1.5 border border-slate-200 rounded-xl shadow-xs">
+                        <input type="date" id="dash-start-date" onchange="UI.triggerGlobalAuditRefresh()" class="text-xs text-slate-600 focus:outline-none cursor-pointer font-medium">
+                        <span class="text-[10px] font-black text-slate-400">TO</span>
+                        <input type="date" id="dash-end-date" onchange="UI.triggerGlobalAuditRefresh()" class="text-xs text-slate-600 focus:outline-none cursor-pointer font-medium">
+                    </div>
+
+                    <div class="text-xs font-bold bg-white px-4 py-2.5 border border-slate-200 rounded-xl text-slate-600 shadow-xs hidden sm:block">
+                        <i class="fa-regular fa-calendar-days mr-2 text-teal-600"></i><span id="dash-date">--/--/----</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+                <h3 class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-4">Action Terminal</h3>
+                <div class="grid grid-cols-2 sm:grid-cols-6 gap-3">
+                    <button onclick="UI.openPatientModal()" class="flex flex-col items-center justify-center p-4 rounded-xl bg-teal-50/70 text-teal-700 border border-teal-100 hover:bg-teal-100/80 transition-all shadow-xs cursor-pointer font-bold active:scale-[0.97]">
+                        <i class="fa-solid fa-user-plus text-xl mb-2"></i><span class="text-xs">Add Patient</span>
+                    </button>
+                    <button onclick="UI.routeToTab('billing')" class="flex flex-col items-center justify-center p-4 rounded-xl bg-emerald-50/70 text-emerald-700 border border-emerald-100 hover:bg-emerald-100/80 transition-all shadow-xs cursor-pointer font-bold active:scale-[0.97]">
+                        <i class="fa-solid fa-cash-register text-xl mb-2"></i><span class="text-xs">Generate Bill</span>
+                    </button>
+                    <button onclick="UI.routeToTab('otc')" class="flex flex-col items-center justify-center p-4 rounded-xl bg-amber-50/70 text-amber-700 border border-amber-100 hover:bg-amber-100/80 transition-all shadow-xs cursor-pointer font-bold active:scale-[0.97]">
+                        <i class="fa-solid fa-shop text-xl mb-2"></i><span class="text-xs">OTC Sale</span>
+                    </button>
+                    <button onclick="UI.initMedicineModal()" class="flex flex-col items-center justify-center p-4 rounded-xl bg-sky-50/70 text-sky-700 border border-sky-100 hover:bg-sky-100/80 transition-all shadow-xs cursor-pointer font-bold active:scale-[0.97]">
+                        <i class="fa-solid fa-pills text-xl mb-2"></i><span class="text-xs">Add Medicine</span>
+                    </button>
+                    <button onclick="UI.openModal('modal-expense')" class="flex flex-col items-center justify-center p-4 rounded-xl bg-rose-50/70 text-rose-700 border border-rose-100 hover:bg-rose-100/80 transition-all shadow-xs cursor-pointer font-bold active:scale-[0.97]">
+                        <i class="fa-solid fa-receipt text-xl mb-2"></i><span class="text-xs">Log Expense</span>
+                    </button>
+                    <button onclick="UI.openCreditsModal()" class="flex flex-col items-center justify-center p-4 rounded-xl bg-purple-50/70 text-purple-700 border border-purple-100 hover:bg-purple-100/80 transition-all shadow-xs cursor-pointer font-bold active:scale-[0.97]">
+                        <i class="fa-solid fa-hand-holding-dollar text-xl mb-2"></i><span class="text-xs">Credit Logs</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between transition-all hover:shadow-md">
+                    <div>
+                        <p class="text-[11px] font-extrabold tracking-wider uppercase text-slate-400">Total OPD</p>
+                        <h3 id="stat-total-patients" class="text-3xl font-black text-slate-900 mt-1">0</h3>
+                    </div>
+                    <div class="h-14 w-14 bg-teal-50 text-teal-600 rounded-xl flex items-center justify-center text-2xl shadow-inner"><i class="fa-solid fa-user-md"></i></div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between transition-all hover:shadow-md">
+                    <div>
+                        <p class="text-[11px] font-extrabold tracking-wider uppercase text-slate-400">Total Revenue</p>
+                        <h3 id="stat-total-revenue" class="text-3xl font-black text-slate-900 mt-1">₹0.00</h3>
+                    </div>
+                    <div class="h-14 w-14 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-2xl shadow-inner"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between transition-all hover:shadow-md">
+                    <div>
+                        <p class="text-[11px] font-extrabold tracking-wider uppercase text-slate-400">Total Stock Amount</p>
+                        <h3 id="stat-stock-value" class="text-3xl font-black text-slate-900 mt-1">₹0.00</h3>
+                    </div>
+                    <div class="h-14 w-14 bg-sky-50 text-sky-600 rounded-xl flex items-center justify-center text-2xl shadow-inner"><i class="fa-solid fa-boxes-packing"></i></div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <h3 class="font-bold text-sm text-slate-700 mb-3 flex items-center"><i class="fa-solid fa-chart-line text-teal-600 mr-2"></i>Revenue vs Expense Flow Chart</h3>
+                    <div class="relative w-full aspect-video flex items-center justify-center">
+                        <canvas id="chart-revenue"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-start">
+                    <h3 class="font-bold text-sm text-slate-700 mb-4 border-b border-slate-100 pb-2 flex items-center"><i class="fa-solid fa-clock-rotate-left text-teal-600 mr-2"></i>Recent Patient Consultations</h3>
+                    <div id="dash-recent-patients" class="space-y-4 overflow-y-auto w-full max-h-[300px] pr-1">
+                        </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="mod-patients" class="erp-section hidden space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-5 gap-4">
+                <div>
+                    <h2 class="text-3xl font-black animated-heading pb-1">Patient Registry</h2>
+                </div>
+                <button onclick="UI.openPatientModal()" class="px-5 py-2.5 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-teal-700/20 active:scale-[0.98] self-start cursor-pointer flex items-center">
+                    <i class="fa-solid fa-user-plus mr-2"></i>Register New Patient
                 </button>
-</div>
-<div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row gap-4 items-center">
-<div class="relative flex-1 w-full">
-<i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-slate-400 text-sm"></i>
-<input class="w-full pl-11 pr-4 py-3 border border-slate-200 rounded-xl text-sm bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all font-medium" id="patient-search" placeholder="Filter patient metrics by legal name, unique code hash, or telephone integers..." type="text"/>
-</div>
-</div>
-<div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-<div class="overflow-x-auto">
-<table class="w-full text-left border-collapse text-sm">
-<thead>
-<tr class="bg-slate-50 text-slate-500 uppercase font-bold text-[11px] tracking-wider border-b border-slate-200">
-<th class="p-4">Reg Code</th>
-<th class="p-4">Patient Identity &amp; Clinical Warnings</th>
-<th class="p-4">Age Profile</th>
-<th class="p-4">Weight Baseline</th>
-<th class="p-4 text-center">Consultations</th>
-<th class="p-4 text-center">Operations Terminal</th>
-</tr>
-</thead>
-<tbody id="patients-table-body">
-</tbody>
-</table>
-</div>
-</div>
-</section>
-<section class="erp-section hidden space-y-6" id="mod-billing">
-<div class="border-b border-slate-200 pb-5">
-<h2 class="text-3xl font-black animated-heading pb-1">Clinic Billing</h2>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-<div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
-<h3 class="font-bold text-base text-slate-800 border-b border-slate-100 pb-2 flex items-center"><i class="fa-solid fa-file-invoice text-teal-600 mr-2"></i>Invoice</h3>
-<div>
-<label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Select Patient</label>
-<select class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all font-medium" id="bill-patient-id">
-</select>
-</div>
-<div>
-<label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">System Reference Code</label>
-<input class="w-full p-3 bg-slate-100 border border-slate-200 rounded-xl text-sm font-mono text-slate-500 font-bold" id="bill-invoice-num" readonly="" type="text"/>
-</div>
-<div>
-<label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Total Amount Payable (₹) *</label>
-<input class="w-full p-3.5 border border-teal-200 rounded-xl text-xl font-black bg-slate-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all text-slate-900" id="bill-amount" min="1" oninput="UI.renderUPIQR()" placeholder="e.g. 500" step="1" type="number"/>
-</div>
-<div>
-<label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Payment Mode</label>
-<select class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-teal-500 transition-all font-medium" id="bill-payment-mode" onchange="UI.renderUPIQR()">
-<option value="Cash">Cash / Physical Currency</option>
-<option value="UPI">UPI Digital Payment Network</option>
-<option value="Credit">Credit / Accounts Receivable (Deferred)</option>
-</select>
-</div>
-<button class="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-bold text-sm rounded-xl shadow-lg shadow-emerald-600/20 active:scale-[0.99] transition-all flex items-center justify-center space-x-2 mt-4 cursor-pointer" onclick="UI.commitInvoiceTransaction()">
-<i class="fa-solid fa-floppy-disk"></i><span>Save &amp; Lock Invoice Record</span>
-</button>
-</div>
-<div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center justify-start h-full space-y-4">
-<div class="w-full border-b border-slate-100 pb-3">
-<label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Receiving Merchant UPI ID Handle</label>
-<div class="flex items-center bg-slate-50 px-3 py-1 rounded-xl border border-slate-200 focus-within:ring-2 focus-within:ring-teal-500/20 focus-within:border-teal-500 transition-all">
-<i class="fa-solid fa-building-columns text-slate-400 mr-2.5"></i>
-<input class="w-full py-2.5 text-sm bg-transparent focus:outline-none text-slate-700 font-bold" id="clinic-upi-id" oninput="UI.renderUPIQR();" placeholder="Enter Clinic UPI ID" type="text" value="yourclinic@okicici"/>
-</div>
-<p class="text-[9px] font-medium text-slate-400 mt-1.5">Ensure precision configurations. Erroneous addresses interrupt transaction validations.</p>
-</div>
-<div class="hidden flex flex-col items-center justify-center pt-2 w-full animate-fade-in" id="upi-qr-container">
-<div class="bg-gradient-to-r from-teal-700 to-slate-800 text-white px-5 py-2.5 rounded-t-xl w-64 text-center font-bold text-xs tracking-wide">
+            </div>
+
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row gap-4 items-center">
+                <div class="relative flex-1 w-full">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-slate-400 text-sm"></i>
+                    <input id="patient-search" type="text" placeholder="Filter patient metrics by legal name, unique code hash, or telephone integers..." class="w-full pl-11 pr-4 py-3 border border-slate-200 rounded-xl text-sm bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all font-medium">
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-500 uppercase font-bold text-[11px] tracking-wider border-b border-slate-200">
+                                <th class="p-4">Reg Code</th>
+                                <th class="p-4">Patient Identity & Clinical Warnings</th>
+                                <th class="p-4">Age Profile</th>
+                                <th class="p-4">Weight Baseline</th>
+                                <th class="p-4 text-center">Consultations</th>
+                                <th class="p-4 text-center">Operations Terminal</th>
+                            </tr>
+                        </thead>
+                        <tbody id="patients-table-body">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="mod-billing" class="erp-section hidden space-y-6">
+            <div class="border-b border-slate-200 pb-5">
+                <h2 class="text-3xl font-black animated-heading pb-1">Clinic Billing</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+                
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
+                    <h3 class="font-bold text-base text-slate-800 border-b border-slate-100 pb-2 flex items-center"><i class="fa-solid fa-file-invoice text-teal-600 mr-2"></i>Invoice</h3>
+                    
+                    <div>
+                        <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Select Patient</label>
+                        <select id="bill-patient-id" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all font-medium">
+                            </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">System Reference Code</label>
+                        <input id="bill-invoice-num" type="text" readonly class="w-full p-3 bg-slate-100 border border-slate-200 rounded-xl text-sm font-mono text-slate-500 font-bold">
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Total Amount Payable (₹) *</label>
+                        <input id="bill-amount" type="number" step="1" min="1" oninput="UI.renderUPIQR()" placeholder="e.g. 500" class="w-full p-3.5 border border-teal-200 rounded-xl text-xl font-black bg-slate-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all text-slate-900">
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Payment Mode</label>
+                        <select id="bill-payment-mode" onchange="UI.renderUPIQR()" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-teal-500 transition-all font-medium">
+                            <option value="Cash">Cash / Physical Currency</option>
+                            <option value="UPI">UPI Digital Payment Network</option>
+                            <option value="Credit">Credit / Accounts Receivable (Deferred)</option>
+                        </select>
+                    </div>
+
+                    <button onclick="UI.commitInvoiceTransaction()" class="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-bold text-sm rounded-xl shadow-lg shadow-emerald-600/20 active:scale-[0.99] transition-all flex items-center justify-center space-x-2 mt-4 cursor-pointer">
+                        <i class="fa-solid fa-floppy-disk"></i><span>Save & Lock Invoice Record</span>
+                    </button>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center justify-start h-full space-y-4">
+                    <div class="w-full border-b border-slate-100 pb-3">
+                        <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Receiving Merchant UPI ID Handle</label>
+                        <div class="flex items-center bg-slate-50 px-3 py-1 rounded-xl border border-slate-200 focus-within:ring-2 focus-within:ring-teal-500/20 focus-within:border-teal-500 transition-all">
+                            <i class="fa-solid fa-building-columns text-slate-400 mr-2.5"></i>
+                            <input id="clinic-upi-id" type="text" oninput="UI.renderUPIQR();" value="yourclinic@okicici" placeholder="Enter Clinic UPI ID" class="w-full py-2.5 text-sm bg-transparent focus:outline-none text-slate-700 font-bold">
+                        </div>
+                        <p class="text-[9px] font-medium text-slate-400 mt-1.5">Ensure precision configurations. Erroneous addresses interrupt transaction validations.</p>
+                    </div>
+
+                    <div id="upi-qr-container" class="hidden flex flex-col items-center justify-center pt-2 w-full animate-fade-in">
+                        <div class="bg-gradient-to-r from-teal-700 to-slate-800 text-white px-5 py-2.5 rounded-t-xl w-64 text-center font-bold text-xs tracking-wide">
                             Scan to Pay: <span class="text-base font-black ml-1 text-emerald-300">₹<span id="qr-amount-display">0</span></span>
-</div>
-<div class="bg-white p-4 border border-t-0 border-slate-200 rounded-b-xl shadow-md flex justify-center w-64 h-64">
-<div class="flex items-center justify-center w-full h-full" id="qrcode"></div>
-</div>
-<p class="text-[10px] font-bold text-slate-400 mt-4 uppercase tracking-wider"><i class="fa-solid fa-qrcode mr-1 text-teal-600"></i> Interoperable UPI Interface Matrix</p>
-</div>
-<div class="flex flex-col items-center justify-center py-16 text-slate-400 text-center" id="qr-placeholder">
-<i class="fa-solid fa-qrcode text-6xl mb-4 text-slate-200 animate-pulse"></i>
-<p class="text-xs font-semibold leading-relaxed text-slate-400">Select UPI financial gateway status and enter numeric values<br/>to generate dynamic client-side QR vectors.</p>
-</div>
-</div>
-</div>
-</section>
-<section class="erp-section hidden space-y-6" id="mod-otc">
-<div class="border-b border-slate-200 pb-5">
-<h2 class="text-3xl font-black animated-heading pb-1">OTC Sale</h2>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-<div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
-<h3 class="font-bold text-base text-slate-800 border-b border-slate-100 pb-2 flex items-center"><i class="fa-solid fa-cart-shopping text-teal-600 mr-2"></i>Active Dispensing Cart</h3>
-<div class="flex items-end gap-3">
-<div class="flex-1">
-<label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Select Medicine</label>
-<select class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all font-medium" id="otc-medicine-select">
-</select>
-</div>
-<div class="w-24">
-<label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Qty</label>
-<input class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-black text-center focus:outline-none focus:ring-2 focus:ring-teal-500/20 text-slate-800" id="otc-qty" min="1" type="number" value="1"/>
-</div>
-<button class="px-5 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white font-bold rounded-xl transition-all shadow-md shadow-teal-700/10 h-11 cursor-pointer active:scale-[0.96] text-xs uppercase tracking-wide" onclick="UI.addOTCToCart()">
+                        </div>
+                        <div class="bg-white p-4 border border-t-0 border-slate-200 rounded-b-xl shadow-md flex justify-center w-64 h-64">
+                            <div id="qrcode" class="flex items-center justify-center w-full h-full"></div>
+                        </div>
+                        <p class="text-[10px] font-bold text-slate-400 mt-4 uppercase tracking-wider"><i class="fa-solid fa-qrcode mr-1 text-teal-600"></i> Interoperable UPI Interface Matrix</p>
+                    </div>
+                    
+                    <div id="qr-placeholder" class="flex flex-col items-center justify-center py-16 text-slate-400 text-center">
+                        <i class="fa-solid fa-qrcode text-6xl mb-4 text-slate-200 animate-pulse"></i>
+                        <p class="text-xs font-semibold leading-relaxed text-slate-400">Select UPI financial gateway status and enter numeric values<br>to generate dynamic client-side QR vectors.</p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="mod-otc" class="erp-section hidden space-y-6">
+            <div class="border-b border-slate-200 pb-5">
+                <h2 class="text-3xl font-black animated-heading pb-1">OTC Sale</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+                
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
+                    <h3 class="font-bold text-base text-slate-800 border-b border-slate-100 pb-2 flex items-center"><i class="fa-solid fa-cart-shopping text-teal-600 mr-2"></i>Active Dispensing Cart</h3>
+                    
+                    <div class="flex items-end gap-3">
+                        <div class="flex-1">
+                            <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Select Medicine</label>
+                            <select id="otc-medicine-select" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all font-medium">
+                                </select>
+                        </div>
+                        <div class="w-24">
+                            <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Qty</label>
+                            <input id="otc-qty" type="number" min="1" value="1" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-black text-center focus:outline-none focus:ring-2 focus:ring-teal-500/20 text-slate-800">
+                        </div>
+                        <button onclick="UI.addOTCToCart()" class="px-5 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white font-bold rounded-xl transition-all shadow-md shadow-teal-700/10 h-11 cursor-pointer active:scale-[0.96] text-xs uppercase tracking-wide">
                             Add
                         </button>
-</div>
-<div class="border border-slate-200 rounded-xl overflow-hidden mt-4">
-<table class="w-full text-left border-collapse text-sm">
-<thead>
-<tr class="bg-slate-50 text-slate-400 uppercase font-extrabold text-[10px] tracking-wider border-b border-slate-200">
-<th class="p-3">Item Descriptor</th>
-<th class="p-3 text-center">Quantity</th>
-<th class="p-3 text-center">Actions</th>
-</tr>
-</thead>
-<tbody id="otc-cart-body">
-<tr><td class="p-4 text-center text-slate-400 text-xs italic font-medium" colspan="3">Cart allocations are currently blank.</td></tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center justify-start h-full space-y-4">
-<div class="w-full bg-slate-50 p-4 rounded-xl border border-slate-200 flex justify-between items-center shadow-inner">
-<span class="text-slate-500 font-extrabold uppercase tracking-wider text-[11px]">Amount Payable (₹)</span>
-<input class="w-36 p-2 bg-white border border-slate-200 rounded-lg text-xl font-black text-slate-900 text-right focus:outline-none focus:ring-2 focus:ring-teal-500/20" id="otc-receive-amount" oninput="UI.renderOTCUPIQR()" placeholder="0.00" type="number"/>
-</div>
-<div class="w-full space-y-2">
-<label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Payment Mode</label>
-<select class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none font-medium" id="otc-payment-mode" onchange="UI.renderOTCUPIQR()">
-<option value="Cash">Cash</option>
-<option value="UPI">UPI</option>
-</select>
-</div>
-<div class="w-full border-b border-slate-100 pb-3 hidden mt-1" id="otc-upi-config-area">
-<label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Receiving UPI Handle</label>
-<div class="flex items-center bg-slate-50 px-3 py-1 rounded-xl border border-slate-200">
-<i class="fa-solid fa-building-columns text-slate-400 mr-2.5"></i>
-<input class="w-full py-2 border-b border-transparent text-sm bg-transparent focus:outline-none text-slate-700 font-bold" id="otc-clinic-upi-id" oninput="UI.renderOTCUPIQR()" placeholder="Enter Clinic UPI ID" type="text" value="yourclinic@okicici"/>
-</div>
-</div>
-<div class="hidden flex flex-col items-center justify-center pt-2 w-full animate-fade-in" id="otc-upi-qr-container">
-<div class="bg-gradient-to-r from-teal-700 to-slate-800 text-white px-5 py-2.5 rounded-t-xl w-64 text-center font-bold text-xs tracking-wide">
-                            Scan to Pay: <span class="text-base font-black text-emerald-300 ml-1">₹<span id="otc-qr-amount-display">0</span></span>
-</div>
-<div class="bg-white p-4 border border-t-0 border-slate-200 rounded-b-xl shadow-md flex justify-center w-64 h-64">
-<div class="flex items-center justify-center w-full h-full" id="otc-qrcode"></div>
-</div>
-</div>
-<div class="w-full pt-4 mt-auto">
-<button class="w-full py-3.5 bg-gradient-to-r from-slate-800 to-slate-950 hover:from-slate-900 hover:to-black text-white font-bold text-sm rounded-xl shadow-md active:scale-[0.99] transition-all flex items-center justify-center space-x-2 cursor-pointer" onclick="UI.commitOTCSale()">
-<i class="fa-solid fa-circle-check text-emerald-400"></i><span>Complete OTC Transaction Settlement</span>
-</button>
-</div>
-</div>
-</div>
-</section>
-<section class="erp-section hidden space-y-6" id="mod-inventory">
-<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-5 gap-4">
-<div>
-<h2 class="text-3xl font-black animated-heading pb-1">Stock Management</h2>
-</div>
-<!-- FIXED RESPONSIVE BUTTONS FOR STOCK MANAGEMENT -->
-<div class="flex gap-2 items-center self-start flex-nowrap w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0 hide-scroll">
-<button class="px-3 sm:px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-indigo-700/20 active:scale-[0.98] cursor-pointer flex items-center shrink-0" onclick="UI.printInventoryStock()">
-<i class="fa-solid fa-print sm:mr-2"></i><span class="hidden sm:inline">Print Stock</span>
-</button>
-<button class="px-3 sm:px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-emerald-700/20 active:scale-[0.98] cursor-pointer flex items-center shrink-0" onclick="UI.exportInventoryCSV()">
-<i class="fa-solid fa-file-csv sm:mr-2"></i><span class="hidden sm:inline">Export Stock</span>
-</button>
-<button class="px-4 sm:px-5 py-2.5 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-teal-700/20 active:scale-[0.98] cursor-pointer flex items-center shrink-0 whitespace-nowrap" onclick="UI.initMedicineModal()">
-<i class="fa-solid fa-pills mr-2"></i>Add Medicine
-                    </button>
-</div>
-</div>
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-<div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-<div>
-<p class="text-[10px] font-extrabold tracking-wider uppercase text-slate-400">Valuation Base (PTR)</p>
-<h3 class="text-lg font-black text-slate-900 mt-0.5" id="inv-ptr-val">₹0.00</h3>
-</div>
-<div class="h-10 w-10 bg-teal-50 text-teal-600 rounded-xl flex items-center justify-center text-base shadow-inner"><i class="fa-solid fa-calculator"></i></div>
-</div>
-<button class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between text-left hover:border-rose-300 transition-all cursor-pointer group active:scale-[0.98]" id="btn-filter-low" onclick="UI.toggleInventoryFilter('LOW_STOCK')">
-<div>
-<p class="text-[10px] font-extrabold tracking-wider uppercase text-slate-400 group-hover:text-rose-600 transition-colors">Low Stock Alerts</p>
-<h3 class="text-lg font-black text-rose-600 mt-0.5" id="inv-low-count">0</h3>
-</div>
-<div class="h-10 w-10 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center text-base shadow-inner"><i class="fa-solid fa-triangle-exclamation"></i></div>
-</button>
-<button class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between text-left hover:border-amber-300 transition-all cursor-pointer group active:scale-[0.98]" id="btn-filter-expiry" onclick="UI.toggleInventoryFilter('NEAR_EXPIRY')">
-<div>
-<p class="text-[10px] font-extrabold tracking-wider uppercase text-slate-400 group-hover:text-amber-600 transition-colors">Near Expiry Matrix</p>
-<h3 class="text-lg font-black text-amber-600 mt-0.5" id="inv-expiry-count">0</h3>
-</div>
-<div class="h-10 w-10 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center text-base shadow-inner"><i class="fa-solid fa-hourglass-half"></i></div>
-</button>
-<button class="bg-gradient-to-br from-teal-700 to-teal-900 hover:from-teal-800 hover:to-teal-950 p-5 rounded-2xl text-white shadow-md flex items-center justify-between text-left transition-all cursor-pointer active:scale-[0.98]" onclick="UI.viewVendorNetwork()">
-<div>
-<p class="text-[10px] font-bold tracking-wider uppercase text-teal-200">Supplier Network</p>
-<h3 class="text-xs font-extrabold mt-1 uppercase tracking-wide flex items-center"><i class="fa-solid fa-eye mr-1.5 text-emerald-400"></i>View &amp; Add Supplier</h3>
-</div>
-<div class="h-10 w-10 bg-teal-600/50 text-white rounded-xl flex items-center justify-center text-base shadow-inner"><i class="fa-solid fa-truck-field"></i></div>
-</button>
-</div>
-<!-- SEARCH AND FILTER SECTION FOR INVENTORY -->
-<div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row gap-4 items-center">
-<div class="relative flex-1 w-full">
-<i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-slate-400 text-sm"></i>
-<input class="w-full pl-11 pr-4 py-3 border border-slate-200 rounded-xl text-sm bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all font-medium" id="inventory-search" oninput="UI.triggerInventoryFilter()" placeholder="Search medicine by name or supplier..." type="text"/>
-</div>
-<div class="w-full md:w-56">
-<select class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all font-bold text-slate-700" id="inventory-type-filter" onchange="UI.triggerInventoryFilter()">
-<option value="ALL">All Medicine Types</option>
-<option value="Tablet">Tablet</option>
-<option value="Capsule">Capsule</option>
-<option value="Syrup">Syrup</option>
-<option value="Ointment">Ointment</option>
-<option value="Drop">Drop</option>
-<option value="Vial">Vial</option>
-<option value="Ampule">Ampule</option>
-<option value="SN">SN</option>
-<option value="Lotion">Lotion</option>
-<option value="Sachet">Sachet</option>
-<option value="Nab">Nab</option>
-<option value="Other">Other</option>
-</select>
-</div>
-</div>
-<div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-<div class="overflow-x-auto">
-<table class="w-full text-left border-collapse text-sm">
-<thead>
-<tr class="bg-slate-50 text-slate-500 uppercase font-bold text-[11px] tracking-wider border-b border-slate-200">
-<th class="p-4">Compound Descriptor</th>
-<th class="p-4">Supplier Identity</th>
-<th class="p-4">Expiry Vectors</th>
-<th class="p-4 text-center">Quantities Available</th>
-<th class="p-4 text-right">Pricing Profiles</th>
-<th class="p-4 text-right">Total Value (PTR)</th>
-<th class="p-4 text-center">Status Flag</th>
-<th class="p-4 text-right">Actions</th>
-</tr>
-</thead>
-<tbody id="inventory-table-body">
-</tbody>
-</table>
-</div>
-</div>
-</section>
-<section class="erp-section hidden space-y-6" id="mod-finance">
-<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-5 gap-4">
-<div>
-<h2 class="text-3xl font-black animated-heading pb-1">Accounts &amp; Ledger</h2>
-</div>
-<div class="flex gap-2.5 self-start flex-wrap">
-<button class="px-4 py-2.5 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer flex items-center active:scale-[0.97]" onclick="UI.openCreditsModal()">
-<i class="fa-solid fa-hand-holding-dollar mr-2"></i>Credit
-                    </button>
-<button class="px-4 py-2.5 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 text-white rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer flex items-center active:scale-[0.97]" onclick="UI.openModal('modal-expense')">
-<i class="fa-solid fa-receipt mr-2"></i>Log Overhead Expense
-                    </button>
-</div>
-</div>
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-<div class="lg:col-span-2 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm overflow-x-auto">
-<h3 class="font-bold text-sm text-slate-700 mb-4 flex items-center"><i class="fa-solid fa-list-check text-slate-400 mr-2"></i>Recent Financial Events String</h3>
-<table class="w-full text-left border-collapse text-xs">
-<thead>
-<tr class="bg-slate-50 text-slate-500 uppercase font-bold text-[10px] tracking-wider border-b border-slate-200">
-<th class="p-3">Timestamp</th>
-<th class="p-3">Category Parameters</th>
-<th class="p-3">Reference Allocation</th>
-<th class="p-3 text-right">Delta Vector Value</th>
-<th class="p-3 text-right">Action</th>
-</tr>
-</thead>
-<tbody id="finance-ledger-body">
-</tbody>
-</table>
-</div>
-<div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-<h3 class="font-bold text-sm text-slate-700 border-b border-slate-100 pb-2 flex items-center"><i class="fa-solid fa-chart-pie text-teal-600 mr-2"></i>Balance Sheet Summary</h3>
-<div class="space-y-3.5 text-xs font-medium">
-<div class="flex justify-between">
-<span class="text-slate-500">Gross Operational Inflows:</span>
-<span class="font-black text-emerald-600" id="fin-gross-in">+₹0.00</span>
-</div>
-<div class="flex justify-between">
-<span class="text-slate-500">Gross Overhead Drain:</span>
-<span class="font-black text-rose-600" id="fin-gross-out">-₹0.00</span>
-</div>
-<hr class="border-slate-100"/>
-<div class="flex justify-between text-sm font-black bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-<span class="text-slate-700">Net Retained Cash Profit:</span>
-<span class="text-teal-700" id="fin-net-profit">₹0.00</span>
-</div>
-</div>
-</div>
-</div>
-</section>
-<!-- NEW SETTINGS SECTION -->
-<section class="erp-section hidden space-y-6" id="mod-settings">
-<div class="border-b border-slate-200 pb-5">
-<h2 class="text-3xl font-black animated-heading pb-1">Clinic Settings</h2>
-</div>
-<div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm max-w-3xl">
-<div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-<div class="md:col-span-2">
-<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Clinic Name</label>
-<input class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800" id="clinic-name" placeholder="e.g. Astha Clinic" type="text"/>
-</div>
-<div class="md:col-span-2">
-<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Clinic Address</label>
-<input class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800" id="clinic-address" placeholder="e.g. 101, Health Hub Building, Main Road, Ahmedabad" type="text"/>
-</div>
-<div>
-<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Contact Number</label>
-<input class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800" id="clinic-mobile" placeholder="e.g. +91 9876543210" type="text"/>
-</div>
-<div>
-<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Doctor Name</label>
-<input class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800" id="clinic-doctor" placeholder="e.g. Dr. Meet Patel" type="text"/>
-</div>
-<div>
-<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Doctor Degree</label>
-<input class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800" id="clinic-degree" placeholder="e.g. MBBS, BHMS, BAMS" type="text"/>
-</div>
-<div>
-<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Registration Number</label>
-<input class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800" id="clinic-regno" placeholder="e.g. G-12345" type="text"/>
-</div>
-<!-- E-SIGN & E-STAMP CONFIGURATION AREA -->
-<div class="md:col-span-2 pt-4 border-t border-slate-100 mt-2">
-<h3 class="font-bold text-sm text-slate-800 mb-3"><i class="fa-solid fa-signature text-teal-600 mr-2"></i>E-Signature &amp; E-Stamp Configuration</h3>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-<div>
-<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Upload Signature</label>
-<input accept="image/*" class="w-full p-2 border border-slate-200 rounded-xl bg-slate-50 text-sm font-medium file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100 cursor-pointer" id="clinic-esign-file" type="file"/>
-<input id="clinic-esign-base64" type="hidden"/>
-<img class="mt-2 h-12 object-contain hidden border border-slate-200 rounded bg-white p-1" id="esign-preview" src=""/>
-</div>
-<div>
-<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Upload E-Stamp</label>
-<input accept="image/*" class="w-full p-2 border border-slate-200 rounded-xl bg-slate-50 text-sm font-medium file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100 cursor-pointer" id="clinic-estamp-file" type="file"/>
-<input id="clinic-estamp-base64" type="hidden"/>
-<img class="mt-2 h-16 object-contain hidden border border-slate-200 rounded bg-white p-1" id="estamp-preview" src=""/>
-</div>
-<div>
-<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Security Passcode (PIN)</label>
-<input class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800" id="clinic-esign-pin" placeholder="Enter PIN to lock both" type="password"/>
-</div>
-</div>
-</div>
-<div class="md:col-span-2 pt-3">
-<button class="px-5 py-3 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white font-bold rounded-xl shadow-md transition-all cursor-pointer active:scale-[0.99] flex items-center justify-center w-full md:w-auto" onclick="UI.saveClinicProfile()">
-<i class="fa-solid fa-floppy-disk mr-2"></i> Save Settings
-                        </button>
-</div>
-</div>
-</div>
-</section>
-</main>
-<div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print" id="modal-patient">
-<div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh] transform transition-all border border-slate-200 animate-zoom-in">
-<div class="bg-gradient-to-r from-teal-800 to-teal-950 p-4 text-white flex justify-between items-center">
-<h3 class="font-bold text-sm tracking-wide uppercase"><i class="fa-solid fa-user-plus mr-2 text-emerald-400"></i>New Patient Registration</h3>
-<button class="text-white/80 hover:text-white transition cursor-pointer text-xl" onclick="UI.closeModal('modal-patient')"><i class="fa-solid fa-xmark"></i></button>
-</div>
-<div class="p-6 overflow-y-auto space-y-4 flex-1">
-<form class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm font-medium text-slate-700" id="form-patient" onsubmit="UI.handlePatientSubmit(event)">
-<div>
-<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Patient Name *</label>
-<input class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold" id="p-name" required="" type="text"/>
-</div>
-<div>
-<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Mobile Number *</label>
-<input class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold" id="p-mobile" required="" type="text"/>
-</div>
-<div>
-<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Age *</label>
-<div class="flex space-x-2">
-<input class="w-2/3 p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-bold" id="p-age-val" min="0" oninput="UI.handleAgeChange()" required="" type="number"/>
-<select class="w-1/3 p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-bold" id="p-age-unit" onchange="UI.handleAgeChange()">
-<option value="Years">Years</option>
-<option value="Months">Months</option>
-</select>
-</div>
-</div>
-<div>
-<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Sex *</label>
-<select class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-bold" id="p-gender" required="">
-<option value="Male">Male</option>
-<option value="Female">Female</option>
-<option value="Other">Other</option>
-</select>
-</div>
-<div class="hidden" id="p-weight-container">
-<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Weight Value (kg) *</label>
-<input class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-bold" id="p-weight" placeholder="Mandatory for age &lt;= 15" step="0.1" type="number"/>
-</div>
-<div>
-<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Address</label>
-<input class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all" id="p-address" placeholder="Flat/House No, Street, City" type="text"/>
-</div>
-<div class="sm:col-span-2">
-<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Remarks - BP/Sugar/Allergy</label>
-<textarea class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all" id="p-allergies" placeholder="Penicillin sensitivity, diabetic metrics, systemic hypertension histories..." rows="2"></textarea>
-</div>
-<div class="sm:col-span-2 pt-2">
-<button class="w-full py-3 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white font-bold rounded-xl shadow-md transition-all cursor-pointer active:scale-[0.99]" type="submit">Save New Patient</button>
-</div>
-</form>
-</div>
-</div>
-</div>
-<div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print" id="modal-visit">
-<div class="w-full max-w-3xl bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border border-slate-200 animate-zoom-in">
-<div class="bg-gradient-to-r from-teal-800 to-teal-950 p-4 text-white flex justify-between items-center">
-<h3 class="font-bold text-sm tracking-wide uppercase"><i class="fa-solid fa-notes-medical mr-2 text-emerald-400"></i>Patient Clinical Notes &amp; Prescription</h3>
-<button class="text-white/80 hover:text-white transition cursor-pointer text-xl" onclick="UI.closeModal('modal-visit')"><i class="fa-solid fa-xmark"></i></button>
-</div>
-<div class="p-6 overflow-y-auto space-y-4 flex-1" id="visit-scroll-area">
-<form class="space-y-4 text-sm font-medium text-slate-700" id="form-visit" onsubmit="UI.handleVisitSubmit(event)">
-<input id="v-patient-id" type="hidden"/>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-<div>
-<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Chief Complaint</label>
-<input class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800" id="v-complaint" placeholder="Patient presents with acute symptoms..." required="" type="text"/>
-</div>
-<div>
-<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Clinical Impression / Diagnosis</label>
-<input class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800" id="v-diagnosis" placeholder="Clinical findings evaluation..." required="" type="text"/>
-</div>
-</div>
-<div class="border border-slate-200 p-4 rounded-xl bg-slate-50/50 space-y-3 shadow-inner">
-<label class="block text-xs font-black text-slate-600 uppercase tracking-wider">Patient Vital Constants</label>
-<div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-<div>
-<label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">BP (mmHg)</label>
-<input class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/10 font-bold" id="v-bp" placeholder="e.g. 120/80" type="text"/>
-</div>
-<div>
-<label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Pulse (bpm)</label>
-<input class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/10 font-bold" id="v-pulse" placeholder="e.g. 72" type="text"/>
-</div>
-<div>
-<label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">SpO2 (%)</label>
-<input class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/10 font-bold" id="v-spo2" placeholder="e.g. 98" type="text"/>
-</div>
-<div>
-<label class="flex items-center space-x-2 text-[10px] font-bold text-slate-500 uppercase mb-1 cursor-pointer select-none">
-<input class="rounded border-slate-300 accent-teal-700" id="v-rbs-check" onchange="UI.toggleRBS()" type="checkbox"/> <span>Check RBS?</span>
-</label>
-<input class="w-full p-2 border border-slate-200 rounded-lg bg-slate-100 focus:outline-none hidden font-bold" id="v-rbs" placeholder="RBS (mg/dL)" type="text"/>
-</div>
-</div>
-</div>
-<div class="border border-slate-200 p-4 rounded-xl bg-slate-50/50 space-y-3 shadow-inner">
-<div class="flex justify-between items-center">
-<label class="block text-xs font-black text-slate-600 uppercase tracking-wider">In-Clinic Treatment</label>
-<select class="p-1.5 text-xs border border-slate-200 rounded-lg bg-white focus:outline-none font-bold text-teal-700 cursor-pointer" id="v-treatment-type" onchange="UI.toggleTreatment()">
-<option value="None">None</option>
-<option value="Injection">Injection</option>
-<option value="Drip">IV Drip Fluid</option>
-<option value="Dressing">Dressing</option>
-<option value="Stitches">Stitches</option>
-</select>
-</div>
-<div class="hidden space-y-3 pt-3 border-t border-slate-200" id="treatment-container">
-<div class="grid grid-cols-1 md:grid-cols-4 gap-3" id="treatment-med-controls">
-<div class="md:col-span-1">
-<label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Med Type Filter</label>
-<select class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-semibold" id="v-treatment-med-type" onchange="UI.filterVisitMedicineOptions('v-treatment-medicine', this.value)">
-<option value="ALL">All Types</option>
-<option value="Tablet">Tablet</option>
-<option value="Capsule">Capsule</option>
-<option value="Syrup">Syrup</option>
-<option value="Ointment">Ointment</option>
-<option value="Drop">Drop</option>
-<option value="Vial">Vial</option>
-<option value="Ampule">Ampule</option>
-<option value="SN">SN</option>
-<option value="Lotion">Lotion</option>
-<option value="Sachet">Sachet</option>
-<option value="Nab">Nab</option>
-<option value="Other">Other</option>
-</select>
-</div>
-<div class="md:col-span-2">
-<label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Target Compound stock</label>
-<select class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-semibold" id="v-treatment-medicine"></select>
-</div>
-<div class="md:col-span-1">
-<label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Dose Volume</label>
-<input class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-semibold" id="v-treatment-qty" placeholder="e.g. 1 Amp / 1 Vial" type="text"/>
-</div>
-</div>
-<div class="hidden grid grid-cols-1 md:grid-cols-4 gap-3" id="stitches-container">
-<div class="md:col-span-2">
-<label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Number of Stitches</label>
-<input class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-semibold" id="v-stitches-count" placeholder="e.g. 5" type="number"/>
-</div>
-</div>
-<div class="flex justify-end mt-2">
-<button class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs rounded-xl transition-all shadow-xs flex items-center cursor-pointer" onclick="UI.addTreatmentToPrescription()" type="button">
-<i class="fa-solid fa-plus mr-1"></i> Add to Treatment Plan
-                                </button>
-</div>
-<textarea class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none text-xs font-semibold font-mono text-slate-700 mt-2" id="v-treatment-plan" placeholder="In-Clinic Treatments will map visually in this block space..." rows="2"></textarea>
-</div>
-</div>
-<div class="border border-slate-200 p-4 rounded-xl bg-slate-50/50 space-y-3 shadow-inner">
-<label class="block text-xs font-black text-slate-600 uppercase tracking-wider">Prescription Architecture &amp; Stock Auto Deductions</label>
-<div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-<div class="col-span-2 md:col-span-1">
-<label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Med Type Filter</label>
-<select class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-semibold" id="v-rx-med-type" onchange="UI.filterVisitMedicineOptions('v-medicine', this.value)">
-<option value="ALL">All Types</option>
-<option value="Tablet">Tablet</option>
-<option value="Capsule">Capsule</option>
-<option value="Syrup">Syrup</option>
-<option value="Ointment">Ointment</option>
-<option value="Drop">Drop</option>
-<option value="Vial">Vial</option>
-<option value="Ampule">Ampule</option>
-<option value="SN">SN</option>
-<option value="Lotion">Lotion</option>
-<option value="Sachet">Sachet</option>
-<option value="Nab">Nab</option>
-<option value="Other">Other</option>
-</select>
-</div>
-<div class="col-span-2 md:col-span-3">
-<label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Medicine Compound Selection</label>
-<select class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-semibold" id="v-medicine" onchange="UI.handlePrescriptionMedicineChange()"></select>
-</div>
-<div class="hidden col-span-2 md:col-span-1" id="v-ml-container">
-<label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Dose (ML)</label>
-<input class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-bold text-teal-700" id="v-ml-input" placeholder="e.g. 2.5" step="0.1" type="number"/>
-</div>
-<div class="hidden col-span-2 md:col-span-1" id="v-direct-qty-container">
-<label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Qty Given</label>
-<input class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-bold text-teal-700" id="v-direct-qty-input" placeholder="Total Qty" step="0.1" type="number"/>
-</div>
-<div class="col-span-2 md:col-span-1">
-<label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Frequency Matrix</label>
-<select class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-bold text-slate-700" id="v-dose">
-<option value="1-0-1">1-0-1</option>
-<option value="1-1-1">1-1-1</option>
-<option value="1-0-0">1-0-0</option>
-<option value="0-1-0">0-1-0</option>
-<option value="0-0-1">0-0-1</option>
-<option value="1/2-1/2-1/2">1/2-1/2-1/2</option>
-<option value="1/2-0-1/2">1/2-0-1/2</option>
-<option value="1-0-1/2">1-0-1/2</option>
-<option value="1/2-0-1">1/2-0-1</option>
-</select>
-</div>
-<div class="col-span-2 md:col-span-1">
-<label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Meal Relationship</label>
-<select class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-bold text-slate-700" id="v-meal">
-<option value="After meal">After meal</option>
-<option value="Before meal">Before meal</option>
-</select>
-</div>
-<div class="col-span-2 md:col-span-1">
-<label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Duration Cycle</label>
-<input class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-semibold" id="v-duration" placeholder="e.g. 5" type="text"/>
-</div>
-<div class="col-span-2 md:col-span-4 flex justify-end">
-<button class="px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 font-bold text-xs rounded-xl transition-all shadow-xs flex items-center cursor-pointer" onclick="UI.addMedicineToPrescription()" type="button">
-<i class="fa-solid fa-plus mr-1"></i> Add to Prescription List
-                                </button>
-</div>
-</div>
-<textarea class="w-full p-3 border border-slate-200 rounded-xl bg-white focus:outline-none font-mono text-sm leading-relaxed text-slate-800 font-medium" id="v-prescription" placeholder="Aggregated systemic prescriptions generate structurally here..." rows="4"></textarea>
-</div>
-<div class="bg-amber-50 p-3 rounded-xl text-xs text-amber-800 border border-amber-200 flex items-start font-medium leading-normal">
-<i class="fa-solid fa-circle-info mr-2.5 mt-0.5 text-amber-600 text-sm"></i> Note: This console process writes strictly into clinical record registries. To compute invoice billing protocols, trigger the "Generate Bill" module manually.
                     </div>
-<div class="pt-2 space-y-2">
-<button class="w-full py-3 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white font-bold rounded-xl shadow-md transition-all cursor-pointer active:scale-[0.99]" type="submit">Save Clinical Prescription Record</button>
-<button class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl transition-all cursor-pointer text-xs active:scale-[0.99]" onclick="document.getElementById('visit-scroll-area').scrollTo({top: 0, behavior: 'smooth'})" type="button"><i class="fa-solid fa-arrow-up mr-1.5"></i>Back to Top</button>
-</div>
-</form>
-</div>
-</div>
-</div>
-<div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print" id="modal-consultations">
-<div class="w-full max-w-4xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden animate-zoom-in">
-<div class="bg-gradient-to-r from-teal-800 to-teal-950 text-white px-5 py-4 flex items-center justify-between">
-<div>
-<h3 class="font-bold text-sm uppercase tracking-wide"><i class="fa-solid fa-file-waveform mr-2 text-emerald-400"></i>Patient Consultation Chronology</h3>
-<p class="text-xs text-teal-200 mt-1 font-medium" id="consultations-patient-meta">Historical audit tracking files</p>
-</div>
-<button class="text-white/80 hover:text-white text-xl cursor-pointer" onclick="UI.closeModal('modal-consultations')"><i class="fa-solid fa-xmark"></i></button>
-</div>
-<div class="p-5 max-h-[75vh] overflow-y-auto bg-slate-50">
-<div class="space-y-4" id="consultations-history-list"></div>
-</div>
-</div>
-</div>
-<div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print" id="modal-medicine">
-<div class="bg-white rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden flex flex-col max-h-[90vh] border border-slate-200 animate-zoom-in">
-<div class="bg-gradient-to-r from-teal-800 to-teal-950 p-4 text-white flex justify-between items-center">
-<h3 class="font-bold text-sm uppercase tracking-wide" id="medicine-modal-title"><i class="fa-solid fa-pills mr-2 text-emerald-400"></i>Register New Medicine</h3>
-<button class="text-white/80 hover:text-white text-xl cursor-pointer" onclick="UI.closeModal('modal-medicine')"><i class="fa-solid fa-xmark"></i></button>
-</div>
-<div class="p-6 overflow-y-auto space-y-4 flex-1" id="medicine-scroll-area">
-<form class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm font-medium text-slate-700" id="form-medicine" onsubmit="UI.handleMedicineSubmit(event)">
-<input id="m-edit-id" type="hidden" value=""/>
-<div class="sm:col-span-2">
-<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Medicine Type *</label>
-<select class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-700 cursor-pointer" id="m-type" onchange="UI.handleMedTypeChange()" required="">
-<option disabled="" selected="" value="">Select Type</option>
-<option value="Tablet">Tablet</option>
-<option value="Capsule">Capsule</option>
-<option value="Syrup">Syrup</option>
-<option value="Ointment">Ointment</option>
-<option value="Drop">Drop</option>
-<option value="Vial">Vial</option>
-<option value="Ampule">Ampule</option>
-<option value="SN">SN</option>
-<option value="Lotion">Lotion</option>
-<option value="Sachet">Sachet</option>
-<option value="Nab">Nab</option>
-<option value="Other">Other</option>
-</select>
-</div>
-<div class="sm:col-span-2 hidden" id="m-type-other-container">
-<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Specify Custom Category *</label>
-<input class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800" id="m-type-other" placeholder="e.g., Inhaler, Patch, Cream" type="text"/>
-</div>
-<div class="sm:col-span-2">
-<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Medicine Name *</label>
-<input class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800" id="m-name" placeholder="e.g., Augmentin 625 Duo" required="" type="text"/>
-</div>
-<div>
-<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Medicine Supplier</label>
-<select class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-700" id="m-supplier">
-</select>
-</div>
-<div>
-<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Expiry Date (MM-YYYY) *</label>
-<div class="flex space-x-2">
-<select class="w-1/2 p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-bold text-slate-700 cursor-pointer" id="m-expiry-month" required="">
-<option disabled="" selected="" value="">MM</option>
-<option value="01">01 - Jan</option>
-<option value="02">02 - Feb</option>
-<option value="03">03 - Mar</option>
-<option value="04">04 - Apr</option>
-<option value="05">05 - May</option>
-<option value="06">06 - Jun</option>
-<option value="07">07 - Jul</option>
-<option value="08">08 - Aug</option>
-<option value="09">09 - Sep</option>
-<option value="10">10 - Oct</option>
-<option value="11">11 - Nov</option>
-<option value="12">12 - Dec</option>
-</select>
-<select class="w-1/2 p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-bold text-slate-700 cursor-pointer" id="m-expiry-year" required="">
-</select>
-</div>
-</div>
-<div class="sm:col-span-2">
-<hr class="border-slate-100 my-1"/>
-</div>
-<div class="sm:col-span-2">
-<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Package Type &amp; Units per Pkg *</label>
-<div class="flex space-x-2">
-<select class="w-1/2 p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-bold text-slate-700" id="m-unit-type">
-<option value="Strip">Strip</option>
-<option value="ML">ML</option>
-<option value="Box">Box</option>
-<option value="Tray">Tray</option>
-<option value="Pck">Pck</option>
-<option value="Piece">Piece</option>
-</select>
-<input class="w-1/2 p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none font-bold text-slate-800" id="m-unit-qty" min="1" oninput="UI.calculateTotalQty()" placeholder="Units per pkg (e.g. 10)" required="" type="number"/>
-</div>
-</div>
-<div>
-<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Total Units Per Box/Packages *</label>
-<input class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none font-bold text-slate-800" id="m-qty" oninput="UI.calculateTotalQty()" placeholder="e.g. 5" required="" type="number"/>
-</div>
-<div>
-<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Total Inventory</label>
-<input class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-100 focus:outline-none font-black text-teal-700" id="m-total-qty" readonly="" type="number"/>
-</div>
-<div>
-<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">PTR (₹) *</label>
-<input class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none font-bold text-slate-800" id="m-purchase" required="" step="0.01" type="number"/>
-</div>
-<div>
-<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">MRP (₹) *</label>
-<input class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none font-bold text-slate-800" id="m-selling" required="" step="0.01" type="number"/>
-</div>
-<div class="sm:col-span-2 pt-2 space-y-2">
-<button class="w-full py-3 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white font-bold rounded-xl shadow-md transition-all cursor-pointer active:scale-[0.99]" id="medicine-submit-btn" type="submit">Save &amp; Add Medicine</button>
-<button class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl transition-all cursor-pointer text-xs active:scale-[0.99]" onclick="document.getElementById('medicine-scroll-area').scrollTo({top: 0, behavior: 'smooth'})" type="button"><i class="fa-solid fa-arrow-up mr-1.5"></i>Back to Top</button>
-</div>
-</form>
-</div>
-</div>
-</div>
-<div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print" id="modal-vendors">
-<div class="w-full max-w-3xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden animate-zoom-in">
-<div class="bg-gradient-to-r from-teal-800 to-teal-950 text-white px-5 py-4 flex items-center justify-between">
-<div>
-<h3 class="font-bold text-sm uppercase tracking-wide"><i class="fa-solid fa-truck-field mr-2 text-emerald-400"></i>Supplier Network</h3>
-</div>
-<div class="flex items-center gap-3">
-<button class="px-3 py-1.5 bg-white text-teal-900 rounded-lg text-xs font-bold hover:bg-slate-50 transition-all shadow-xs cursor-pointer active:scale-[0.96]" onclick="UI.openAddVendorFromNetwork()">Add Supplier</button>
-<button class="text-white/80 hover:text-white text-xl cursor-pointer" onclick="UI.closeModal('modal-vendors')"><i class="fa-solid fa-xmark"></i></button>
-</div>
-</div>
-<div class="p-5 max-h-[75vh] overflow-y-auto bg-slate-50">
-<div class="space-y-3" id="vendor-network-list"></div>
-</div>
-</div>
-</div>
-<div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print" id="modal-supplier">
-<div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col border border-slate-200 animate-zoom-in">
-<div class="bg-gradient-to-r from-teal-800 to-teal-950 p-4 text-white flex justify-between items-center">
-<h3 class="font-bold text-sm uppercase tracking-wide" id="supplier-modal-title"><i class="fa-solid fa-truck-field mr-2 text-emerald-400"></i>Create Vendor Profile</h3>
-<button class="text-white/80 hover:text-white text-xl cursor-pointer" onclick="UI.closeModal('modal-supplier')"><i class="fa-solid fa-xmark"></i></button>
-</div>
-<div class="p-6 space-y-4">
-<form class="space-y-4 text-sm font-medium text-slate-700" id="form-supplier" onsubmit="UI.handleSupplierSubmit(event)">
-<input id="s-edit-index" type="hidden" value=""/>
-<div>
-<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Supplier Name *</label>
-<input class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800" id="s-name" placeholder="e.g., Balaji Pharma Distributors" required="" type="text"/>
-</div>
-<div>
-<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Supplier Address</label>
-<input class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none text-slate-800" id="s-contact" placeholder="e.g., Ahmedabad" type="text"/>
-</div>
-<div>
-<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Mobile Number *</label>
-<input class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-bold text-slate-800" id="s-phone" placeholder="e.g., 9876543211" required="" type="text"/>
-</div>
-<div class="pt-2">
-<button class="w-full py-3 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white font-bold rounded-xl shadow-md transition-all cursor-pointer active:scale-[0.99]" type="submit"><span id="supplier-submit-text">Commit Vendor Profile</span></button>
-</div>
-</form>
-</div>
-</div>
-</div>
-<div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print" id="modal-expense">
-<div class="w-full max-w-xl bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border border-slate-200 animate-zoom-in">
-<div class="bg-gradient-to-r from-rose-700 to-rose-900 p-4 text-white flex justify-between items-center">
-<h3 class="font-bold text-sm uppercase tracking-wide"><i class="fa-solid fa-receipt mr-2"></i>Log Infrastructure Overhead Expense</h3>
-<button class="text-white/80 hover:text-white text-xl cursor-pointer" onclick="UI.closeModal('modal-expense')"><i class="fa-solid fa-xmark"></i></button>
-</div>
-<div class="p-6 overflow-y-auto space-y-4 flex-1">
-<form class="space-y-4 text-sm font-medium text-slate-700" id="form-expense" onsubmit="UI.handleExpenseSubmit(event)">
-<div>
-<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Expense Classification *</label>
-<select class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-rose-500/20 transition-all font-semibold text-slate-700" id="e-category">
-<option value="Clinic Rental System">Clinic Space Rental</option>
-<option value="Staff Payroll &amp; Wages">Staff Wages &amp; Salaries</option>
-<option value="Utility Grid (Power/Net)">Electricity &amp; Internet Grid</option>
-<option value="Medical Disposal / Clinical Overhead">Bio-Waste &amp; Clinic Consumables</option>
-<option value="Miscellaneous Incidental Fees">Miscellaneous Incidental Fees</option>
-</select>
-</div>
-<div>
-<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Outflow Value Amount (₹) *</label>
-<input class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-rose-500/20 transition-all font-bold text-slate-900" id="e-amount" required="" step="0.01" type="number"/>
-</div>
-<div>
-<label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Internal Audit Memo Text</label>
-<input class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none text-slate-800" id="e-notes" placeholder="e.g., Monthly broadband settlement" type="text"/>
-</div>
-<div class="pt-2">
-<button class="w-full py-3 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 text-white font-bold rounded-xl shadow-md transition-all cursor-pointer active:scale-[0.99]" type="submit">Post Overhead Outflow</button>
-</div>
-</form>
-</div>
-</div>
-</div>
-<div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print" id="modal-credits">
-<div class="w-full max-w-3xl bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border border-slate-200 animate-zoom-in">
-<div class="bg-gradient-to-r from-teal-800 to-teal-950 p-4 text-white flex justify-between items-center">
-<h3 class="font-bold text-sm uppercase tracking-wide"><i class="fa-solid fa-hand-holding-dollar mr-2 text-emerald-400"></i>Credit Logs</h3>
-<button class="text-white/80 hover:text-white text-xl cursor-pointer" onclick="UI.closeModal('modal-credits')"><i class="fa-solid fa-xmark"></i></button>
-</div>
-<div class="p-6 overflow-y-auto bg-slate-100 flex-1">
-<div class="space-y-4" id="credits-list">
-</div>
-</div>
-</div>
-</div>
-<div class="hidden font-mono text-sm bg-white text-slate-900 w-full max-w-full" id="print-area">
-</div>
 
-<script src="script.js"></script></body>
+                    <div class="border border-slate-200 rounded-xl overflow-hidden mt-4">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="bg-slate-50 text-slate-400 uppercase font-extrabold text-[10px] tracking-wider border-b border-slate-200">
+                                    <th class="p-3">Item Descriptor</th>
+                                    <th class="p-3 text-center">Quantity</th>
+                                    <th class="p-3 text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="otc-cart-body">
+                                <tr><td colspan="3" class="p-4 text-center text-slate-400 text-xs italic font-medium">Cart allocations are currently blank.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center justify-start h-full space-y-4">
+                    
+                    <div class="w-full bg-slate-50 p-4 rounded-xl border border-slate-200 flex justify-between items-center shadow-inner">
+                        <span class="text-slate-500 font-extrabold uppercase tracking-wider text-[11px]">Amount Payable (₹)</span>
+                        <input type="number" id="otc-receive-amount" oninput="UI.renderOTCUPIQR()" placeholder="0.00" class="w-36 p-2 bg-white border border-slate-200 rounded-lg text-xl font-black text-slate-900 text-right focus:outline-none focus:ring-2 focus:ring-teal-500/20">
+                    </div>
+
+                    <div class="w-full space-y-2">
+                        <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Payment Mode</label>
+                        <select id="otc-payment-mode" onchange="UI.renderOTCUPIQR()" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none font-medium">
+                            <option value="Cash">Cash</option>
+                            <option value="UPI">UPI</option>
+                        </select>
+                    </div>
+
+                    <div id="otc-upi-config-area" class="w-full border-b border-slate-100 pb-3 hidden mt-1">
+                        <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Receiving UPI Handle</label>
+                        <div class="flex items-center bg-slate-50 px-3 py-1 rounded-xl border border-slate-200">
+                            <i class="fa-solid fa-building-columns text-slate-400 mr-2.5"></i>
+                            <input id="otc-clinic-upi-id" type="text" oninput="UI.renderOTCUPIQR()" value="yourclinic@okicici" placeholder="Enter Clinic UPI ID" class="w-full py-2 border-b border-transparent text-sm bg-transparent focus:outline-none text-slate-700 font-bold">
+                        </div>
+                    </div>
+
+                    <div id="otc-upi-qr-container" class="hidden flex flex-col items-center justify-center pt-2 w-full animate-fade-in">
+                        <div class="bg-gradient-to-r from-teal-700 to-slate-800 text-white px-5 py-2.5 rounded-t-xl w-64 text-center font-bold text-xs tracking-wide">
+                            Scan to Pay: <span class="text-base font-black text-emerald-300 ml-1">₹<span id="otc-qr-amount-display">0</span></span>
+                        </div>
+                        <div class="bg-white p-4 border border-t-0 border-slate-200 rounded-b-xl shadow-md flex justify-center w-64 h-64">
+                            <div id="otc-qrcode" class="flex items-center justify-center w-full h-full"></div>
+                        </div>
+                    </div>
+
+                    <div class="w-full pt-4 mt-auto">
+                        <button onclick="UI.commitOTCSale()" class="w-full py-3.5 bg-gradient-to-r from-slate-800 to-slate-950 hover:from-slate-900 hover:to-black text-white font-bold text-sm rounded-xl shadow-md active:scale-[0.99] transition-all flex items-center justify-center space-x-2 cursor-pointer">
+                            <i class="fa-solid fa-circle-check text-emerald-400"></i><span>Complete OTC Transaction Settlement</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="mod-inventory" class="erp-section hidden space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-5 gap-4">
+                <div>
+                    <h2 class="text-3xl font-black animated-heading pb-1">Stock Management</h2>
+                </div>
+                <!-- FIXED RESPONSIVE BUTTONS FOR STOCK MANAGEMENT -->
+                <div class="flex gap-2 items-center self-start flex-nowrap w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0 hide-scroll">
+                    <button onclick="UI.printInventoryStock()" class="px-3 sm:px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-indigo-700/20 active:scale-[0.98] cursor-pointer flex items-center shrink-0">
+                        <i class="fa-solid fa-print sm:mr-2"></i><span class="hidden sm:inline">Print Stock</span>
+                    </button>
+                    <button onclick="UI.exportInventoryCSV()" class="px-3 sm:px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-emerald-700/20 active:scale-[0.98] cursor-pointer flex items-center shrink-0">
+                        <i class="fa-solid fa-file-csv sm:mr-2"></i><span class="hidden sm:inline">Export Stock</span>
+                    </button>
+                    <button onclick="UI.initMedicineModal()" class="px-4 sm:px-5 py-2.5 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-teal-700/20 active:scale-[0.98] cursor-pointer flex items-center shrink-0 whitespace-nowrap">
+                        <i class="fa-solid fa-pills mr-2"></i>Add Medicine
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
+                    <div>
+                        <p class="text-[10px] font-extrabold tracking-wider uppercase text-slate-400">Valuation Base (PTR)</p>
+                        <h3 id="inv-ptr-val" class="text-lg font-black text-slate-900 mt-0.5">₹0.00</h3>
+                    </div>
+                    <div class="h-10 w-10 bg-teal-50 text-teal-600 rounded-xl flex items-center justify-center text-base shadow-inner"><i class="fa-solid fa-calculator"></i></div>
+                </div>
+                <button onclick="UI.toggleInventoryFilter('LOW_STOCK')" id="btn-filter-low" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between text-left hover:border-rose-300 transition-all cursor-pointer group active:scale-[0.98]">
+                    <div>
+                        <p class="text-[10px] font-extrabold tracking-wider uppercase text-slate-400 group-hover:text-rose-600 transition-colors">Low Stock Alerts</p>
+                        <h3 id="inv-low-count" class="text-lg font-black text-rose-600 mt-0.5">0</h3>
+                    </div>
+                    <div class="h-10 w-10 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center text-base shadow-inner"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                </button>
+                <button onclick="UI.toggleInventoryFilter('NEAR_EXPIRY')" id="btn-filter-expiry" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between text-left hover:border-amber-300 transition-all cursor-pointer group active:scale-[0.98]">
+                    <div>
+                        <p class="text-[10px] font-extrabold tracking-wider uppercase text-slate-400 group-hover:text-amber-600 transition-colors">Near Expiry Matrix</p>
+                        <h3 id="inv-expiry-count" class="text-lg font-black text-amber-600 mt-0.5">0</h3>
+                    </div>
+                    <div class="h-10 w-10 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center text-base shadow-inner"><i class="fa-solid fa-hourglass-half"></i></div>
+                </button>
+                <button onclick="UI.viewVendorNetwork()" class="bg-gradient-to-br from-teal-700 to-teal-900 hover:from-teal-800 hover:to-teal-950 p-5 rounded-2xl text-white shadow-md flex items-center justify-between text-left transition-all cursor-pointer active:scale-[0.98]">
+                    <div>
+                        <p class="text-[10px] font-bold tracking-wider uppercase text-teal-200">Supplier Network</p>
+                        <h3 class="text-xs font-extrabold mt-1 uppercase tracking-wide flex items-center"><i class="fa-solid fa-eye mr-1.5 text-emerald-400"></i>View & Add Supplier</h3>
+                    </div>
+                    <div class="h-10 w-10 bg-teal-600/50 text-white rounded-xl flex items-center justify-center text-base shadow-inner"><i class="fa-solid fa-truck-field"></i></div>
+                </button>
+            </div>
+
+            <!-- SEARCH AND FILTER SECTION FOR INVENTORY -->
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row gap-4 items-center">
+                <div class="relative flex-1 w-full">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-slate-400 text-sm"></i>
+                    <input id="inventory-search" type="text" oninput="UI.triggerInventoryFilter()" placeholder="Search medicine by name or supplier..." class="w-full pl-11 pr-4 py-3 border border-slate-200 rounded-xl text-sm bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all font-medium">
+                </div>
+                <div class="w-full md:w-56">
+                    <select id="inventory-type-filter" onchange="UI.triggerInventoryFilter()" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all font-bold text-slate-700">
+                        <option value="ALL">All Medicine Types</option>
+                        <option value="Tablet">Tablet</option>
+                        <option value="Capsule">Capsule</option>
+                        <option value="Syrup">Syrup</option>
+                        <option value="Ointment">Ointment</option>
+                        <option value="Drop">Drop</option>
+                        <option value="Vial">Vial</option>
+                        <option value="Ampule">Ampule</option>
+                        <option value="SN">SN</option>
+                        <option value="Lotion">Lotion</option>
+                        <option value="Sachet">Sachet</option>
+                        <option value="Nab">Nab</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-500 uppercase font-bold text-[11px] tracking-wider border-b border-slate-200">
+                                <th class="p-4">Compound Descriptor</th>
+                                <th class="p-4">Supplier Identity</th>
+                                <th class="p-4">Expiry Vectors</th>
+                                <th class="p-4 text-center">Quantities Available</th>
+                                <th class="p-4 text-right">Pricing Profiles</th>
+                                <th class="p-4 text-right">Total Value (PTR)</th>
+                                <th class="p-4 text-center">Status Flag</th>
+                                <th class="p-4 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventory-table-body">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="mod-finance" class="erp-section hidden space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-5 gap-4">
+                <div>
+                    <h2 class="text-3xl font-black animated-heading pb-1">Accounts & Ledger</h2>
+                </div>
+                <div class="flex gap-2.5 self-start flex-wrap">
+                    <button onclick="UI.openCreditsModal()" class="px-4 py-2.5 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer flex items-center active:scale-[0.97]">
+                        <i class="fa-solid fa-hand-holding-dollar mr-2"></i>Credit
+                    </button>
+                    <button onclick="UI.openModal('modal-expense')" class="px-4 py-2.5 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 text-white rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer flex items-center active:scale-[0.97]">
+                        <i class="fa-solid fa-receipt mr-2"></i>Log Overhead Expense
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm overflow-x-auto">
+                    <h3 class="font-bold text-sm text-slate-700 mb-4 flex items-center"><i class="fa-solid fa-list-check text-slate-400 mr-2"></i>Recent Financial Events String</h3>
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-500 uppercase font-bold text-[10px] tracking-wider border-b border-slate-200">
+                                <th class="p-3">Timestamp</th>
+                                <th class="p-3">Category Parameters</th>
+                                <th class="p-3">Reference Allocation</th>
+                                <th class="p-3 text-right">Delta Vector Value</th>
+                                <th class="p-3 text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="finance-ledger-body">
+                            </tbody>
+                    </table>
+                </div>
+                
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <h3 class="font-bold text-sm text-slate-700 border-b border-slate-100 pb-2 flex items-center"><i class="fa-solid fa-chart-pie text-teal-600 mr-2"></i>Balance Sheet Summary</h3>
+                    <div class="space-y-3.5 text-xs font-medium">
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Gross Operational Inflows:</span>
+                            <span id="fin-gross-in" class="font-black text-emerald-600">+₹0.00</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Gross Overhead Drain:</span>
+                            <span id="fin-gross-out" class="font-black text-rose-600">-₹0.00</span>
+                        </div>
+                        <hr class="border-slate-100">
+                        <div class="flex justify-between text-sm font-black bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                            <span class="text-slate-700">Net Retained Cash Profit:</span>
+                            <span id="fin-net-profit" class="text-teal-700">₹0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- NEW SETTINGS SECTION -->
+        <section id="mod-settings" class="erp-section hidden space-y-6">
+            <div class="border-b border-slate-200 pb-5">
+                <h2 class="text-3xl font-black animated-heading pb-1">Clinic Settings</h2>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm max-w-3xl">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div class="md:col-span-2">
+                        <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Clinic Name</label>
+                        <input type="text" id="clinic-name" placeholder="e.g. Astha Clinic" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Clinic Address</label>
+                        <input type="text" id="clinic-address" placeholder="e.g. 101, Health Hub Building, Main Road, Ahmedabad" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Contact Number</label>
+                        <input type="text" id="clinic-mobile" placeholder="e.g. +91 9876543210" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Doctor Name</label>
+                        <input type="text" id="clinic-doctor" placeholder="e.g. Dr. Meet Patel" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Doctor Degree</label>
+                        <input type="text" id="clinic-degree" placeholder="e.g. MBBS, BHMS, BAMS" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Registration Number</label>
+                        <input type="text" id="clinic-regno" placeholder="e.g. G-12345" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800">
+                    </div>
+
+                    <!-- E-SIGN & E-STAMP CONFIGURATION AREA -->
+                    <div class="md:col-span-2 pt-4 border-t border-slate-100 mt-2">
+                        <h3 class="font-bold text-sm text-slate-800 mb-3"><i class="fa-solid fa-signature text-teal-600 mr-2"></i>E-Signature & E-Stamp Configuration</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                            <div>
+                                <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Upload Signature</label>
+                                <input type="file" id="clinic-esign-file" accept="image/*" class="w-full p-2 border border-slate-200 rounded-xl bg-slate-50 text-sm font-medium file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100 cursor-pointer">
+                                <input type="hidden" id="clinic-esign-base64">
+                                <img id="esign-preview" src="" class="mt-2 h-12 object-contain hidden border border-slate-200 rounded bg-white p-1">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Upload E-Stamp</label>
+                                <input type="file" id="clinic-estamp-file" accept="image/*" class="w-full p-2 border border-slate-200 rounded-xl bg-slate-50 text-sm font-medium file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100 cursor-pointer">
+                                <input type="hidden" id="clinic-estamp-base64">
+                                <img id="estamp-preview" src="" class="mt-2 h-16 object-contain hidden border border-slate-200 rounded bg-white p-1">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Security Passcode (PIN)</label>
+                                <input type="password" id="clinic-esign-pin" placeholder="Enter PIN to lock both" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="md:col-span-2 pt-3">
+                        <button onclick="UI.saveClinicProfile()" class="px-5 py-3 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white font-bold rounded-xl shadow-md transition-all cursor-pointer active:scale-[0.99] flex items-center justify-center w-full md:w-auto">
+                            <i class="fa-solid fa-floppy-disk mr-2"></i> Save Settings
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <div id="modal-patient" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh] transform transition-all border border-slate-200 animate-zoom-in">
+            <div class="bg-gradient-to-r from-teal-800 to-teal-950 p-4 text-white flex justify-between items-center">
+                <h3 class="font-bold text-sm tracking-wide uppercase"><i class="fa-solid fa-user-plus mr-2 text-emerald-400"></i>New Patient Registration</h3>
+                <button onclick="UI.closeModal('modal-patient')" class="text-white/80 hover:text-white transition cursor-pointer text-xl"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-6 overflow-y-auto space-y-4 flex-1">
+                <form id="form-patient" class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm font-medium text-slate-700" onsubmit="UI.handlePatientSubmit(event)">
+                    <div>
+                        <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Patient Name *</label>
+                        <input type="text" id="p-name" required class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Mobile Number *</label>
+                        <input type="text" id="p-mobile" required class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Age *</label>
+                        <div class="flex space-x-2">
+                            <input type="number" id="p-age-val" oninput="UI.handleAgeChange()" required min="0" class="w-2/3 p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-bold">
+                            <select id="p-age-unit" onchange="UI.handleAgeChange()" class="w-1/3 p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-bold">
+                                <option value="Years">Years</option>
+                                <option value="Months">Months</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Sex *</label>
+                        <select id="p-gender" required class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-bold">
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div id="p-weight-container" class="hidden">
+                        <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Weight Value (kg) *</label>
+                        <input type="number" step="0.1" id="p-weight" placeholder="Mandatory for age <= 15" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Address</label>
+                        <input type="text" id="p-address" placeholder="Flat/House No, Street, City" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all">
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Remarks - BP/Sugar/Allergy</label>
+                        <textarea id="p-allergies" rows="2" placeholder="Penicillin sensitivity, diabetic metrics, systemic hypertension histories..." class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all"></textarea>
+                    </div>
+                    <div class="sm:col-span-2 pt-2">
+                        <button type="submit" class="w-full py-3 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white font-bold rounded-xl shadow-md transition-all cursor-pointer active:scale-[0.99]">Save New Patient</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-visit" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print">
+        <div class="w-full max-w-3xl bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border border-slate-200 animate-zoom-in">
+            <div class="bg-gradient-to-r from-teal-800 to-teal-950 p-4 text-white flex justify-between items-center">
+                <h3 class="font-bold text-sm tracking-wide uppercase"><i class="fa-solid fa-notes-medical mr-2 text-emerald-400"></i>Patient Clinical Notes & Prescription</h3>
+                <button onclick="UI.closeModal('modal-visit')" class="text-white/80 hover:text-white transition cursor-pointer text-xl"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-6 overflow-y-auto space-y-4 flex-1" id="visit-scroll-area">
+                <form id="form-visit" class="space-y-4 text-sm font-medium text-slate-700" onsubmit="UI.handleVisitSubmit(event)">
+                    <input type="hidden" id="v-patient-id">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Chief Complaint</label>
+                            <input type="text" id="v-complaint" required placeholder="Patient presents with acute symptoms..." class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Clinical Impression / Diagnosis</label>
+                            <input type="text" id="v-diagnosis" required placeholder="Clinical findings evaluation..." class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800">
+                        </div>
+                    </div>
+
+                    <div class="border border-slate-200 p-4 rounded-xl bg-slate-50/50 space-y-3 shadow-inner">
+                        <label class="block text-xs font-black text-slate-600 uppercase tracking-wider">Patient Vital Constants</label>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">BP (mmHg)</label>
+                                <input type="text" id="v-bp" placeholder="e.g. 120/80" class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/10 font-bold">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Pulse (bpm)</label>
+                                <input type="text" id="v-pulse" placeholder="e.g. 72" class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/10 font-bold">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">SpO2 (%)</label>
+                                <input type="text" id="v-spo2" placeholder="e.g. 98" class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/10 font-bold">
+                            </div>
+                            <div>
+                                <label class="flex items-center space-x-2 text-[10px] font-bold text-slate-500 uppercase mb-1 cursor-pointer select-none">
+                                    <input type="checkbox" id="v-rbs-check" onchange="UI.toggleRBS()" class="rounded border-slate-300 accent-teal-700"> <span>Check RBS?</span>
+                                </label>
+                                <input type="text" id="v-rbs" placeholder="RBS (mg/dL)" class="w-full p-2 border border-slate-200 rounded-lg bg-slate-100 focus:outline-none hidden font-bold">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border border-slate-200 p-4 rounded-xl bg-slate-50/50 space-y-3 shadow-inner">
+                        <div class="flex justify-between items-center">
+                            <label class="block text-xs font-black text-slate-600 uppercase tracking-wider">In-Clinic Treatment</label>
+                            <select id="v-treatment-type" onchange="UI.toggleTreatment()" class="p-1.5 text-xs border border-slate-200 rounded-lg bg-white focus:outline-none font-bold text-teal-700 cursor-pointer">
+                                <option value="None">None</option>
+                                <option value="Injection">Injection</option>
+                                <option value="Drip">IV Drip Fluid</option>
+                                <option value="Dressing">Dressing</option>
+                                <option value="Stitches">Stitches</option>
+                            </select>
+                        </div>
+                        <div id="treatment-container" class="hidden space-y-3 pt-3 border-t border-slate-200">
+                            
+                            <div id="treatment-med-controls" class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                                <div class="md:col-span-1">
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Med Type Filter</label>
+                                    <select id="v-treatment-med-type" onchange="UI.filterVisitMedicineOptions('v-treatment-medicine', this.value)" class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-semibold">
+                                        <option value="ALL">All Types</option>
+                                        <option value="Tablet">Tablet</option>
+                                        <option value="Capsule">Capsule</option>
+                                        <option value="Syrup">Syrup</option>
+                                        <option value="Ointment">Ointment</option>
+                                        <option value="Drop">Drop</option>
+                                        <option value="Vial">Vial</option>
+                                        <option value="Ampule">Ampule</option>
+                                        <option value="SN">SN</option>
+                                        <option value="Lotion">Lotion</option>
+                                        <option value="Sachet">Sachet</option>
+                                        <option value="Nab">Nab</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Target Compound stock</label>
+                                    <select id="v-treatment-medicine" onchange="UI.handleTreatmentMedicineChange()" class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-semibold"></select>
+                                </div>
+                                <div class="md:col-span-1">
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Dose Volume</label>
+                                    <input type="text" id="v-treatment-qty" placeholder="e.g. 1 Amp / 1 Vial" class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-semibold">
+                                </div>
+                            </div>
+
+                            <div id="stitches-container" class="hidden grid grid-cols-1 md:grid-cols-4 gap-3">
+                                <div class="md:col-span-2">
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Number of Stitches</label>
+                                    <input type="number" id="v-stitches-count" placeholder="e.g. 5" class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-semibold">
+                                </div>
+                            </div>
+
+                            <div class="flex justify-end mt-2">
+                                <button type="button" onclick="UI.addTreatmentToPrescription()" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs rounded-xl transition-all shadow-xs flex items-center cursor-pointer">
+                                    <i class="fa-solid fa-plus mr-1"></i> Add to Treatment Plan
+                                </button>
+                            </div>
+                            
+                            <textarea id="v-treatment-plan" rows="2" placeholder="In-Clinic Treatments will map visually in this block space..." class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none text-xs font-semibold font-mono text-slate-700 mt-2"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="border border-slate-200 p-4 rounded-xl bg-slate-50/50 space-y-3 shadow-inner">
+                        <label class="block text-xs font-black text-slate-600 uppercase tracking-wider">Prescription Architecture & Stock Auto Deductions</label>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            <div class="col-span-2 md:col-span-1">
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Med Type Filter</label>
+                                <select id="v-rx-med-type" onchange="UI.filterVisitMedicineOptions('v-medicine', this.value)" class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-semibold">
+                                    <option value="ALL">All Types</option>
+                                    <option value="Tablet">Tablet</option>
+                                    <option value="Capsule">Capsule</option>
+                                    <option value="Syrup">Syrup</option>
+                                    <option value="Ointment">Ointment</option>
+                                    <option value="Drop">Drop</option>
+                                    <option value="Vial">Vial</option>
+                                    <option value="Ampule">Ampule</option>
+                                    <option value="SN">SN</option>
+                                    <option value="Lotion">Lotion</option>
+                                    <option value="Sachet">Sachet</option>
+                                    <option value="Nab">Nab</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-span-2 md:col-span-3">
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Medicine Compound Selection</label>
+                                <select id="v-medicine" onchange="UI.handlePrescriptionMedicineChange()" class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-semibold"></select>
+                            </div>
+                            
+                            <div id="v-ml-container" class="hidden col-span-2 md:col-span-1">
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Dose (ML)</label>
+                                <input type="number" step="0.1" id="v-ml-input" placeholder="e.g. 2.5" class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-bold text-teal-700">
+                            </div>
+                            
+                            <div id="v-direct-qty-container" class="hidden col-span-2 md:col-span-1">
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Qty Given</label>
+                                <input type="number" step="0.1" id="v-direct-qty-input" placeholder="Total Qty" class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-bold text-teal-700">
+                            </div>
+
+                            <div class="col-span-2 md:col-span-1">
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Frequency Matrix</label>
+                                <select id="v-dose" class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-bold text-slate-700">
+                                    <option value="1-0-1">1-0-1</option>
+                                    <option value="1-1-1">1-1-1</option>
+                                    <option value="1-0-0">1-0-0</option>
+                                    <option value="0-1-0">0-1-0</option>
+                                    <option value="0-0-1">0-0-1</option>
+                                    <option value="1/2-1/2-1/2">1/2-1/2-1/2</option>
+                                    <option value="1/2-0-1/2">1/2-0-1/2</option>
+                                    <option value="1-0-1/2">1-0-1/2</option>
+                                    <option value="1/2-0-1">1/2-0-1</option>
+                                </select>
+                            </div>
+                            <div class="col-span-2 md:col-span-1">
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Meal Relationship</label>
+                                <select id="v-meal" class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-bold text-slate-700">
+                                    <option value="After meal">After meal</option>
+                                    <option value="Before meal">Before meal</option>
+                                </select>
+                            </div>
+                            <div class="col-span-2 md:col-span-1">
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Duration Cycle</label>
+                                <input type="text" id="v-duration" placeholder="e.g. 5" class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-semibold">
+                            </div>
+                            <div class="col-span-2 md:col-span-4 flex justify-end">
+                                <button type="button" onclick="UI.addMedicineToPrescription()" class="px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 font-bold text-xs rounded-xl transition-all shadow-xs flex items-center cursor-pointer">
+                                    <i class="fa-solid fa-plus mr-1"></i> Add to Prescription List
+                                </button>
+                            </div>
+                        </div>
+                        <textarea id="v-prescription" rows="4" placeholder="Aggregated systemic prescriptions generate structurally here..." class="w-full p-3 border border-slate-200 rounded-xl bg-white focus:outline-none font-mono text-sm leading-relaxed text-slate-800 font-medium"></textarea>
+                    </div>
+                    
+                    <div class="bg-amber-50 p-3 rounded-xl text-xs text-amber-800 border border-amber-200 flex items-start font-medium leading-normal">
+                        <i class="fa-solid fa-circle-info mr-2.5 mt-0.5 text-amber-600 text-sm"></i> Note: This console process writes strictly into clinical record registries. To compute invoice billing protocols, trigger the "Generate Bill" module manually.
+                    </div>
+
+                    <div class="pt-2 space-y-2">
+                        <button type="submit" class="w-full py-3 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white font-bold rounded-xl shadow-md transition-all cursor-pointer active:scale-[0.99]">Save Clinical Prescription Record</button>
+                        <button type="button" onclick="document.getElementById('visit-scroll-area').scrollTo({top: 0, behavior: 'smooth'})" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl transition-all cursor-pointer text-xs active:scale-[0.99]"><i class="fa-solid fa-arrow-up mr-1.5"></i>Back to Top</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-consultations" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print">
+        <div class="w-full max-w-4xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden animate-zoom-in">
+            <div class="bg-gradient-to-r from-teal-800 to-teal-950 text-white px-5 py-4 flex items-center justify-between">
+                <div>
+                    <h3 class="font-bold text-sm uppercase tracking-wide"><i class="fa-solid fa-file-waveform mr-2 text-emerald-400"></i>Patient Consultation Chronology</h3>
+                    <p id="consultations-patient-meta" class="text-xs text-teal-200 mt-1 font-medium">Historical audit tracking files</p>
+                </div>
+                <button onclick="UI.closeModal('modal-consultations')" class="text-white/80 hover:text-white text-xl cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-5 max-h-[75vh] overflow-y-auto bg-slate-50">
+                <div id="consultations-history-list" class="space-y-4"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-medicine" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden flex flex-col max-h-[90vh] border border-slate-200 animate-zoom-in">
+            <div class="bg-gradient-to-r from-teal-800 to-teal-950 p-4 text-white flex justify-between items-center">
+                <h3 id="medicine-modal-title" class="font-bold text-sm uppercase tracking-wide"><i class="fa-solid fa-pills mr-2 text-emerald-400"></i>Register New Medicine</h3>
+                <button onclick="UI.closeModal('modal-medicine')" class="text-white/80 hover:text-white text-xl cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-6 overflow-y-auto space-y-4 flex-1" id="medicine-scroll-area">
+                <form id="form-medicine" class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm font-medium text-slate-700" onsubmit="UI.handleMedicineSubmit(event)">
+                    <input type="hidden" id="m-edit-id" value="">
+                    
+                    <div class="sm:col-span-2">
+                        <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Medicine Type *</label>
+                        <select id="m-type" required onchange="UI.handleMedTypeChange()" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-700 cursor-pointer">
+                            <option value="" disabled selected>Select Type</option>
+                            <option value="Tablet">Tablet</option>
+                            <option value="Capsule">Capsule</option>
+                            <option value="Syrup">Syrup</option>
+                            <option value="Ointment">Ointment</option>
+                            <option value="Drop">Drop</option>
+                            <option value="Vial">Vial</option>
+                            <option value="Ampule">Ampule</option>
+                            <option value="SN">SN</option>
+                            <option value="Lotion">Lotion</option>
+                            <option value="Sachet">Sachet</option>
+                            <option value="Nab">Nab</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div id="m-type-other-container" class="sm:col-span-2 hidden">
+                        <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Specify Custom Category *</label>
+                        <input type="text" id="m-type-other" placeholder="e.g., Inhaler, Patch, Cream" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800">
+                    </div>
+
+                    <div class="sm:col-span-2">
+                        <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Medicine Name *</label>
+                        <input type="text" id="m-name" required placeholder="e.g., Augmentin 625 Duo" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Medicine Supplier</label>
+                        <select id="m-supplier" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-700">
+                            </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Expiry Date (MM-YYYY) *</label>
+                        <div class="flex space-x-2">
+                            <select id="m-expiry-month" required class="w-1/2 p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-bold text-slate-700 cursor-pointer">
+                                <option value="" disabled selected>MM</option>
+                                <option value="01">01 - Jan</option>
+                                <option value="02">02 - Feb</option>
+                                <option value="03">03 - Mar</option>
+                                <option value="04">04 - Apr</option>
+                                <option value="05">05 - May</option>
+                                <option value="06">06 - Jun</option>
+                                <option value="07">07 - Jul</option>
+                                <option value="08">08 - Aug</option>
+                                <option value="09">09 - Sep</option>
+                                <option value="10">10 - Oct</option>
+                                <option value="11">11 - Nov</option>
+                                <option value="12">12 - Dec</option>
+                            </select>
+                            <select id="m-expiry-year" required class="w-1/2 p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-bold text-slate-700 cursor-pointer">
+                                </select>
+                        </div>
+                    </div>
+                    <div class="sm:col-span-2">
+                        <hr class="border-slate-100 my-1">
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Package Type & Units per Pkg *</label>
+                        <div class="flex space-x-2">
+                            <select id="m-unit-type" class="w-1/2 p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-bold text-slate-700">
+                                <option value="Strip">Strip</option>
+                                <option value="ML">ML</option>
+                                <option value="Box">Box</option>
+                                <option value="Tray">Tray</option>
+                                <option value="Pck">Pck</option>
+                                <option value="Piece">Piece</option>
+                            </select>
+                            <input type="number" id="m-unit-qty" oninput="UI.calculateTotalQty()" required min="1" placeholder="Units per pkg (e.g. 10)" class="w-1/2 p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none font-bold text-slate-800">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Total Units Per Box/Packages *</label>
+                        <input type="number" id="m-qty" oninput="UI.calculateTotalQty()" required placeholder="e.g. 5" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none font-bold text-slate-800">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Total Inventory</label>
+                        <input type="number" id="m-total-qty" readonly class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-100 focus:outline-none font-black text-teal-700">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">PTR (₹) *</label>
+                        <input type="number" step="0.01" id="m-purchase" required class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none font-bold text-slate-800">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">MRP (₹) *</label>
+                        <input type="number" step="0.01" id="m-selling" required class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none font-bold text-slate-800">
+                    </div>
+                    <div class="sm:col-span-2 pt-2 space-y-2">
+                        <button type="submit" id="medicine-submit-btn" class="w-full py-3 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white font-bold rounded-xl shadow-md transition-all cursor-pointer active:scale-[0.99]">Save & Add Medicine</button>
+                        <button type="button" onclick="document.getElementById('medicine-scroll-area').scrollTo({top: 0, behavior: 'smooth'})" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl transition-all cursor-pointer text-xs active:scale-[0.99]"><i class="fa-solid fa-arrow-up mr-1.5"></i>Back to Top</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-vendors" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print">
+        <div class="w-full max-w-3xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden animate-zoom-in">
+            <div class="bg-gradient-to-r from-teal-800 to-teal-950 text-white px-5 py-4 flex items-center justify-between">
+                <div>
+                    <h3 class="font-bold text-sm uppercase tracking-wide"><i class="fa-solid fa-truck-field mr-2 text-emerald-400"></i>Supplier Network</h3>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="UI.openAddVendorFromNetwork()" class="px-3 py-1.5 bg-white text-teal-900 rounded-lg text-xs font-bold hover:bg-slate-50 transition-all shadow-xs cursor-pointer active:scale-[0.96]">Add Supplier</button>
+                    <button onclick="UI.closeModal('modal-vendors')" class="text-white/80 hover:text-white text-xl cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            </div>
+            <div class="p-5 max-h-[75vh] overflow-y-auto bg-slate-50">
+                <div id="vendor-network-list" class="space-y-3"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-supplier" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col border border-slate-200 animate-zoom-in">
+            <div class="bg-gradient-to-r from-teal-800 to-teal-950 p-4 text-white flex justify-between items-center">
+                <h3 id="supplier-modal-title" class="font-bold text-sm uppercase tracking-wide"><i class="fa-solid fa-truck-field mr-2 text-emerald-400"></i>Create Vendor Profile</h3>
+                <button onclick="UI.closeModal('modal-supplier')" class="text-white/80 hover:text-white text-xl cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-6 space-y-4">
+                <form id="form-supplier" class="space-y-4 text-sm font-medium text-slate-700" onsubmit="UI.handleSupplierSubmit(event)">
+                    <input type="hidden" id="s-edit-index" value="">
+                    <div>
+                        <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Supplier Name *</label>
+                        <input type="text" id="s-name" required placeholder="e.g., Balaji Pharma Distributors" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Supplier Address</label>
+                        <input type="text" id="s-contact" placeholder="e.g., Ahmedabad" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none text-slate-800">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Mobile Number *</label>
+                        <input type="text" id="s-phone" required placeholder="e.g., 9876543211" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-bold text-slate-800">
+                    </div>
+                    <div class="pt-2">
+                        <button type="submit" class="w-full py-3 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white font-bold rounded-xl shadow-md transition-all cursor-pointer active:scale-[0.99]"><span id="supplier-submit-text">Commit Vendor Profile</span></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-expense" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print">
+        <div class="w-full max-w-xl bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border border-slate-200 animate-zoom-in">
+            <div class="bg-gradient-to-r from-rose-700 to-rose-900 p-4 text-white flex justify-between items-center">
+                <h3 class="font-bold text-sm uppercase tracking-wide"><i class="fa-solid fa-receipt mr-2"></i>Log Infrastructure Overhead Expense</h3>
+                <button onclick="UI.closeModal('modal-expense')" class="text-white/80 hover:text-white text-xl cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-6 overflow-y-auto space-y-4 flex-1">
+                <form id="form-expense" class="space-y-4 text-sm font-medium text-slate-700" onsubmit="UI.handleExpenseSubmit(event)">
+                    <div>
+                        <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Expense Classification *</label>
+                        <select id="e-category" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-rose-500/20 transition-all font-semibold text-slate-700">
+                            <option value="Clinic Rental System">Clinic Space Rental</option>
+                            <option value="Staff Payroll & Wages">Staff Wages & Salaries</option>
+                            <option value="Utility Grid (Power/Net)">Electricity & Internet Grid</option>
+                            <option value="Medical Disposal / Clinical Overhead">Bio-Waste & Clinic Consumables</option>
+                            <option value="Miscellaneous Incidental Fees">Miscellaneous Incidental Fees</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Outflow Value Amount (₹) *</label>
+                        <input type="number" step="0.01" id="e-amount" required class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-rose-500/20 transition-all font-bold text-slate-900">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Internal Audit Memo Text</label>
+                        <input type="text" id="e-notes" placeholder="e.g., Monthly broadband settlement" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none text-slate-800">
+                    </div>
+                    <div class="pt-2">
+                        <button type="submit" class="w-full py-3 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 text-white font-bold rounded-xl shadow-md transition-all cursor-pointer active:scale-[0.99]">Post Overhead Outflow</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-credits" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print">
+        <div class="w-full max-w-3xl bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border border-slate-200 animate-zoom-in">
+            <div class="bg-gradient-to-r from-teal-800 to-teal-950 p-4 text-white flex justify-between items-center">
+                <h3 class="font-bold text-sm uppercase tracking-wide"><i class="fa-solid fa-hand-holding-dollar mr-2 text-emerald-400"></i>Credit Logs</h3>
+                <button onclick="UI.closeModal('modal-credits')" class="text-white/80 hover:text-white text-xl cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-6 overflow-y-auto bg-slate-100 flex-1">
+                <div id="credits-list" class="space-y-4">
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="print-area" class="hidden font-mono text-sm bg-white text-slate-900 w-full max-w-full">
+        </div>
+
+    <script src="script.js"></script>
+</body>
 </html>

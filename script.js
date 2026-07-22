@@ -252,6 +252,8 @@
                 
                 if (selectId === 'v-medicine') {
                     this.handlePrescriptionMedicineChange();
+                } else if (selectId === 'v-treatment-medicine') {
+                    this.handleTreatmentMedicineChange();
                 }
             }
 
@@ -276,6 +278,24 @@
                     if(mlContainer) mlContainer.classList.remove('hidden');
                 } else if (directQtyTypes.includes(type)) {
                     if(directQtyContainer) directQtyContainer.classList.remove('hidden');
+                }
+            }
+
+            static handleTreatmentMedicineChange() {
+                const select = document.getElementById('v-treatment-medicine');
+                const qtyInput = document.getElementById('v-treatment-qty');
+                
+                if(!select || !qtyInput) return;
+                
+                const option = select.options[select.selectedIndex];
+                const type = option ? option.dataset.type : '';
+                
+                if (type === 'Ampule') {
+                    qtyInput.placeholder = "e.g. 1 (Outputs: 1 Amp)";
+                } else if (type === 'Vial') {
+                    qtyInput.placeholder = "e.g. 3 (Outputs: 3 ML)";
+                } else {
+                    qtyInput.placeholder = "e.g. 1 Amp / 1 Vial";
                 }
             }
 
@@ -1685,6 +1705,7 @@
                 }
 
                 this.handlePrescriptionMedicineChange(); 
+                this.handleTreatmentMedicineChange();
                 this.pendingStockDeductions = [];
 
                 this.openModal('modal-visit');
@@ -1752,9 +1773,23 @@
                         alert("Please map both target stock parameters and volume counts first.");
                         return;
                     }
-                    line = `[In-Clinic Treatment] ${medSelect.value} -- Vol/Dose: ${qtyInput.value}`;
                     
-                    let deductQty = parseFloat(qtyInput.value) || 1;
+                    const medOption = medSelect.options[medSelect.selectedIndex];
+                    const medType = medOption ? medOption.dataset.type : '';
+                    const rawQty = qtyInput.value;
+                    let numericVal = parseFloat(rawQty);
+                    if (isNaN(numericVal)) numericVal = 1;
+                    
+                    // Specific logic for Ampule & Vial text formatting
+                    if (medType === 'Ampule') {
+                        line = `[In-Clinic Treatment] ${medSelect.value} -- Dose: ${numericVal} Amp`;
+                    } else if (medType === 'Vial') {
+                        line = `[In-Clinic Treatment] ${medSelect.value} -- Dose: ${numericVal} ML`;
+                    } else {
+                        line = `[In-Clinic Treatment] ${medSelect.value} -- Vol/Dose: ${rawQty}`;
+                    }
+                    
+                    let deductQty = numericVal;
                     this.pendingStockDeductions.push({ name: medSelect.value, qty: deductQty });
                     medSelect.selectedIndex = 0;
                     qtyInput.value = "";
