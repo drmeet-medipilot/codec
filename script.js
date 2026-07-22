@@ -1064,12 +1064,10 @@
                 this.renderInventoryGrid(SystemStorage.read(), this.currentInventoryFilter);
             }
 
-            // NEW FUNCTION: Print Inventory Stock
             static printInventoryStock() {
                 const db = SystemStorage.read();
                 let datasets = db.inventory;
                 
-                // Apply active filters so only shown items are printed
                 if (this.currentInventoryFilter === 'LOW_STOCK') {
                     datasets = datasets.filter(i => i.qty <= 15);
                 } else if (this.currentInventoryFilter === 'NEAR_EXPIRY') {
@@ -1186,7 +1184,6 @@
 
                 let datasets = db.inventory;
                 
-                // Existing logic for button filters
                 if (filter === 'LOW_STOCK') {
                     datasets = datasets.filter(i => i.qty <= 15);
                 } else if (filter === 'NEAR_EXPIRY') {
@@ -1198,7 +1195,6 @@
                     });
                 }
 
-                // Search by Name/Supplier
                 const searchInput = document.getElementById('inventory-search');
                 if (searchInput) {
                     const searchTerm = searchInput.value.toLowerCase().trim();
@@ -1210,7 +1206,6 @@
                     }
                 }
 
-                // Filter by Medicine Type
                 const typeFilter = document.getElementById('inventory-type-filter');
                 if (typeFilter && typeFilter.value !== 'ALL') {
                     datasets = datasets.filter(i => i.type === typeFilter.value);
@@ -1736,17 +1731,16 @@
 
             static addTreatmentToPrescription() {
                 const type = document.getElementById('v-treatment-type').value;
-                let line = "";
+                let lineContent = "";
                 const planArea = document.getElementById('v-treatment-plan');
-                const rxArea = document.getElementById('v-prescription');
 
                 if (type === 'Stitches') {
                     const count = document.getElementById('v-stitches-count').value;
                     if (!count) { alert("Please enter the number of stitches."); return; }
-                    line = `[Stat Administered] Stitches -- Count: ${count}`;
+                    lineContent = `Stitches -- Count: ${count}`;
                     document.getElementById('v-stitches-count').value = "";
                 } else if (type === 'Dressing') {
-                    line = `[Stat Administered] Dressing`;
+                    lineContent = `Dressing`;
                 } else {
                     const medSelect = document.getElementById('v-treatment-medicine');
                     const qtyInput = document.getElementById('v-treatment-qty');
@@ -1761,7 +1755,7 @@
                     if(medType === 'Ampule') suffix = " Ampule";
                     else if(medType === 'Vial') suffix = " ML";
 
-                    line = `[Stat Administered] ${medSelect.value} -- Dose: ${qtyInput.value}${suffix}`;
+                    lineContent = `${medSelect.value} -- Dose: ${qtyInput.value}${suffix}`;
                     
                     let deductQty = parseFloat(qtyInput.value) || 1;
                     this.pendingStockDeductions.push({ name: medSelect.value, qty: deductQty });
@@ -1769,8 +1763,11 @@
                     qtyInput.value = "";
                 }
                 
-                planArea.value = planArea.value ? planArea.value + "\n" + line : line;
-                rxArea.value = rxArea.value ? rxArea.value + "\n" + line : line;
+                const currentText = planArea.value.trim();
+                const nextNum = currentText ? currentText.split('\n').length + 1 : 1;
+                const finalLine = `${nextNum}. ${lineContent}`;
+                
+                planArea.value = currentText ? currentText + "\n" + finalLine : finalLine;
             }
 
             static addMedicineToPrescription() {
@@ -1809,7 +1806,7 @@
                 }
                 const medNameWithPrefix = prefix + medSelect.value;
                 
-                let line = "";
+                let lineContent = "";
                 let calculatedUnits = 10;
                 let durationStr = durInput.value.trim();
                 
@@ -1833,7 +1830,7 @@
                         alert("Please enter a valid Dose (ML) for this Vial prescription.");
                         return;
                     }
-                    line = `${medNameWithPrefix} -- ${mlDose} ML per dose -- ${doseSelect.value} -- ${mealSelect.value} -- ${finalDuration}`;
+                    lineContent = `${medNameWithPrefix} -- ${mlDose} ML per dose -- ${doseSelect.value} -- ${mealSelect.value} -- ${finalDuration}`;
                     const totalMLNeeded = mlDose * dailyCount * days;
                     calculatedUnits = totalMLNeeded; 
                 } else if (directQtyTypes.includes(medOption.dataset.type)) {
@@ -1842,14 +1839,18 @@
                         alert("Please enter a valid Qty Given for this medicine type.");
                         return;
                     }
-                    line = `${medNameWithPrefix} -- ${doseSelect.value} -- ${mealSelect.value} -- ${finalDuration} -- [Qty Dispensed: ${directQty}]`;
+                    lineContent = `${medNameWithPrefix} -- ${doseSelect.value} -- ${mealSelect.value} -- ${finalDuration} -- [Qty Dispensed: ${directQty}]`;
                     calculatedUnits = directQty;
                 } else {
-                    line = `${medNameWithPrefix} -- ${doseSelect.value} -- ${mealSelect.value} -- ${finalDuration}`;
+                    lineContent = `${medNameWithPrefix} -- ${doseSelect.value} -- ${mealSelect.value} -- ${finalDuration}`;
                     calculatedUnits = days * dailyCount;
                 }
 
-                rxArea.value = rxArea.value ? rxArea.value + "\n" + line : line;
+                const currentText = rxArea.value.trim();
+                const nextNum = currentText ? currentText.split('\n').length + 1 : 1;
+                const finalLine = `${nextNum}. ${lineContent}`;
+
+                rxArea.value = currentText ? currentText + "\n" + finalLine : finalLine;
                 
                 this.pendingStockDeductions.push({ name: medSelect.value, qty: calculatedUnits });
 
