@@ -1665,6 +1665,7 @@
             static initiateVisitModal(patientId) {
                 document.getElementById('form-visit').reset();
                 document.getElementById('v-patient-id').value = patientId;
+                document.getElementById('v-visit-id').value = ""; // Clear for new visits
                 document.getElementById('v-prescription').value = "";
                 document.getElementById('v-treatment-plan').value = "";
                 document.getElementById('v-treatment-qty').value = "";
@@ -1753,7 +1754,6 @@
                     const medType = medOption ? medOption.dataset.type : '';
                     let suffix = "";
                     
-                    // Modifying the suffix condition based on user request
                     if(medType === 'Ampule') suffix = " Ampule";
                     else if(medType === 'Vial') suffix = " ML";
                     else if(medType === 'SN' || medType === 'Other') suffix = " piece";
@@ -1770,7 +1770,6 @@
                 const nextNum = currentText ? currentText.split('\n').length + 1 : 1;
                 const finalLine = `${nextNum}. ${lineContent}`;
                 
-                // Writing to planArea strictly. Not appending to rxArea here.
                 planArea.value = currentText ? currentText + "\n" + finalLine : finalLine;
             }
 
@@ -1869,11 +1868,18 @@
                 e.preventDefault();
                 const db = SystemStorage.read();
                 const pId = document.getElementById('v-patient-id').value;
+                const vId = document.getElementById('v-visit-id').value; 
+
+                let visitDate = new Date().toLocaleDateString('en-IN');
+                if (vId) {
+                    const existingVisit = db.visits.find(v => v.id === vId);
+                    if (existingVisit) visitDate = existingVisit.date;
+                }
 
                 const visitPayload = {
-                    id: `VST-${Math.floor(10000 + Math.random() * 90000)}`,
+                    id: vId || `VST-${Math.floor(10000 + Math.random() * 90000)}`,
                     patientId: pId,
-                    date: new Date().toLocaleDateString('en-IN'),
+                    date: visitDate, 
                     complaint: document.getElementById('v-complaint').value.trim(),
                     diagnosis: document.getElementById('v-diagnosis').value.trim(),
                     vitals: {
@@ -1894,7 +1900,17 @@
                     }
                 });
 
-                db.visits.push(visitPayload);
+                if (vId) {
+                    const idx = db.visits.findIndex(v => v.id === vId);
+                    if (idx !== -1) {
+                        db.visits[idx] = visitPayload;
+                    } else {
+                        db.visits.push(visitPayload);
+                    }
+                } else {
+                    db.visits.push(visitPayload);
+                }
+
                 SystemStorage.write(db);
 
                 this.closeModal('modal-visit');
@@ -1911,6 +1927,7 @@
                 const latest = visits[visits.length - 1];
                 
                 this.initiateVisitModal(patientId);
+                document.getElementById('v-visit-id').value = latest.id; 
                 
                 document.getElementById('v-complaint').value = latest.complaint || '';
                 document.getElementById('v-diagnosis').value = latest.diagnosis || '';
@@ -1928,9 +1945,6 @@
                 this.toggleTreatment();
                 document.getElementById('v-treatment-plan').value = latest.treatmentPlan || '';
                 document.getElementById('v-prescription').value = latest.prescription || '';
-                
-                db.visits.pop();
-                SystemStorage.write(db);
             }
 
             static renderAnalyticsMatrixCharts(revenue, expenses) {
