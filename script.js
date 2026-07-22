@@ -1,6 +1,6 @@
 
         // =========================================================================
-        // 1. SUPABASE CLOUD ENGINE (Ahiya URL ane Key nakho)
+        // 1. SUPABASE CLOUD ENGINE
         // =========================================================================
         const supabaseUrl = 'https://mhquthxfsjnakymtaizp.supabase.co'; 
         const supabaseKey = 'sb_publishable_S_GEAd5Y35gqI0Dgz0XNEQ_VNKimiUY';
@@ -108,6 +108,7 @@
                         this.cache = this.initializeEmptySchema();
                         await supabaseApp.from('clinic_vault').insert([{ clinic_id: currentUser.id, data: this.cache }]);
                     }
+                    UI.loadClinicProfile();
                     UI.triggerGlobalAuditRefresh();
                 } catch (e) {
                     console.error("Cloud Fetch Failed", e);
@@ -236,7 +237,16 @@
                 const db = SystemStorage.read();
                 const inventory = Array.isArray(db.inventory) ? [...db.inventory].sort((a, b) => (a.name || '').localeCompare(b.name || '')) : [];
                 
-                const filtered = filterType === 'ALL' ? inventory : inventory.filter(i => i.type === filterType);
+                const standardTypes = ['Tablet', 'Capsule', 'Syrup', 'Ointment', 'Drop', 'Vial', 'Ampule', 'SN', 'Lotion', 'Sachet', 'Nab'];
+                
+                let filtered = inventory;
+                if (filterType !== 'ALL') {
+                    if (filterType === 'Other') {
+                        filtered = inventory.filter(i => !standardTypes.includes(i.type));
+                    } else {
+                        filtered = inventory.filter(i => i.type === filterType);
+                    }
+                }
                 
                 const optionsHtml = '<option value="" data-type="" data-unitqty="">Select medicine from stock</option>' + 
                     filtered.map(item => `<option value="${item.name}" data-type="${item.type || ''}" data-unitqty="${item.unitQty || 1}">${item.name}</option>`).join('');
@@ -360,7 +370,7 @@
 
                 const treatmentHtml = latestVisit?.treatmentType && latestVisit.treatmentType !== 'None' ? `
                     <div style="margin-bottom:12px;">
-                        <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:#0f766e;text-transform:uppercase;margin-bottom:5px;">Administered ${latestVisit.treatmentType}</div>
+                        <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:#0f766e;text-transform:uppercase;margin-bottom:5px;">In-Clinic Treatment</div>
                         <div style="min-height:40px;border:1px solid #cbd5e1;border-radius:10px;padding:10px 12px;font-size:14px;line-height:1.6;background:#fef2f2;white-space:pre-wrap;">${latestVisit.treatmentPlan || 'No records'}</div>
                     </div>` : '';
 
@@ -525,15 +535,14 @@
 
                 const msgText = `Hello ${patient.name},\nHere is your prescription from ${clinic.name || 'our clinic'}. Please find the attached PDF document.`;
                 let mobileNum = patient.mobile ? patient.mobile.replace(/\D/g, '') : '';
-                if(mobileNum.length === 10) mobileNum = '91' + mobileNum; // Add India country code automatically if 10 digits
+                if(mobileNum.length === 10) mobileNum = '91' + mobileNum; 
 
                 html2pdf().set(opt).from(node).toPdf().get('pdf').then(function(pdf) {
                     const pdfBlob = pdf.output('blob');
-                    node.remove(); // Cleanup DOM
+                    node.remove(); 
                     
                     const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
                     
-                    // Web Share API (Works natively on Mobile Devices)
                     if (navigator.canShare && navigator.canShare({ files: [file] })) {
                         navigator.share({
                             files: [file],
@@ -541,7 +550,6 @@
                             text: msgText
                         }).catch(err => console.log('Share error:', err));
                     } else {
-                        // Desktop Fallback: Download file automatically and open WhatsApp Web
                         alert("Direct PDF sharing to WhatsApp is supported mainly on Mobile phones. The PDF will now be downloaded to your device. Please attach it manually in the WhatsApp chat.");
                         
                         const url = URL.createObjectURL(pdfBlob);
@@ -627,7 +635,6 @@
                     });
                 }
 
-                this.loadClinicProfile();
                 this.triggerGlobalAuditRefresh();
             }
 
@@ -653,6 +660,7 @@
             static triggerGlobalAuditRefresh() {
                 const db = SystemStorage.read();
                 
+                this.loadClinicProfile();
                 this.renderGreeting(); 
 
                 const timeframe = document.getElementById('dashboard-timeframe')?.value || 'TODAY';
@@ -972,7 +980,7 @@
                     
                     let treatHtml = visit.treatmentType && visit.treatmentType !== 'None' ? `
                         <div class="mt-2">
-                            <div class="text-[10px] font-extrabold uppercase tracking-wide text-rose-600 mb-1">Administered ${visit.treatmentType}</div>
+                            <div class="text-[10px] font-extrabold uppercase tracking-wide text-rose-600 mb-1">In-Clinic Treatment</div>
                             <div class="text-rose-700 bg-rose-50/60 p-2.5 rounded-xl text-xs font-mono font-medium whitespace-pre-wrap border border-rose-100">${visit.treatmentPlan || 'N/A'}</div>
                         </div>` : '';
 
@@ -1335,7 +1343,7 @@
                 document.getElementById('m-edit-id').value = item.id;
                 document.getElementById('m-unit-type').value = item.unitType || 'Strip';
                 document.getElementById('m-unit-qty').value = item.unitQty || 1;
-                document.getElementById('m-qty').value = item.qty / (item.unitQty || 1); // Reverse calculate package volume based on current stock
+                document.getElementById('m-qty').value = item.qty / (item.unitQty || 1); 
                 document.getElementById('m-total-qty').value = item.qty;
                 
                 document.getElementById('m-name').value = item.name;
@@ -1651,7 +1659,7 @@
                 const msgText = `Hello ${pName},\nWelcome to ${clinicName}!\nYour Patient Registration Number is: ${newId}\nPlease keep this number safe for future visits.`;
                 
                 let mobileNum = pMobile.replace(/\D/g, '');
-                if(mobileNum.length === 10) mobileNum = '91' + mobileNum; // auto-append India code
+                if(mobileNum.length === 10) mobileNum = '91' + mobileNum; 
                 
                 if (mobileNum) {
                     const waUrl = `https://wa.me/${mobileNum}?text=${encodeURIComponent(msgText)}`;
@@ -1730,6 +1738,7 @@
                 const type = document.getElementById('v-treatment-type').value;
                 let line = "";
                 const planArea = document.getElementById('v-treatment-plan');
+                const rxArea = document.getElementById('v-prescription');
 
                 if (type === 'Stitches') {
                     const count = document.getElementById('v-stitches-count').value;
@@ -1745,7 +1754,14 @@
                         alert("Please map both target stock parameters and volume counts first.");
                         return;
                     }
-                    line = `[Stat Administered] ${medSelect.value} -- Vol/Dose: ${qtyInput.value}`;
+                    
+                    const medOption = medSelect.options[medSelect.selectedIndex];
+                    const medType = medOption ? medOption.dataset.type : '';
+                    let suffix = "";
+                    if(medType === 'Ampule') suffix = " Ampule";
+                    else if(medType === 'Vial') suffix = " ML";
+
+                    line = `[Stat Administered] ${medSelect.value} -- Dose: ${qtyInput.value}${suffix}`;
                     
                     let deductQty = parseFloat(qtyInput.value) || 1;
                     this.pendingStockDeductions.push({ name: medSelect.value, qty: deductQty });
@@ -1754,6 +1770,7 @@
                 }
                 
                 planArea.value = planArea.value ? planArea.value + "\n" + line : line;
+                rxArea.value = rxArea.value ? rxArea.value + "\n" + line : line;
             }
 
             static addMedicineToPrescription() {
@@ -1773,11 +1790,37 @@
                 const medOption = medSelect.options[medSelect.selectedIndex];
                 const isVial = medOption.dataset.type === 'Vial';
                 const unitQty = parseFloat(medOption.dataset.unitqty) || 1;
+                const medType = medOption.dataset.type;
+
+                let prefix = "";
+                switch(medType) {
+                    case 'Tablet': prefix = 'Tab. '; break;
+                    case 'Capsule': prefix = 'Cap. '; break;
+                    case 'Syrup': prefix = 'Sy. '; break;
+                    case 'Ointment': prefix = 'Oint. '; break;
+                    case 'Drop': prefix = 'Drop. '; break;
+                    case 'Lotion': prefix = 'Lotion. '; break;
+                    case 'Sachet': prefix = 'Sachet. '; break;
+                    case 'Vial': prefix = 'Vial. '; break;
+                    case 'Ampule': prefix = 'Amp. '; break;
+                    case 'SN': prefix = 'SN. '; break;
+                    case 'Nab': prefix = 'Nab. '; break;
+                    default: prefix = medType ? medType + '. ' : ''; break;
+                }
+                const medNameWithPrefix = prefix + medSelect.value;
                 
                 let line = "";
                 let calculatedUnits = 10;
-                const durMatch = (durInput.value || '').match(/\d+/);
+                let durationStr = durInput.value.trim();
+                
+                if (durationStr && /^\d+$/.test(durationStr)) {
+                    durationStr += " days";
+                }
+                const finalDuration = durationStr || 'As directed';
+
+                const durMatch = finalDuration.match(/\d+/);
                 const days = durMatch ? (parseInt(durMatch[0]) || 1) : 1;
+                
                 let dailyCount = 2;
                 if(doseSelect.value === '1-1-1') dailyCount = 3;
                 if(['1-0-0','0-1-0','0-0-1'].includes(doseSelect.value)) dailyCount = 1;
@@ -1790,19 +1833,19 @@
                         alert("Please enter a valid Dose (ML) for this Vial prescription.");
                         return;
                     }
-                    line = `${medSelect.value} -- ${mlDose} ML per dose -- ${doseSelect.value} -- ${mealSelect.value} -- ${durInput.value || 'As directed'}`;
+                    line = `${medNameWithPrefix} -- ${mlDose} ML per dose -- ${doseSelect.value} -- ${mealSelect.value} -- ${finalDuration}`;
                     const totalMLNeeded = mlDose * dailyCount * days;
-                    calculatedUnits = totalMLNeeded; // FIXED: Direct ML Minus
+                    calculatedUnits = totalMLNeeded; 
                 } else if (directQtyTypes.includes(medOption.dataset.type)) {
                     const directQty = parseFloat(directQtyInput.value) || 0;
                     if(directQty <= 0) {
                         alert("Please enter a valid Qty Given for this medicine type.");
                         return;
                     }
-                    line = `${medSelect.value} -- ${doseSelect.value} -- ${mealSelect.value} -- ${durInput.value || 'As directed'} -- [Qty Dispensed: ${directQty}]`;
+                    line = `${medNameWithPrefix} -- ${doseSelect.value} -- ${mealSelect.value} -- ${finalDuration} -- [Qty Dispensed: ${directQty}]`;
                     calculatedUnits = directQty;
                 } else {
-                    line = `${medSelect.value} -- ${doseSelect.value} -- ${mealSelect.value} -- ${durInput.value || 'As directed'}`;
+                    line = `${medNameWithPrefix} -- ${doseSelect.value} -- ${mealSelect.value} -- ${finalDuration}`;
                     calculatedUnits = days * dailyCount;
                 }
 
@@ -1839,7 +1882,6 @@
                     prescription: document.getElementById('v-prescription').value.trim()
                 };
 
-                // Apply structural deductions to stock cache layers
                 this.pendingStockDeductions.forEach(deduction => {
                     const invItem = db.inventory.find(i => i.name === deduction.name);
                     if(invItem) {
@@ -1882,7 +1924,6 @@
                 document.getElementById('v-treatment-plan').value = latest.treatmentPlan || '';
                 document.getElementById('v-prescription').value = latest.prescription || '';
                 
-                // Pop the last element off to overwrite seamlessly on submission
                 db.visits.pop();
                 SystemStorage.write(db);
             }
