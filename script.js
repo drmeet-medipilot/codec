@@ -367,7 +367,7 @@
 
                 const treatmentHtml = latestVisit?.treatmentType && latestVisit.treatmentType !== 'None' ? `
                     <div style="margin-bottom:12px;">
-                        <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:#0f766e;text-transform:uppercase;margin-bottom:5px;">Administered ${latestVisit.treatmentType}</div>
+                        <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:#0f766e;text-transform:uppercase;margin-bottom:5px;">In-Clinic Treatment</div>
                         <div style="min-height:40px;border:1px solid #cbd5e1;border-radius:10px;padding:10px 12px;font-size:14px;line-height:1.6;background:#fef2f2;white-space:pre-wrap;">${latestVisit.treatmentPlan || 'No records'}</div>
                     </div>` : '';
 
@@ -979,7 +979,7 @@
                     
                     let treatHtml = visit.treatmentType && visit.treatmentType !== 'None' ? `
                         <div class="mt-2">
-                            <div class="text-[10px] font-extrabold uppercase tracking-wide text-rose-600 mb-1">Administered ${visit.treatmentType}</div>
+                            <div class="text-[10px] font-extrabold uppercase tracking-wide text-rose-600 mb-1">In-Clinic Treatment</div>
                             <div class="text-rose-700 bg-rose-50/60 p-2.5 rounded-xl text-xs font-mono font-medium whitespace-pre-wrap border border-rose-100">${visit.treatmentPlan || 'N/A'}</div>
                         </div>` : '';
 
@@ -1752,7 +1752,7 @@
                         alert("Please map both target stock parameters and volume counts first.");
                         return;
                     }
-                    line = `[Stat Administered] ${medSelect.value} -- Vol/Dose: ${qtyInput.value}`;
+                    line = `[In-Clinic Treatment] ${medSelect.value} -- Vol/Dose: ${qtyInput.value}`;
                     
                     let deductQty = parseFloat(qtyInput.value) || 1;
                     this.pendingStockDeductions.push({ name: medSelect.value, qty: deductQty });
@@ -1781,6 +1781,25 @@
                 const isVial = medOption.dataset.type === 'Vial';
                 const unitQty = parseFloat(medOption.dataset.unitqty) || 1;
                 
+                // --- CUSTOM PREFIX LOGIC LOGIC ---
+                let prefix = "";
+                const typeMap = {
+                    'tablet': 'Tab',
+                    'capsule': 'Cap',
+                    'syrup': 'Sy',
+                    'ointment': 'Oint',
+                    'drop': 'drop',
+                    'nab': 'nab'
+                };
+                let rawType = medOption.dataset.type;
+                if (rawType) {
+                    let lowerType = rawType.toLowerCase();
+                    prefix = typeMap[lowerType] ? typeMap[lowerType] : rawType;
+                    prefix += " - "; 
+                }
+                let displayMedName = prefix + medSelect.value;
+                // ---------------------------------
+
                 let line = "";
                 let calculatedUnits = 10;
                 
@@ -1808,7 +1827,7 @@
                         alert("Please enter a valid Dose (ML) for this Vial prescription.");
                         return;
                     }
-                    line = `${medSelect.value} -- ${mlDose} ML per dose -- ${doseSelect.value} -- ${mealSelect.value} -- ${durationText}`;
+                    line = `${displayMedName} -- ${mlDose} ML per dose -- ${doseSelect.value} -- ${mealSelect.value} -- ${durationText}`;
                     const totalMLNeeded = mlDose * dailyCount * days;
                     calculatedUnits = totalMLNeeded; 
                 } else if (directQtyTypes.includes(medOption.dataset.type)) {
@@ -1817,10 +1836,10 @@
                         alert("Please enter a valid Qty Given for this medicine type.");
                         return;
                     }
-                    line = `${medSelect.value} -- ${doseSelect.value} -- ${mealSelect.value} -- ${durationText} -- [Qty Dispensed: ${directQty}]`;
+                    line = `${displayMedName} -- ${doseSelect.value} -- ${mealSelect.value} -- ${durationText} -- [Qty Dispensed: ${directQty}]`;
                     calculatedUnits = directQty;
                 } else {
-                    line = `${medSelect.value} -- ${doseSelect.value} -- ${mealSelect.value} -- ${durationText}`;
+                    line = `${displayMedName} -- ${doseSelect.value} -- ${mealSelect.value} -- ${durationText}`;
                     calculatedUnits = days * dailyCount;
                 }
 
