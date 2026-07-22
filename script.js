@@ -236,7 +236,14 @@
                 const db = SystemStorage.read();
                 const inventory = Array.isArray(db.inventory) ? [...db.inventory].sort((a, b) => (a.name || '').localeCompare(b.name || '')) : [];
                 
-                const filtered = filterType === 'ALL' ? inventory : inventory.filter(i => i.type === filterType);
+                const standardTypes = ["Tablet", "Capsule", "Syrup", "Ointment", "Drop", "Vial", "Ampule", "SN", "Lotion", "Sachet", "Nab"];
+                
+                const filtered = filterType === 'ALL' ? inventory : inventory.filter(i => {
+                    if (filterType === 'Other') {
+                        return !standardTypes.includes(i.type);
+                    }
+                    return i.type === filterType;
+                });
                 
                 const optionsHtml = '<option value="" data-type="" data-unitqty="">Select medicine from stock</option>' + 
                     filtered.map(item => `<option value="${item.name}" data-type="${item.type || ''}" data-unitqty="${item.unitQty || 1}">${item.name}</option>`).join('');
@@ -833,7 +840,7 @@
                     
                     if (manualAmount > 0 && upiId) {
                         qrContainer.classList.remove('hidden');
-                        const upiString = `upi://pay?pa=${upiId}&pn=CareSuite%20Clinic&am=${manualAmount.toFixed(2)}&cu=INR`;
+                        const upiString = `upi://pay?pa=${upiId}&pn=Astha%20Clinic&am=${manualAmount.toFixed(2)}&cu=INR`;
                         displayAmount.innerText = manualAmount.toFixed(2);
                         qrDiv.innerHTML = "";
 
@@ -1557,7 +1564,7 @@
                     displayAmount.innerText = amt.toFixed(2);
                     qrDiv.innerHTML = "";
                     
-                    const upiString = `upi://pay?pa=${upiId}&pn=CareSuite%20Clinic&am=${amt.toFixed(2)}&cu=INR`;
+                    const upiString = `upi://pay?pa=${upiId}&pn=Astha%20Clinic&am=${amt.toFixed(2)}&cu=INR`;
                     if(typeof QRCode !== 'undefined') {
                         this.qrCodeInstance = new QRCode(qrDiv, {
                             text: upiString,
@@ -1734,10 +1741,10 @@
                 if (type === 'Stitches') {
                     const count = document.getElementById('v-stitches-count').value;
                     if (!count) { alert("Please enter the number of stitches."); return; }
-                    line = `[Stat Administered] Stitches -- Count: ${count}`;
+                    line = `Stitches -- Count: ${count}`;
                     document.getElementById('v-stitches-count').value = "";
                 } else if (type === 'Dressing') {
-                    line = `[Stat Administered] Dressing`;
+                    line = `Dressing`;
                 } else {
                     const medSelect = document.getElementById('v-treatment-medicine');
                     const qtyInput = document.getElementById('v-treatment-qty');
@@ -1776,7 +1783,18 @@
                 
                 let line = "";
                 let calculatedUnits = 10;
-                const durMatch = (durInput.value || '').match(/\d+/);
+                
+                // Parse duration string to automatically append " days" if only a number is provided
+                let durationText = durInput.value.trim();
+                if (durationText) {
+                    if (/^\d+$/.test(durationText)) {
+                        durationText += " days";
+                    }
+                } else {
+                    durationText = "As directed";
+                }
+
+                const durMatch = durationText.match(/\d+/);
                 const days = durMatch ? (parseInt(durMatch[0]) || 1) : 1;
                 let dailyCount = 2;
                 if(doseSelect.value === '1-1-1') dailyCount = 3;
@@ -1790,19 +1808,19 @@
                         alert("Please enter a valid Dose (ML) for this Vial prescription.");
                         return;
                     }
-                    line = `${medSelect.value} -- ${mlDose} ML per dose -- ${doseSelect.value} -- ${mealSelect.value} -- ${durInput.value || 'As directed'}`;
+                    line = `${medSelect.value} -- ${mlDose} ML per dose -- ${doseSelect.value} -- ${mealSelect.value} -- ${durationText}`;
                     const totalMLNeeded = mlDose * dailyCount * days;
-                    calculatedUnits = totalMLNeeded; // FIXED: Direct ML Minus
+                    calculatedUnits = totalMLNeeded; 
                 } else if (directQtyTypes.includes(medOption.dataset.type)) {
                     const directQty = parseFloat(directQtyInput.value) || 0;
                     if(directQty <= 0) {
                         alert("Please enter a valid Qty Given for this medicine type.");
                         return;
                     }
-                    line = `${medSelect.value} -- ${doseSelect.value} -- ${mealSelect.value} -- ${durInput.value || 'As directed'} -- [Qty Dispensed: ${directQty}]`;
+                    line = `${medSelect.value} -- ${doseSelect.value} -- ${mealSelect.value} -- ${durationText} -- [Qty Dispensed: ${directQty}]`;
                     calculatedUnits = directQty;
                 } else {
-                    line = `${medSelect.value} -- ${doseSelect.value} -- ${mealSelect.value} -- ${durInput.value || 'As directed'}`;
+                    line = `${medSelect.value} -- ${doseSelect.value} -- ${mealSelect.value} -- ${durationText}`;
                     calculatedUnits = days * dailyCount;
                 }
 
