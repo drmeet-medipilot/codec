@@ -476,7 +476,8 @@
 
             if (error) {
                 console.error("Supabase Error:", error);
-                alert("Submission failed. Please call us directly at +91 99249-77505.");
+                // THIS WILL POP UP THE EXACT ERROR ON YOUR SCREEN
+                alert("Supabase Error: " + error.message + "\nDetails: " + error.details);
             } else {
                 alert(`Thank you! Your ${reqType} has been submitted successfully.`);
                 closeModal();
