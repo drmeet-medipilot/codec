@@ -68,7 +68,6 @@
             <div class="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
                 <a href="mailto:info.medipilot@gmail.com" class="hover:text-brand-light transition flex items-center gap-1.5"><i class="fa-solid fa-envelope"></i> info.medipilot@gmail.com</a>
                 <a href="https://www.medipilot.in" target="_blank" class="hover:text-brand-light transition flex items-center gap-1.5 hidden sm:flex"><i class="fa-solid fa-globe"></i> www.medipilot.in</a>
-                <!-- Added Instagram Link Here -->
                 <a href="https://instagram.com/medipilot.in" target="_blank" class="hover:text-brand-light transition flex items-center gap-1.5"><i class="fa-brands fa-instagram text-sm"></i> @medipilot.in</a>
             </div>
             <div class="flex items-center gap-1.5 mt-1 sm:mt-0">
@@ -118,7 +117,6 @@
                 <a href="#inventory" class="block px-3 py-3 rounded-md text-base font-semibold text-slate-700 hover:bg-slate-50 hover:text-brand">Pharmacy & OTC</a>
                 <a href="#security" class="block px-3 py-3 rounded-md text-base font-semibold text-slate-700 hover:bg-slate-50 hover:text-brand">Cloud Security</a>
                 
-                <!-- New Login Link pointing to your CMS for Mobile -->
                 <a href="/cms" class="block px-3 py-3 rounded-md text-base font-bold text-brand hover:bg-slate-50 hover:text-brand-dark">Client Login</a>
                 
                 <button onclick="openModal('demo')" class="block w-full mt-4 text-center bg-brand text-white px-6 py-3 rounded-xl font-bold transition-all shadow-md cursor-pointer">Book Free Demo</button>
@@ -340,8 +338,6 @@
             
             <div class="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-slate-500 font-medium">
                 <p>&copy; 2026 MediPilot Software Systems. All rights reserved.</p>
-                
-                <!-- Added Instagram Icon to Footer Right Side -->
                 <div class="flex items-center gap-5 mt-4 md:mt-0">
                     <a href="https://www.medipilot.in" target="_blank" class="hover:text-white transition-colors">Visit Website</a>
                     <a href="mailto:info.medipilot@gmail.com" class="hover:text-white transition-colors">Support</a>
@@ -369,17 +365,18 @@
                 <form id="contact-form" onsubmit="submitForm(event)">
                     <input type="hidden" id="request-type" value="General">
                     <div class="space-y-4">
+                        <!-- ADDED IDs TO THESE INPUTS -->
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5">Doctor / Clinic Name *</label>
-                            <input type="text" required class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand transition-all text-sm font-semibold text-slate-800" placeholder="e.g. Dr. Meet Patel">
+                            <input type="text" id="lead-doc-name" required class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand transition-all text-sm font-semibold text-slate-800" placeholder="e.g. Dr. Meet Patel">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5">Mobile Number *</label>
-                            <input type="tel" required class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand transition-all text-sm font-semibold text-slate-800" placeholder="+91 00000-00000">
+                            <input type="tel" id="lead-mobile" required class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand transition-all text-sm font-semibold text-slate-800" placeholder="+91 00000-00000">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5">Email Address</label>
-                            <input type="email" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand transition-all text-sm font-semibold text-slate-800" placeholder="your@email.com">
+                            <input type="email" id="lead-email" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand transition-all text-sm font-semibold text-slate-800" placeholder="your@email.com">
                         </div>
                         <div class="pt-2">
                             <button type="submit" id="submit-btn" class="w-full py-3.5 bg-brand hover:bg-brand-dark text-white font-bold rounded-xl shadow-lg shadow-brand/20 transition-all active:scale-[0.98] cursor-pointer">Submit Request</button>
@@ -397,10 +394,16 @@
     <!-- JavaScript Logic -->
     <script>
         // Supabase Client Initialization
-        // REPLACE THESE TWO STRINGS WITH YOUR EXACT SUPABASE CREDENTIALS
-        const SUPABASE_URL = 'YOUR_SUPABASE_URL_HERE';
-        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY_HERE';
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // !!! YOU MUST REPLACE THESE STRINGS WITH YOUR REAL CREDENTIALS !!!
+        const SUPABASE_URL = 'https://mhquthxfsjnakymtaizp.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_S_GEAd5Y35gqI0Dgz0XNEQ_VNKimiUY';
+        
+        let supabaseClient;
+        try {
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        } catch(e) {
+            console.error("Supabase failed to load. Did you replace the URL and Key?", e);
+        }
 
         // Mobile Menu Toggle
         document.getElementById('mobile-menu-btn').addEventListener('click', function() {
@@ -415,7 +418,7 @@
             });
         });
 
-        // Open Modal with custom title/description
+        // Open Modal
         function openModal(type) {
             const modal = document.getElementById('lead-modal');
             const title = document.getElementById('modal-title');
@@ -444,7 +447,7 @@
             document.getElementById('lead-modal').classList.add('hidden');
         }
 
-        // Sales Call Device Detection Logic
+        // Sales Call Logic
         function handleSalesCall() {
             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
             if (isMobile) {
@@ -454,42 +457,54 @@
             }
         }
 
-        // Submit Form Data Directly to Supabase
+        // CRASH-PROOF Submit Form Logic
         async function submitForm(event) {
             event.preventDefault();
             
-            const form = event.target;
-            const reqType = document.getElementById('request-type').value;
-            const docName = form.querySelector('input[placeholder*="Dr."]').value.trim();
-            const mobile = form.querySelector('input[type="tel"]').value.trim();
-            const email = form.querySelector('input[type="email"]').value.trim();
-
             const submitBtn = document.getElementById('submit-btn');
             submitBtn.innerText = "Submitting...";
             submitBtn.disabled = true;
 
-            const { data, error } = await supabaseClient
-                .from('leads')
-                .insert([
-                    { 
-                        doctor_name: docName, 
-                        mobile: mobile, 
-                        email: email, 
-                        request_type: reqType 
-                    }
-                ]);
+            try {
+                // Now fetching strictly by ID instead of guessing by placeholders
+                const reqType = document.getElementById('request-type').value;
+                const docName = document.getElementById('lead-doc-name').value.trim();
+                const mobile = document.getElementById('lead-mobile').value.trim();
+                const email = document.getElementById('lead-email').value.trim();
 
-            if (error) {
-                console.error("Supabase Error:", error);
-                alert("Submission failed. Please call us directly at +91 99249-77505.");
-            } else {
-                alert(`Thank you! Your ${reqType} has been submitted successfully.`);
-                closeModal();
-                form.reset();
+                // Check if supabase client initialized properly
+                if (!supabaseClient) {
+                    throw new Error("Supabase is not connected. Check your URL and Anon Key.");
+                }
+
+                const { data, error } = await supabaseClient
+                    .from('leads')
+                    .insert([
+                        { 
+                            doctor_name: docName, 
+                            mobile: mobile, 
+                            email: email, 
+                            request_type: reqType 
+                        }
+                    ]);
+
+                if (error) {
+                    console.error("Supabase Error:", error);
+                    alert("Database Error: " + error.message);
+                } else {
+                    alert(`Thank you! Your ${reqType} has been submitted successfully.`);
+                    closeModal();
+                    event.target.reset(); // Reset form fields
+                }
+
+            } catch (err) {
+                console.error("Script Error:", err);
+                alert("An unexpected error occurred: " + err.message + "\n\nPlease check the console for details.");
+            } finally {
+                // The 'finally' block GUARANTEES the button un-sticks no matter what happens
+                submitBtn.innerText = "Submit Request";
+                submitBtn.disabled = false;
             }
-
-            submitBtn.innerText = "Submit Request";
-            submitBtn.disabled = false;
         }
     </script>
 </body>
