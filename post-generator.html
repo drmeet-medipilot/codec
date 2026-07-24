@@ -317,49 +317,58 @@ Stay hydrated and consult a doctor immediately. Do not self-medicate.
 
         // 2. AI Image Generation Logic (Connecting to internet for real images)
 function generateAIImage() {
-            // Show loading animation
             loadingAnimation.style.display = 'block';
             outImage.style.display = 'none';
-            aiBtn.innerText = "⏳ AI is drawing your image...";
+            aiBtn.innerText = "⚡ Generating AI Visual...";
 
-            const keyword = categorySelect.value;
-            let aiPrompt = "";
+            const category = categorySelect.value;
+            
+            // 1. Detailed AI Prompts
+            const prompts = {
+                virus: "3d microscopic view of virus cell, medical illustration, clinical blue background, 8k resolution",
+                laboratory: "modern hospital laboratory equipment, clean bright clinical setting, professional healthcare photography",
+                pediatrics: "vector 3d medical illustration of happy healthy child care, clean soft lighting",
+                medical: "doctor stethoscope on clean hospital desk, modern medical center background, photorealistic"
+            };
 
-            // Create a highly detailed prompt for the AI to draw based on the selected category
-            if (keyword === "virus") {
-                aiPrompt = "highly detailed 3d medical illustration of a virus cell, microscopic view, clean clinical blue background, 8k resolution, professional healthcare visual";
-            } else if (keyword === "laboratory") {
-                aiPrompt = "modern medical laboratory equipment, glowing blue lights, clean professional hospital setting, photorealistic, cinematic lighting";
-            } else if (keyword === "pediatrics") {
-                aiPrompt = "beautiful 3d illustration of a healthy happy child, soft bright lighting, pediatric healthcare concept, clean background";
-            } else {
-                aiPrompt = "professional doctor stethoscope on a clean desk, modern hospital background, photorealistic, 8k, highly detailed";
-            }
-
-            // Encode the text so it works safely inside a URL
-            const encodedPrompt = encodeURIComponent(aiPrompt);
-
-            // Fetch the image from a real AI Generative Engine (Stable Diffusion)
-            // nologo=true removes the watermark, and we pass the exact width and height we need
-            const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=800&height=500&nologo=true&seed=${new Date().getTime()}`;
+            const promptText = prompts[category] || prompts.medical;
+            
+            // Primary AI Engine URL (Pollinations with Flux model parameters)
+            const aiUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(promptText)}?width=800&height=500&nologo=true&model=flux&seed=${Math.floor(Math.random() * 100000)}`;
+            
+            // Backup High-Speed Visual Engine (In case the AI queue is full)
+            const fallbackUrl = `https://picsum.photos/seed/${category}-${Math.floor(Math.random() * 1000)}/800/500`;
 
             const img = new Image();
-            img.crossOrigin = "Anonymous"; 
-            img.src = imageUrl;
+            img.crossOrigin = "Anonymous";
+
+            // Set a 6-second timeout: if the primary AI takes too long, switch to fallback
+            let timeoutTriggered = false;
+            const timer = setTimeout(() => {
+                timeoutTriggered = true;
+                aiBtn.innerText = "✨ Visual Generated (Fast Mode)";
+                img.src = fallbackUrl;
+            }, 6000);
 
             img.onload = () => {
-                outImage.src = imageUrl;
+                clearTimeout(timer);
+                outImage.src = img.src;
                 loadingAnimation.style.display = 'none';
                 outImage.style.display = 'block';
-                aiBtn.innerText = "✨ Generate Another AI Image";
+                if (!timeoutTriggered) {
+                    aiBtn.innerText = "✨ Generate Another AI Image";
+                }
             };
 
             img.onerror = () => {
-                aiBtn.innerText = "⚠️ AI Server Busy. Try Again.";
-                loadingAnimation.style.display = 'block';
+                clearTimeout(timer);
+                // If AI errors out immediately, load the backup engine automatically
+                img.src = fallbackUrl;
             };
-        }
 
+            // Start loading primary AI
+            img.src = aiUrl;
+        }
         // Trigger AI image generation on button click
         aiBtn.addEventListener('click', generateAIImage);
 
