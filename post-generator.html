@@ -327,7 +327,7 @@ Stay hydrated and consult a doctor immediately. Do not self-medicate.
             
             // Use Unsplash API to fetch a professional, copyright-free stock image based on the keyword
             // Adding a random timestamp prevents the browser from caching the same image
-            const imageUrl = `https://source.unsplash.com/featured/800x500/?${keyword}&sig=${new Date().getTime()}`;
+            const imageUrl = `https://loremflickr.com/800/500/${keyword}?random=${new Date().getTime()}`;
 
             // Load the image
             const img = new Image();
