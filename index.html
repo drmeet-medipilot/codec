@@ -65,11 +65,13 @@
     <!-- Top Contact Bar -->
     <div class="bg-brand-dark text-white text-[11px] sm:text-xs font-medium py-2 px-4 border-b border-brand z-50 relative">
         <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
-            <div class="flex items-center gap-4 sm:gap-6">
+            <div class="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
                 <a href="mailto:info.medipilot@gmail.com" class="hover:text-brand-light transition flex items-center gap-1.5"><i class="fa-solid fa-envelope"></i> info.medipilot@gmail.com</a>
                 <a href="https://www.medipilot.in" target="_blank" class="hover:text-brand-light transition flex items-center gap-1.5 hidden sm:flex"><i class="fa-solid fa-globe"></i> www.medipilot.in</a>
+                <!-- Added Instagram Link Here -->
+                <a href="https://instagram.com/medipilot.in" target="_blank" class="hover:text-brand-light transition flex items-center gap-1.5"><i class="fa-brands fa-instagram text-sm"></i> @medipilot.in</a>
             </div>
-            <div class="flex items-center gap-1.5">
+            <div class="flex items-center gap-1.5 mt-1 sm:mt-0">
                 <span class="text-brand-light">Sales & Support:</span>
                 <a href="tel:+919924977505" class="font-bold tracking-wide hover:text-brand-light transition"><i class="fa-solid fa-phone mr-1"></i> +91 99249-77505</a>
             </div>
@@ -338,9 +340,12 @@
             
             <div class="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-slate-500 font-medium">
                 <p>&copy; 2026 MediPilot Software Systems. All rights reserved.</p>
-                <div class="flex gap-4 mt-4 md:mt-0">
+                
+                <!-- Added Instagram Icon to Footer Right Side -->
+                <div class="flex items-center gap-5 mt-4 md:mt-0">
                     <a href="https://www.medipilot.in" target="_blank" class="hover:text-white transition-colors">Visit Website</a>
                     <a href="mailto:info.medipilot@gmail.com" class="hover:text-white transition-colors">Support</a>
+                    <a href="https://instagram.com/medipilot.in" target="_blank" class="hover:text-white transition-colors text-lg" title="Follow us on Instagram"><i class="fa-brands fa-instagram"></i></a>
                 </div>
             </div>
         </div>
@@ -393,8 +398,8 @@
     <script>
         // Supabase Client Initialization
         // REPLACE THESE TWO STRINGS WITH YOUR EXACT SUPABASE CREDENTIALS
-        const SUPABASE_URL = 'https://mhquthxfsjnakymtaizp.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_S_GEAd5Y35gqI0Dgz0XNEQ_VNKimiUY';
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL_HERE';
+        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY_HERE';
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // Mobile Menu Toggle
@@ -476,8 +481,7 @@
 
             if (error) {
                 console.error("Supabase Error:", error);
-                // THIS WILL POP UP THE EXACT ERROR ON YOUR SCREEN
-                alert("Supabase Error: " + error.message + "\nDetails: " + error.details);
+                alert("Submission failed. Please call us directly at +91 99249-77505.");
             } else {
                 alert(`Thank you! Your ${reqType} has been submitted successfully.`);
                 closeModal();
