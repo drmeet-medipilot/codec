@@ -88,15 +88,18 @@
                 </div>
                 
                 <!-- Desktop Menu -->
-                <div class="hidden md:flex items-center space-x-8">
+                <div class="hidden md:flex items-center space-x-6 lg:space-x-8">
                     <a href="#features" class="text-sm font-semibold text-slate-600 hover:text-brand transition-colors">Features</a>
                     <a href="#inventory" class="text-sm font-semibold text-slate-600 hover:text-brand transition-colors">Pharmacy & OTC</a>
                     <a href="#security" class="text-sm font-semibold text-slate-600 hover:text-brand transition-colors">Cloud Security</a>
                     
+                    <!-- Added Buy Subscription Button -->
+                    <a href="#pricing" class="bg-white border-2 border-brand text-brand hover:bg-brand hover:text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-sm active:scale-95 inline-block cursor-pointer">Buy Subscription</a>
+
                     <!-- Doctor's Login Link Highlighted as Button -->
-                    <a href="/cms" class="bg-brand hover:bg-brand-dark text-white px-6 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-brand/30 hover:shadow-brand/50 active:scale-95 inline-block cursor-pointer">Doctor's Login</a>
+                    <a href="/cms" class="bg-brand hover:bg-brand-dark text-white px-5 lg:px-6 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-brand/30 hover:shadow-brand/50 active:scale-95 inline-block cursor-pointer">Doctor's Login</a>
                     
-                    <button onclick="openModal('demo')" class="bg-brand hover:bg-brand-dark text-white px-6 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-brand/30 hover:shadow-brand/50 active:scale-95 inline-block cursor-pointer">
+                    <button onclick="openModal('demo')" class="bg-brand hover:bg-brand-dark text-white px-5 lg:px-6 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-brand/30 hover:shadow-brand/50 active:scale-95 inline-block cursor-pointer">
                         Book Free Demo
                     </button>
                 </div>
@@ -117,6 +120,8 @@
                 <a href="#inventory" class="block px-3 py-3 rounded-md text-base font-semibold text-slate-700 hover:bg-slate-50 hover:text-brand">Pharmacy & OTC</a>
                 <a href="#security" class="block px-3 py-3 rounded-md text-base font-semibold text-slate-700 hover:bg-slate-50 hover:text-brand">Cloud Security</a>
                 
+                <a href="#pricing" class="block w-full mt-4 text-center bg-white border-2 border-brand text-brand px-6 py-3 rounded-xl font-bold transition-all shadow-md cursor-pointer">Buy Subscription</a>
+
                 <a href="/cms" class="block w-full mt-4 text-center bg-brand text-white px-6 py-3 rounded-xl font-bold transition-all shadow-md cursor-pointer">Doctor's Login</a>
                 
                 <button onclick="openModal('demo')" class="block w-full mt-4 text-center bg-brand text-white px-6 py-3 rounded-xl font-bold transition-all shadow-md cursor-pointer">Book Free Demo</button>
@@ -305,6 +310,74 @@
         </div>
     </section>
 
+    <!-- Subscription / Pricing Section -->
+    <section id="pricing" class="py-24 bg-slate-50 border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-light text-brand font-bold text-xs uppercase tracking-wide mb-4">
+                    <i class="fa-solid fa-tags"></i> Transparent Plans
+                </div>
+                <h2 class="text-3xl md:text-4xl font-black text-slate-900 mb-4">Simple, Scalable Pricing</h2>
+                <p class="text-slate-500 font-medium max-w-2xl mx-auto">Choose a plan that fits your clinic's needs. Enjoy complete access to all premium features without hidden fees.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- 1 Month Plan -->
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 hover:shadow-xl hover:border-brand/30 transition-all flex flex-col text-center">
+                    <h3 class="text-xl font-bold text-slate-900">For 1 Month</h3>
+                    <p class="text-sm text-slate-500 mt-2 mb-6">Short-term flexibility</p>
+                    <div class="mb-8">
+                        <span class="text-4xl font-black text-slate-900">Rs.499/-</span>
+                        <span class="block text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Only</span>
+                    </div>
+                    <button onclick="openModal('buy')" class="mt-auto w-full py-3.5 bg-brand-light hover:bg-brand text-brand hover:text-white rounded-xl font-bold transition-colors shadow-sm cursor-pointer">
+                        Subscribe Now
+                    </button>
+                </div>
+
+                <!-- 3 Month Plan -->
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 hover:shadow-xl hover:border-brand/30 transition-all flex flex-col text-center">
+                    <h3 class="text-xl font-bold text-slate-900">For 3 Month</h3>
+                    <p class="text-sm text-slate-500 mt-2 mb-6">Quarterly commitment</p>
+                    <div class="mb-8">
+                        <span class="text-4xl font-black text-slate-900">Rs.1399/-</span>
+                        <span class="block text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Only</span>
+                    </div>
+                    <button onclick="openModal('buy')" class="mt-auto w-full py-3.5 bg-brand-light hover:bg-brand text-brand hover:text-white rounded-xl font-bold transition-colors shadow-sm cursor-pointer">
+                        Subscribe Now
+                    </button>
+                </div>
+
+                <!-- 6 Month Plan -->
+                <div class="bg-brand p-8 rounded-3xl shadow-xl border border-brand-dark transition-all flex flex-col text-center relative transform lg:-translate-y-4">
+                    <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-amber-400 text-amber-900 text-[10px] font-black uppercase tracking-wider py-1.5 px-4 rounded-full shadow-md">Most Popular</div>
+                    <h3 class="text-xl font-bold text-white">For 6 Month</h3>
+                    <p class="text-sm text-brand-light mt-2 mb-6">Excellent biannual value</p>
+                    <div class="mb-8">
+                        <span class="text-4xl font-black text-white">Rs.2799/-</span>
+                        <span class="block text-xs font-bold text-brand-light uppercase tracking-widest mt-1">Only</span>
+                    </div>
+                    <button onclick="openModal('buy')" class="mt-auto w-full py-3.5 bg-white hover:bg-slate-100 text-brand rounded-xl font-bold transition-colors shadow-md cursor-pointer">
+                        Subscribe Now
+                    </button>
+                </div>
+
+                <!-- 1 Year Plan -->
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 hover:shadow-xl hover:border-brand/30 transition-all flex flex-col text-center">
+                    <h3 class="text-xl font-bold text-slate-900">For 1 Year</h3>
+                    <p class="text-sm text-slate-500 mt-2 mb-6">Best long-term savings</p>
+                    <div class="mb-8">
+                        <span class="text-4xl font-black text-slate-900">Rs.5599/-</span>
+                        <span class="block text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Only</span>
+                    </div>
+                    <button onclick="openModal('buy')" class="mt-auto w-full py-3.5 bg-brand-light hover:bg-brand text-brand hover:text-white rounded-xl font-bold transition-colors shadow-sm cursor-pointer">
+                        Subscribe Now
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Footer / CTA -->
     <footer class="bg-slate-950 text-white pt-20 pb-10 border-t-4 border-brand">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -367,7 +440,8 @@
                     <div class="space-y-4">
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5">Doctor / Clinic Name *</label>
-                            <input type="text" id="lead-doc-name" required class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand transition-all text-sm font-semibold text-slate-800" placeholder="e.g. Dr. Meet Patel">
+                            <!-- Personal touch applied to the placeholder -->
+                            <input type="text" id="lead-doc-name" required class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand transition-all text-sm font-semibold text-slate-800" placeholder="e.g. Astha Clinic">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5">Mobile Number *</label>
@@ -436,6 +510,10 @@
                 title.innerText = "Request for MediPilot Installation";
                 desc.innerText = "Ready to upgrade? Fill out your details for installation.";
                 reqType.value = "Installation Request";
+            } else if (type === 'buy') {
+                title.innerText = "Buy Subscription";
+                desc.innerText = "Enter your details and our team will get in touch to activate your plan.";
+                reqType.value = "Subscription Purchase";
             }
 
             modal.classList.remove('hidden');
