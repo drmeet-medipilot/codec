@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medipilot AI Premium Post Generator</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-color: #f3f4f6;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --text-main: #111827;
+            --text-muted: #6b7280;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin: 0;
+        }
+
+        /* --- EDITOR PANEL --- */
+        .editor-panel {
+            background: white;
+            padding: 32px;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            width: 400px;
+        }
+        
+        .editor-panel h2 {
+            margin-top: 0;
+            font-size: 20px;
+            color: var(--text-main);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 14px;
+            background-color: #f9fafb;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: white;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        /* --- BUTTONS --- */
+        .btn-ai {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 16px;
+            transition: opacity 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-ai:hover { opacity: 0.9; }
+
+        .btn-download {
+            width: 100%;
+            padding: 14px;
+            background-color: #25D366; 
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn-download:hover { background-color: #16a34a; }
+
+        /* --- THE PREMIUM CARD (LIKE INSTAGRAM/LINKEDIN) --- */
+        .preview-panel { width: 450px; }
+
+        .community-post {
+            background-color: white; 
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            overflow: hidden;
+            border: 1px solid #f3f4f6;
+        }
+
+        .post-header {
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .clinic-avatar {
+            width: 46px;
+            height: 46px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 20px;
+            margin-right: 12px;
+        }
+
+        .clinic-name {
+            font-weight: 700;
+            color: var(--text-main);
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .verified-badge { color: #3b82f6; font-size: 14px; }
+        .doctor-name { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
+        /* --- AUTO-GENERATED IMAGE AREA --- */
+        .post-image-container {
+            width: 100%;
+            height: 250px;
+            background-color: #e5e7eb;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .post-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none; /* Hidden until loaded */
+        }
+
+        /* SHIMMER ANIMATION FOR LOADING */
+        .shimmer {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(90deg, #e5e7eb 0px, #f3f4f6 50%, #e5e7eb 100%);
+            background-size: 200% 100%;
+            animation: shimmerEffect 1.5s infinite linear;
+        }
+
+        @keyframes shimmerEffect {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        /* --- CONTENT AREA --- */
+        .post-content { padding: 20px; }
+
+        .category-tag {
+            display: inline-block;
+            color: var(--primary);
+            background-color: #eff6ff;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .post-body {
+            font-size: 15px;
+            color: var(--text-main);
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .post-footer {
+            background-color: #f9fafb;
+            padding: 16px 20px;
+            font-size: 13px;
+            color: var(--text-muted);
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .watermark { font-weight: 700; color: #d1d5db; }
+    </style>
+</head>
+<body>
+
+    <div class="editor-panel">
+        <h2>🤖 Medipilot AI Studio</h2>
+        
+        <div class="form-group">
+            <label>Topic Category</label>
+            <select id="inputCategory">
+                <option value="virus">Seasonal Disease Alert</option>
+                <option value="medical">General Health Tip</option>
+                <option value="laboratory">New Medical Invention</option>
+                <option value="pediatrics">Child Care & Pediatrics</option>
+            </select>
+        </div>
+
+        <!-- The AI Integration Button -->
+        <button id="aiBtn" class="btn-ai">
+            ✨ Auto-Generate Professional Image
+        </button>
+
+        <div class="form-group">
+            <label>Health Information</label>
+            <textarea id="inputMessage" rows="5">Monsoon is here! Be aware of Dengue symptoms: High fever, severe headache, and joint pain.
+
+Stay hydrated and consult a doctor immediately. Do not self-medicate.</textarea>
+        </div>
+
+        <div class="form-group" style="display: none;">
+            <input type="text" id="inputClinic" value="Astha Clinic">
+            <input type="text" id="inputDoc" value="Dr. Sharma">
+            <input type="text" id="inputReg" value="GMC-45982">
+            <input type="text" id="inputContact" value="9876543210 | Main Road Branch">
+        </div>
+
+        <button id="downloadBtn" class="btn-download">⬇ Download Post for Social Media</button>
+    </div>
+
+    <div class="preview-panel">
+        <div class="community-post" id="captureArea">
+            
+            <div class="post-header">
+                <div class="clinic-avatar" id="outAvatar">A</div>
+                <div>
+                    <div class="clinic-name">
+                        <span id="outClinic">Astha Clinic</span> 
+                        <span class="verified-badge">✔</span>
+                    </div>
+                    <div class="doctor-name" id="outDocDetails">Dr. Sharma • Reg: GMC-45982</div>
+                </div>
+            </div>
+
+            <!-- AI Image Area with Animation -->
+            <div class="post-image-container">
+                <div class="shimmer" id="loadingAnimation"></div>
+                <img id="outImage" class="post-image" crossorigin="anonymous" src="" alt="Medical visual">
+            </div>
+
+            <div class="post-content">
+                <div class="category-tag" id="outCategory">Seasonal Disease Alert</div>
+                <div class="post-body" id="outMessage">
+                    Monsoon is here! Be aware of Dengue symptoms: High fever, severe headache, and joint pain.
+
+Stay hydrated and consult a doctor immediately. Do not self-medicate.
+                </div>
+            </div>
+
+            <div class="post-footer">
+                <span id="outContact">📞 9876543210 | 📍 Main Road Branch</span>
+                <span class="watermark">MEDIPILOT</span>
+            </div>
+            
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const categorySelect = document.getElementById('inputCategory');
+        const messageInput = document.getElementById('inputMessage');
+        const outCategory = document.getElementById('outCategory');
+        const outMessage = document.getElementById('outMessage');
+        
+        const aiBtn = document.getElementById('aiBtn');
+        const outImage = document.getElementById('outImage');
+        const loadingAnimation = document.getElementById('loadingAnimation');
+
+        // 1. Text Updating Logic
+        messageInput.addEventListener('input', () => {
+            outMessage.innerText = messageInput.value || 'Type your message...';
+        });
+
+        categorySelect.addEventListener('change', () => {
+            outCategory.innerText = categorySelect.options[categorySelect.selectedIndex].text;
+        });
+
+        // 2. AI Image Generation Logic (Connecting to internet for real images)
+        function generateAIImage() {
+            // Show loading animation
+            loadingAnimation.style.display = 'block';
+            outImage.style.display = 'none';
+            aiBtn.innerText = "⏳ Generating AI Image...";
+
+            // Get the keyword from the category dropdown value
+            const keyword = categorySelect.value;
+            
+            // Use Unsplash API to fetch a professional, copyright-free stock image based on the keyword
+            // Adding a random timestamp prevents the browser from caching the same image
+            const imageUrl = `https://source.unsplash.com/featured/800x500/?${keyword}&sig=${new Date().getTime()}`;
+
+            // Load the image
+            const img = new Image();
+            img.crossOrigin = "Anonymous"; // Crucial for downloading later
+            img.src = imageUrl;
+
+            img.onload = () => {
+                // Once loaded, hide animation and show image
+                outImage.src = imageUrl;
+                loadingAnimation.style.display = 'none';
+                outImage.style.display = 'block';
+                aiBtn.innerText = "✨ Regenerate Image";
+            };
+
+            img.onerror = () => {
+                // Fallback in case of internet error
+                aiBtn.innerText = "⚠️ Network Error. Try Again.";
+                loadingAnimation.style.display = 'block';
+            };
+        }
+
+        // Trigger AI image generation on button click
+        aiBtn.addEventListener('click', generateAIImage);
+
+        // Auto-generate an image when the page first loads
+        window.onload = generateAIImage;
+
+        // 3. Download Logic
+        document.getElementById('downloadBtn').addEventListener('click', function() {
+            const captureArea = document.getElementById('captureArea');
+            const btn = this;
+            const originalText = btn.innerText;
+            btn.innerText = "Processing...";
+
+            // Configuration ensures high-res and handles the internet images
+            html2canvas(captureArea, {
+                scale: 3, 
+                useCORS: true, 
+                allowTaint: true,
+                backgroundColor: "#ffffff"
+            }).then(canvas => {
+                const imageURL = canvas.toDataURL("image/jpeg", 0.9);
+                const downloadLink = document.createElement('a');
+                downloadLink.href = imageURL;
+                downloadLink.download = `medipilot-professional-post.jpg`;
+                downloadLink.click();
+                btn.innerText = originalText;
+            });
+        });
+    </script>
+</body>
+</html>
