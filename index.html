@@ -93,8 +93,8 @@
                     <a href="#inventory" class="text-sm font-semibold text-slate-600 hover:text-brand transition-colors">Pharmacy & OTC</a>
                     <a href="#security" class="text-sm font-semibold text-slate-600 hover:text-brand transition-colors">Cloud Security</a>
                     
-                    <!-- New Login Link pointing to your CMS -->
-                    <a href="/cms" class="text-sm font-bold text-brand hover:text-brand-dark transition-colors">Client Login</a>
+                    <!-- Doctor's Login Link Highlighted as Button -->
+                    <a href="/cms" class="bg-brand hover:bg-brand-dark text-white px-6 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-brand/30 hover:shadow-brand/50 active:scale-95 inline-block cursor-pointer">Doctor's Login</a>
                     
                     <button onclick="openModal('demo')" class="bg-brand hover:bg-brand-dark text-white px-6 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-brand/30 hover:shadow-brand/50 active:scale-95 inline-block cursor-pointer">
                         Book Free Demo
@@ -117,7 +117,7 @@
                 <a href="#inventory" class="block px-3 py-3 rounded-md text-base font-semibold text-slate-700 hover:bg-slate-50 hover:text-brand">Pharmacy & OTC</a>
                 <a href="#security" class="block px-3 py-3 rounded-md text-base font-semibold text-slate-700 hover:bg-slate-50 hover:text-brand">Cloud Security</a>
                 
-                <a href="/cms" class="block px-3 py-3 rounded-md text-base font-bold text-brand hover:bg-slate-50 hover:text-brand-dark">Client Login</a>
+                <a href="/cms" class="block w-full mt-4 text-center bg-brand text-white px-6 py-3 rounded-xl font-bold transition-all shadow-md cursor-pointer">Doctor's Login</a>
                 
                 <button onclick="openModal('demo')" class="block w-full mt-4 text-center bg-brand text-white px-6 py-3 rounded-xl font-bold transition-all shadow-md cursor-pointer">Book Free Demo</button>
             </div>
@@ -365,7 +365,6 @@
                 <form id="contact-form" onsubmit="submitForm(event)">
                     <input type="hidden" id="request-type" value="General">
                     <div class="space-y-4">
-                        <!-- ADDED IDs TO THESE INPUTS -->
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5">Doctor / Clinic Name *</label>
                             <input type="text" id="lead-doc-name" required class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand transition-all text-sm font-semibold text-slate-800" placeholder="e.g. Dr. Meet Patel">
