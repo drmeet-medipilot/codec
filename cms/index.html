@@ -81,9 +81,8 @@
     <div id="login-overlay" class="fixed inset-0 z-[9999] bg-slate-100 flex items-center justify-center p-4 backdrop-blur-md">
         <div class="bg-white p-8 rounded-2xl shadow-2xl border border-slate-200 w-full max-w-sm transform transition-all duration-300">
             <div class="flex justify-center mb-6">
-                <!-- Fixed Logo Area (object-contain + padding) -->
-                <div class="h-24 w-24 bg-white rounded-full flex items-center justify-center shadow-lg shadow-blue-700/30 border-2 border-blue-100 p-1">
-                    <img src="88553.jpg" alt="Brand Logo" class="h-full w-full object-contain rounded-full">
+                <div class="h-24 w-24 bg-white rounded-full flex items-center justify-center shadow-lg shadow-blue-700/30 border-2 border-blue-100 overflow-hidden">
+                    <img src="cms/88553.jpg" alt="Brand Logo" class="h-full w-full object-cover rounded-full">
                 </div>
             </div>
             <h2 class="text-2xl font-extrabold text-slate-900 text-center mb-1 tracking-tight">MediPilot Admin Panel</h2>
@@ -99,8 +98,7 @@
 
     <header class="bg-gradient-to-r from-blue-800 to-slate-900 text-white p-4 flex justify-between items-center md:hidden no-print shadow-md">
         <div class="flex items-center space-x-2">
-            <!-- Fixed Logo Area (object-contain + padding) -->
-            <img src="88553.jpg" alt="Logo" class="h-8 w-8 object-contain bg-white rounded-full shadow-sm border border-blue-700/50 p-0.5">
+            <img src="cms/88553.jpg" alt="Logo" class="h-8 w-8 object-cover bg-white rounded-full shadow-sm border border-blue-700/50">
             <span class="font-extrabold text-lg tracking-wider uppercase">MediPilot For GP</span>
         </div>
         <button id="mobile-menu-btn" class="text-2xl focus:outline-none p-1 rounded hover:bg-blue-700/50 transition cursor-pointer">
@@ -110,9 +108,8 @@
 
     <nav id="sidebar" class="hidden md:flex flex-col w-full md:w-64 bg-white border-r border-slate-200 no-print shadow-sm z-50 fixed md:relative h-screen">
         <div class="p-5 border-b border-slate-100 hidden md:flex items-center space-x-3 bg-gradient-to-br from-blue-800 via-blue-900 to-slate-900 text-white shadow-inner">
-            <!-- Fixed Logo Area (object-contain + padding) -->
-            <div class="bg-white rounded-full p-1 shadow-md flex-shrink-0 flex items-center justify-center">
-                <img src="88553.jpg" alt="Logo" class="h-7 w-7 object-contain rounded-full">
+            <div class="bg-white rounded-full p-0.5 shadow-md flex-shrink-0">
+                <img src="cms/88553.jpg" alt="Logo" class="h-8 w-8 object-cover rounded-full">
             </div>
             <div>
                 <h1 class="font-black text-lg tracking-tight leading-tight">MediPilot</h1>
