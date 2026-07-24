@@ -46,9 +46,9 @@
         }
         
         .active-tab {
-            background-color: rgb(240, 253, 250);
-            color: rgb(13, 148, 136);
-            border-left: 4px solid rgb(13, 148, 136);
+            background-color: rgb(239, 246, 255);
+            color: rgb(29, 78, 216);
+            border-left: 4px solid rgb(29, 78, 216);
             font-weight: 700;
         }
         
@@ -68,7 +68,7 @@
         }
         .animated-heading {
             animation: subtleZoom 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            background: linear-gradient(135deg, #0f766e 0%, #0f172a 100%);
+            background: linear-gradient(135deg, #1d4ed8 0%, #0f172a 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             display: inline-block;
@@ -81,37 +81,39 @@
     <div id="login-overlay" class="fixed inset-0 z-[9999] bg-slate-100 flex items-center justify-center p-4 backdrop-blur-md">
         <div class="bg-white p-8 rounded-2xl shadow-2xl border border-slate-200 w-full max-w-sm transform transition-all duration-300">
             <div class="flex justify-center mb-6">
-                <div class="h-16 w-16 bg-teal-700 rounded-2xl flex items-center justify-center text-white text-3xl shadow-lg shadow-teal-700/30">
-                    <i class="fa-solid fa-shield-halved"></i>
+                <div class="h-24 w-24 bg-white rounded-full flex items-center justify-center shadow-lg shadow-blue-700/30 p-2 border-2 border-blue-100">
+                    <img src="88553.png" alt="Brand Logo" class="h-full w-full object-contain">
                 </div>
             </div>
             <h2 class="text-2xl font-extrabold text-slate-900 text-center mb-1 tracking-tight">MediPilot Admin Panel</h2>
             <p class="text-xs text-slate-500 text-center mb-6 font-medium">Secure Cloud Authentication - Enter Credentials</p>
             <div class="space-y-4">
-                <input id="login-user" type="email" placeholder="Clinic Email Address" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600 transition-all font-medium text-sm">
-                <input id="login-pass" type="password" placeholder="Secure Password (Min 6 chars)" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600 transition-all font-medium text-sm">
-                <button onclick="processLogin()" class="w-full py-3 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white font-bold rounded-xl transition-all duration-200 shadow-lg shadow-teal-700/20 hover:shadow-teal-700/30 active:scale-[0.99] text-sm cursor-pointer">Login to Dashboard</button>
+                <input id="login-user" type="email" placeholder="Clinic Email Address" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all font-medium text-sm">
+                <input id="login-pass" type="password" placeholder="Secure Password (Min 6 chars)" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all font-medium text-sm">
+                <button onclick="processLogin()" class="w-full py-3 bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-800 hover:to-blue-900 text-white font-bold rounded-xl transition-all duration-200 shadow-lg shadow-blue-700/20 hover:shadow-blue-700/30 active:scale-[0.99] text-sm cursor-pointer">Login to Dashboard</button>
                 <button onclick="processRegister()" class="w-full py-3 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-all active:scale-[0.98] text-sm cursor-pointer mt-3">Register New Clinic Account</button>
             </div>
         </div>
     </div>
 
-    <header class="bg-gradient-to-r from-teal-800 to-slate-900 text-white p-4 flex justify-between items-center md:hidden no-print shadow-md">
+    <header class="bg-gradient-to-r from-blue-800 to-slate-900 text-white p-4 flex justify-between items-center md:hidden no-print shadow-md">
         <div class="flex items-center space-x-2">
-            <i class="fa-solid fa-circle-h text-2xl text-emerald-400"></i>
+            <img src="88553.png" alt="Logo" class="h-8 w-8 object-contain bg-white rounded-full p-0.5">
             <span class="font-extrabold text-lg tracking-wider uppercase">MediPilot For GP</span>
         </div>
-        <button id="mobile-menu-btn" class="text-2xl focus:outline-none p-1 rounded hover:bg-teal-700/50 transition cursor-pointer">
+        <button id="mobile-menu-btn" class="text-2xl focus:outline-none p-1 rounded hover:bg-blue-700/50 transition cursor-pointer">
             <i class="fa-solid fa-bars-staggered"></i>
         </button>
     </header>
 
     <nav id="sidebar" class="hidden md:flex flex-col w-full md:w-64 bg-white border-r border-slate-200 no-print shadow-sm z-50 fixed md:relative h-screen">
-        <div class="p-5 border-b border-slate-100 hidden md:flex items-center space-x-3 bg-gradient-to-br from-teal-800 via-teal-900 to-slate-900 text-white shadow-inner">
-            <i class="fa-solid fa-compass-dominant text-2xl text-emerald-400 animate-pulse"></i>
+        <div class="p-5 border-b border-slate-100 hidden md:flex items-center space-x-3 bg-gradient-to-br from-blue-800 via-blue-900 to-slate-900 text-white shadow-inner">
+            <div class="bg-white rounded-full p-1 shadow-md">
+                <img src="88553.png" alt="Logo" class="h-8 w-8 object-contain">
+            </div>
             <div>
                 <h1 class="font-black text-lg tracking-tight leading-tight">MediPilot</h1>
-                <p class="text-[10px] text-teal-300 font-semibold uppercase tracking-wider">© Reserve To Dr.Meet P. Patel</p>
+                <p class="text-[10px] text-blue-300 font-semibold uppercase tracking-wider">© Reserve To Dr.Meet P. Patel</p>
             </div>
         </div>
         
@@ -155,7 +157,7 @@
                 </div>
                 
                 <div class="flex flex-col sm:flex-row items-center gap-3 self-start lg:self-end">
-                    <select id="dashboard-timeframe" onchange="UI.handleTimeframeChange()" class="text-xs font-bold bg-white px-3 py-2.5 border border-slate-200 rounded-xl text-teal-800 shadow-xs focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition cursor-pointer">
+                    <select id="dashboard-timeframe" onchange="UI.handleTimeframeChange()" class="text-xs font-bold bg-white px-3 py-2.5 border border-slate-200 rounded-xl text-blue-800 shadow-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition cursor-pointer">
                         <option value="TODAY" selected>Today</option>
                         <option value="YESTERDAY">Yesterday</option>
                         <option value="THIS_WEEK">This Week</option>
@@ -172,7 +174,7 @@
                     </div>
 
                     <div class="text-xs font-bold bg-white px-4 py-2.5 border border-slate-200 rounded-xl text-slate-600 shadow-xs hidden sm:block">
-                        <i class="fa-regular fa-calendar-days mr-2 text-teal-600"></i><span id="dash-date">--/--/----</span>
+                        <i class="fa-regular fa-calendar-days mr-2 text-blue-600"></i><span id="dash-date">--/--/----</span>
                     </div>
                 </div>
             </div>
@@ -180,7 +182,7 @@
             <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
                 <h3 class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-4">Action Terminal</h3>
                 <div class="grid grid-cols-2 sm:grid-cols-6 gap-3">
-                    <button onclick="UI.openPatientModal()" class="flex flex-col items-center justify-center p-4 rounded-xl bg-teal-50/70 text-teal-700 border border-teal-100 hover:bg-teal-100/80 transition-all shadow-xs cursor-pointer font-bold active:scale-[0.97]">
+                    <button onclick="UI.openPatientModal()" class="flex flex-col items-center justify-center p-4 rounded-xl bg-blue-50/70 text-blue-700 border border-blue-100 hover:bg-blue-100/80 transition-all shadow-xs cursor-pointer font-bold active:scale-[0.97]">
                         <i class="fa-solid fa-user-plus text-xl mb-2"></i><span class="text-xs">Add Patient</span>
                     </button>
                     <button onclick="UI.routeToTab('billing')" class="flex flex-col items-center justify-center p-4 rounded-xl bg-emerald-50/70 text-emerald-700 border border-emerald-100 hover:bg-emerald-100/80 transition-all shadow-xs cursor-pointer font-bold active:scale-[0.97]">
@@ -207,7 +209,7 @@
                         <p class="text-[11px] font-extrabold tracking-wider uppercase text-slate-400">Total OPD</p>
                         <h3 id="stat-total-patients" class="text-3xl font-black text-slate-900 mt-1">0</h3>
                     </div>
-                    <div class="h-14 w-14 bg-teal-50 text-teal-600 rounded-xl flex items-center justify-center text-2xl shadow-inner"><i class="fa-solid fa-user-md"></i></div>
+                    <div class="h-14 w-14 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-2xl shadow-inner"><i class="fa-solid fa-user-md"></i></div>
                 </div>
                 <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between transition-all hover:shadow-md">
                     <div>
@@ -227,13 +229,13 @@
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
-                    <h3 class="font-bold text-sm text-slate-700 mb-3 flex items-center"><i class="fa-solid fa-chart-line text-teal-600 mr-2"></i>Revenue vs Expense Flow Chart</h3>
+                    <h3 class="font-bold text-sm text-slate-700 mb-3 flex items-center"><i class="fa-solid fa-chart-line text-blue-600 mr-2"></i>Revenue vs Expense Flow Chart</h3>
                     <div class="relative w-full aspect-video flex items-center justify-center">
                         <canvas id="chart-revenue"></canvas>
                     </div>
                 </div>
                 <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-start">
-                    <h3 class="font-bold text-sm text-slate-700 mb-4 border-b border-slate-100 pb-2 flex items-center"><i class="fa-solid fa-clock-rotate-left text-teal-600 mr-2"></i>Recent Patient Consultations</h3>
+                    <h3 class="font-bold text-sm text-slate-700 mb-4 border-b border-slate-100 pb-2 flex items-center"><i class="fa-solid fa-clock-rotate-left text-blue-600 mr-2"></i>Recent Patient Consultations</h3>
                     <div id="dash-recent-patients" class="space-y-4 overflow-y-auto w-full max-h-[300px] pr-1">
                         </div>
                 </div>
@@ -245,7 +247,7 @@
                 <div>
                     <h2 class="text-3xl font-black animated-heading pb-1">Patient Registry</h2>
                 </div>
-                <button onclick="UI.openPatientModal()" class="px-5 py-2.5 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-teal-700/20 active:scale-[0.98] self-start cursor-pointer flex items-center">
+                <button onclick="UI.openPatientModal()" class="px-5 py-2.5 bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-800 hover:to-blue-900 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-blue-700/20 active:scale-[0.98] self-start cursor-pointer flex items-center">
                     <i class="fa-solid fa-user-plus mr-2"></i>Register New Patient
                 </button>
             </div>
@@ -253,7 +255,7 @@
             <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row gap-4 items-center">
                 <div class="relative flex-1 w-full">
                     <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-slate-400 text-sm"></i>
-                    <input id="patient-search" type="text" placeholder="Filter patient metrics by legal name, unique code hash, or telephone integers..." class="w-full pl-11 pr-4 py-3 border border-slate-200 rounded-xl text-sm bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all font-medium">
+                    <input id="patient-search" type="text" placeholder="Filter patient metrics by legal name, unique code hash, or telephone integers..." class="w-full pl-11 pr-4 py-3 border border-slate-200 rounded-xl text-sm bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium">
                 </div>
             </div>
 
@@ -285,11 +287,11 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
                 
                 <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
-                    <h3 class="font-bold text-base text-slate-800 border-b border-slate-100 pb-2 flex items-center"><i class="fa-solid fa-file-invoice text-teal-600 mr-2"></i>Invoice</h3>
+                    <h3 class="font-bold text-base text-slate-800 border-b border-slate-100 pb-2 flex items-center"><i class="fa-solid fa-file-invoice text-blue-600 mr-2"></i>Invoice</h3>
                     
                     <div>
                         <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Select Patient</label>
-                        <select id="bill-patient-id" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all font-medium">
+                        <select id="bill-patient-id" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium">
                             </select>
                     </div>
                     
@@ -300,12 +302,12 @@
 
                     <div>
                         <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Total Amount Payable (₹) *</label>
-                        <input id="bill-amount" type="number" step="1" min="1" oninput="UI.renderUPIQR()" placeholder="e.g. 500" class="w-full p-3.5 border border-teal-200 rounded-xl text-xl font-black bg-slate-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all text-slate-900">
+                        <input id="bill-amount" type="number" step="1" min="1" oninput="UI.renderUPIQR()" placeholder="e.g. 500" class="w-full p-3.5 border border-blue-200 rounded-xl text-xl font-black bg-slate-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all text-slate-900">
                     </div>
 
                     <div>
                         <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Payment Mode</label>
-                        <select id="bill-payment-mode" onchange="UI.renderUPIQR()" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-teal-500 transition-all font-medium">
+                        <select id="bill-payment-mode" onchange="UI.renderUPIQR()" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 transition-all font-medium">
                             <option value="Cash">Cash / Physical Currency</option>
                             <option value="UPI">UPI Digital Payment Network</option>
                             <option value="Credit">Credit / Accounts Receivable (Deferred)</option>
@@ -320,7 +322,7 @@
                 <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center justify-start h-full space-y-4">
                     <div class="w-full border-b border-slate-100 pb-3">
                         <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Receiving Merchant UPI ID Handle</label>
-                        <div class="flex items-center bg-slate-50 px-3 py-1 rounded-xl border border-slate-200 focus-within:ring-2 focus-within:ring-teal-500/20 focus-within:border-teal-500 transition-all">
+                        <div class="flex items-center bg-slate-50 px-3 py-1 rounded-xl border border-slate-200 focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 transition-all">
                             <i class="fa-solid fa-building-columns text-slate-400 mr-2.5"></i>
                             <input id="clinic-upi-id" type="text" oninput="UI.renderUPIQR();" value="yourclinic@okicici" placeholder="Enter Clinic UPI ID" class="w-full py-2.5 text-sm bg-transparent focus:outline-none text-slate-700 font-bold">
                         </div>
@@ -328,13 +330,13 @@
                     </div>
 
                     <div id="upi-qr-container" class="hidden flex flex-col items-center justify-center pt-2 w-full animate-fade-in">
-                        <div class="bg-gradient-to-r from-teal-700 to-slate-800 text-white px-5 py-2.5 rounded-t-xl w-64 text-center font-bold text-xs tracking-wide">
+                        <div class="bg-gradient-to-r from-blue-700 to-slate-800 text-white px-5 py-2.5 rounded-t-xl w-64 text-center font-bold text-xs tracking-wide">
                             Scan to Pay: <span class="text-base font-black ml-1 text-emerald-300">₹<span id="qr-amount-display">0</span></span>
                         </div>
                         <div class="bg-white p-4 border border-t-0 border-slate-200 rounded-b-xl shadow-md flex justify-center w-64 h-64">
                             <div id="qrcode" class="flex items-center justify-center w-full h-full"></div>
                         </div>
-                        <p class="text-[10px] font-bold text-slate-400 mt-4 uppercase tracking-wider"><i class="fa-solid fa-qrcode mr-1 text-teal-600"></i> Interoperable UPI Interface Matrix</p>
+                        <p class="text-[10px] font-bold text-slate-400 mt-4 uppercase tracking-wider"><i class="fa-solid fa-qrcode mr-1 text-blue-600"></i> Interoperable UPI Interface Matrix</p>
                     </div>
                     
                     <div id="qr-placeholder" class="flex flex-col items-center justify-center py-16 text-slate-400 text-center">
@@ -354,19 +356,19 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
                 
                 <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
-                    <h3 class="font-bold text-base text-slate-800 border-b border-slate-100 pb-2 flex items-center"><i class="fa-solid fa-cart-shopping text-teal-600 mr-2"></i>Active Dispensing Cart</h3>
+                    <h3 class="font-bold text-base text-slate-800 border-b border-slate-100 pb-2 flex items-center"><i class="fa-solid fa-cart-shopping text-blue-600 mr-2"></i>Active Dispensing Cart</h3>
                     
                     <div class="flex items-end gap-3">
                         <div class="flex-1">
                             <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Select Medicine</label>
-                            <select id="otc-medicine-select" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all font-medium">
+                            <select id="otc-medicine-select" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium">
                                 </select>
                         </div>
                         <div class="w-24">
                             <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Qty</label>
-                            <input id="otc-qty" type="number" min="1" value="1" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-black text-center focus:outline-none focus:ring-2 focus:ring-teal-500/20 text-slate-800">
+                            <input id="otc-qty" type="number" min="1" value="1" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-black text-center focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-800">
                         </div>
-                        <button onclick="UI.addOTCToCart()" class="px-5 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white font-bold rounded-xl transition-all shadow-md shadow-teal-700/10 h-11 cursor-pointer active:scale-[0.96] text-xs uppercase tracking-wide">
+                        <button onclick="UI.addOTCToCart()" class="px-5 bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-800 hover:to-blue-900 text-white font-bold rounded-xl transition-all shadow-md shadow-blue-700/10 h-11 cursor-pointer active:scale-[0.96] text-xs uppercase tracking-wide">
                             Add
                         </button>
                     </div>
@@ -391,7 +393,7 @@
                     
                     <div class="w-full bg-slate-50 p-4 rounded-xl border border-slate-200 flex justify-between items-center shadow-inner">
                         <span class="text-slate-500 font-extrabold uppercase tracking-wider text-[11px]">Amount Payable (₹)</span>
-                        <input type="number" id="otc-receive-amount" oninput="UI.renderOTCUPIQR()" placeholder="0.00" class="w-36 p-2 bg-white border border-slate-200 rounded-lg text-xl font-black text-slate-900 text-right focus:outline-none focus:ring-2 focus:ring-teal-500/20">
+                        <input type="number" id="otc-receive-amount" oninput="UI.renderOTCUPIQR()" placeholder="0.00" class="w-36 p-2 bg-white border border-slate-200 rounded-lg text-xl font-black text-slate-900 text-right focus:outline-none focus:ring-2 focus:ring-blue-500/20">
                     </div>
 
                     <div class="w-full space-y-2">
@@ -411,7 +413,7 @@
                     </div>
 
                     <div id="otc-upi-qr-container" class="hidden flex flex-col items-center justify-center pt-2 w-full animate-fade-in">
-                        <div class="bg-gradient-to-r from-teal-700 to-slate-800 text-white px-5 py-2.5 rounded-t-xl w-64 text-center font-bold text-xs tracking-wide">
+                        <div class="bg-gradient-to-r from-blue-700 to-slate-800 text-white px-5 py-2.5 rounded-t-xl w-64 text-center font-bold text-xs tracking-wide">
                             Scan to Pay: <span class="text-base font-black text-emerald-300 ml-1">₹<span id="otc-qr-amount-display">0</span></span>
                         </div>
                         <div class="bg-white p-4 border border-t-0 border-slate-200 rounded-b-xl shadow-md flex justify-center w-64 h-64">
@@ -442,7 +444,7 @@
                     <button onclick="UI.exportInventoryCSV()" class="px-3 sm:px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-emerald-700/20 active:scale-[0.98] cursor-pointer flex items-center shrink-0">
                         <i class="fa-solid fa-file-csv sm:mr-2"></i><span class="hidden sm:inline">Export Stock</span>
                     </button>
-                    <button onclick="UI.initMedicineModal()" class="px-4 sm:px-5 py-2.5 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-teal-700/20 active:scale-[0.98] cursor-pointer flex items-center shrink-0 whitespace-nowrap">
+                    <button onclick="UI.initMedicineModal()" class="px-4 sm:px-5 py-2.5 bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-800 hover:to-blue-900 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-blue-700/20 active:scale-[0.98] cursor-pointer flex items-center shrink-0 whitespace-nowrap">
                         <i class="fa-solid fa-pills mr-2"></i>Add Medicine
                     </button>
                 </div>
@@ -454,7 +456,7 @@
                         <p class="text-[10px] font-extrabold tracking-wider uppercase text-slate-400">Valuation Base (PTR)</p>
                         <h3 id="inv-ptr-val" class="text-lg font-black text-slate-900 mt-0.5">₹0.00</h3>
                     </div>
-                    <div class="h-10 w-10 bg-teal-50 text-teal-600 rounded-xl flex items-center justify-center text-base shadow-inner"><i class="fa-solid fa-calculator"></i></div>
+                    <div class="h-10 w-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-base shadow-inner"><i class="fa-solid fa-calculator"></i></div>
                 </div>
                 <button onclick="UI.toggleInventoryFilter('LOW_STOCK')" id="btn-filter-low" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between text-left hover:border-rose-300 transition-all cursor-pointer group active:scale-[0.98]">
                     <div>
@@ -470,12 +472,12 @@
                     </div>
                     <div class="h-10 w-10 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center text-base shadow-inner"><i class="fa-solid fa-hourglass-half"></i></div>
                 </button>
-                <button onclick="UI.viewVendorNetwork()" class="bg-gradient-to-br from-teal-700 to-teal-900 hover:from-teal-800 hover:to-teal-950 p-5 rounded-2xl text-white shadow-md flex items-center justify-between text-left transition-all cursor-pointer active:scale-[0.98]">
+                <button onclick="UI.viewVendorNetwork()" class="bg-gradient-to-br from-blue-700 to-blue-900 hover:from-blue-800 hover:to-blue-950 p-5 rounded-2xl text-white shadow-md flex items-center justify-between text-left transition-all cursor-pointer active:scale-[0.98]">
                     <div>
-                        <p class="text-[10px] font-bold tracking-wider uppercase text-teal-200">Supplier Network</p>
+                        <p class="text-[10px] font-bold tracking-wider uppercase text-blue-200">Supplier Network</p>
                         <h3 class="text-xs font-extrabold mt-1 uppercase tracking-wide flex items-center"><i class="fa-solid fa-eye mr-1.5 text-emerald-400"></i>View & Add Supplier</h3>
                     </div>
-                    <div class="h-10 w-10 bg-teal-600/50 text-white rounded-xl flex items-center justify-center text-base shadow-inner"><i class="fa-solid fa-truck-field"></i></div>
+                    <div class="h-10 w-10 bg-blue-600/50 text-white rounded-xl flex items-center justify-center text-base shadow-inner"><i class="fa-solid fa-truck-field"></i></div>
                 </button>
             </div>
 
@@ -483,10 +485,10 @@
             <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row gap-4 items-center">
                 <div class="relative flex-1 w-full">
                     <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-slate-400 text-sm"></i>
-                    <input id="inventory-search" type="text" oninput="UI.triggerInventoryFilter()" placeholder="Search medicine by name or supplier..." class="w-full pl-11 pr-4 py-3 border border-slate-200 rounded-xl text-sm bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all font-medium">
+                    <input id="inventory-search" type="text" oninput="UI.triggerInventoryFilter()" placeholder="Search medicine by name or supplier..." class="w-full pl-11 pr-4 py-3 border border-slate-200 rounded-xl text-sm bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium">
                 </div>
                 <div class="w-full md:w-56">
-                    <select id="inventory-type-filter" onchange="UI.triggerInventoryFilter()" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all font-bold text-slate-700">
+                    <select id="inventory-type-filter" onchange="UI.triggerInventoryFilter()" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-bold text-slate-700">
                         <option value="ALL">All Medicine Types</option>
                         <option value="Tablet">Tablet</option>
                         <option value="Capsule">Capsule</option>
@@ -532,7 +534,7 @@
                     <h2 class="text-3xl font-black animated-heading pb-1">Accounts & Ledger</h2>
                 </div>
                 <div class="flex gap-2.5 self-start flex-wrap">
-                    <button onclick="UI.openCreditsModal()" class="px-4 py-2.5 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer flex items-center active:scale-[0.97]">
+                    <button onclick="UI.openCreditsModal()" class="px-4 py-2.5 bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-800 hover:to-blue-900 text-white rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer flex items-center active:scale-[0.97]">
                         <i class="fa-solid fa-hand-holding-dollar mr-2"></i>Credit
                     </button>
                     <button onclick="UI.openModal('modal-expense')" class="px-4 py-2.5 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 text-white rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer flex items-center active:scale-[0.97]">
@@ -560,7 +562,7 @@
                 </div>
                 
                 <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-                    <h3 class="font-bold text-sm text-slate-700 border-b border-slate-100 pb-2 flex items-center"><i class="fa-solid fa-chart-pie text-teal-600 mr-2"></i>Balance Sheet Summary</h3>
+                    <h3 class="font-bold text-sm text-slate-700 border-b border-slate-100 pb-2 flex items-center"><i class="fa-solid fa-chart-pie text-blue-600 mr-2"></i>Balance Sheet Summary</h3>
                     <div class="space-y-3.5 text-xs font-medium">
                         <div class="flex justify-between">
                             <span class="text-slate-500">Gross Operational Inflows:</span>
@@ -573,7 +575,7 @@
                         <hr class="border-slate-100">
                         <div class="flex justify-between text-sm font-black bg-slate-50 p-2.5 rounded-xl border border-slate-100">
                             <span class="text-slate-700">Net Retained Cash Profit:</span>
-                            <span id="fin-net-profit" class="text-teal-700">₹0.00</span>
+                            <span id="fin-net-profit" class="text-blue-700">₹0.00</span>
                         </div>
                     </div>
                 </div>
@@ -589,54 +591,54 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div class="md:col-span-2">
                         <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Clinic Name</label>
-                        <input type="text" id="clinic-name" autocomplete="off" placeholder="e.g. CareSuite Multi-Specialty Clinic" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800">
+                        <input type="text" id="clinic-name" autocomplete="off" placeholder="e.g. CareSuite Multi-Specialty Clinic" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-semibold text-slate-800">
                     </div>
                     <div class="md:col-span-2">
                         <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Clinic Address</label>
-                        <input type="text" id="clinic-address" autocomplete="off" placeholder="e.g. 101, Health Hub Building, Main Road, Ahmedabad" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800">
+                        <input type="text" id="clinic-address" autocomplete="off" placeholder="e.g. 101, Health Hub Building, Main Road, Ahmedabad" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-semibold text-slate-800">
                     </div>
                     <div>
                         <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Contact Number</label>
-                        <input type="text" id="clinic-mobile" autocomplete="off" placeholder="e.g. +91 9876543210" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800">
+                        <input type="text" id="clinic-mobile" autocomplete="off" placeholder="e.g. +91 9876543210" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-semibold text-slate-800">
                     </div>
                     <div>
                         <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Doctor Name</label>
-                        <input type="text" id="clinic-doctor" autocomplete="off" placeholder="e.g. Dr. Meet Patel" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800">
+                        <input type="text" id="clinic-doctor" autocomplete="off" placeholder="e.g. Dr. Meet Patel" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-semibold text-slate-800">
                     </div>
                     <div>
                         <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Doctor Degree</label>
-                        <input type="text" id="clinic-degree" autocomplete="off" placeholder="e.g. MBBS, BHMS, BAMS" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800">
+                        <input type="text" id="clinic-degree" autocomplete="off" placeholder="e.g. MBBS, BHMS, BAMS" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-semibold text-slate-800">
                     </div>
                     <div>
                         <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Registration Number</label>
-                        <input type="text" id="clinic-regno" autocomplete="off" placeholder="e.g. G-12345" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800">
+                        <input type="text" id="clinic-regno" autocomplete="off" placeholder="e.g. G-12345" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-semibold text-slate-800">
                     </div>
 
                     <!-- E-SIGN & E-STAMP CONFIGURATION AREA -->
                     <div class="md:col-span-2 pt-4 border-t border-slate-100 mt-2">
-                        <h3 class="font-bold text-sm text-slate-800 mb-3"><i class="fa-solid fa-signature text-teal-600 mr-2"></i>E-Signature & E-Stamp Configuration</h3>
+                        <h3 class="font-bold text-sm text-slate-800 mb-3"><i class="fa-solid fa-signature text-blue-600 mr-2"></i>E-Signature & E-Stamp Configuration</h3>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                             <div>
                                 <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Upload Signature</label>
-                                <input type="file" id="clinic-esign-file" accept="image/*" class="w-full p-2 border border-slate-200 rounded-xl bg-slate-50 text-sm font-medium file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100 cursor-pointer">
+                                <input type="file" id="clinic-esign-file" accept="image/*" class="w-full p-2 border border-slate-200 rounded-xl bg-slate-50 text-sm font-medium file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
                                 <input type="hidden" id="clinic-esign-base64">
                                 <img id="esign-preview" src="" class="mt-2 h-12 object-contain hidden border border-slate-200 rounded bg-white p-1">
                             </div>
                             <div>
                                 <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Upload E-Stamp</label>
-                                <input type="file" id="clinic-estamp-file" accept="image/*" class="w-full p-2 border border-slate-200 rounded-xl bg-slate-50 text-sm font-medium file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100 cursor-pointer">
+                                <input type="file" id="clinic-estamp-file" accept="image/*" class="w-full p-2 border border-slate-200 rounded-xl bg-slate-50 text-sm font-medium file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
                                 <input type="hidden" id="clinic-estamp-base64">
                                 <img id="estamp-preview" src="" class="mt-2 h-16 object-contain hidden border border-slate-200 rounded bg-white p-1">
                             </div>
                             <div>
                                 <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Security Passcode (PIN)</label>
-                                <input type="password" id="clinic-esign-pin" autocomplete="off" placeholder="Enter PIN to lock both" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800">
+                                <input type="password" id="clinic-esign-pin" autocomplete="off" placeholder="Enter PIN to lock both" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-semibold text-slate-800">
                             </div>
                         </div>
                     </div>
 
                     <div class="md:col-span-2 pt-3">
-                        <button onclick="UI.saveClinicProfile()" class="px-5 py-3 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white font-bold rounded-xl shadow-md transition-all cursor-pointer active:scale-[0.99] flex items-center justify-center w-full md:w-auto">
+                        <button onclick="UI.saveClinicProfile()" class="px-5 py-3 bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-800 hover:to-blue-900 text-white font-bold rounded-xl shadow-md transition-all cursor-pointer active:scale-[0.99] flex items-center justify-center w-full md:w-auto">
                             <i class="fa-solid fa-floppy-disk mr-2"></i> Save Settings
                         </button>
                     </div>
@@ -648,7 +650,7 @@
 
     <div id="modal-patient" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh] transform transition-all border border-slate-200 animate-zoom-in">
-            <div class="bg-gradient-to-r from-teal-800 to-teal-950 p-4 text-white flex justify-between items-center">
+            <div class="bg-gradient-to-r from-blue-800 to-blue-950 p-4 text-white flex justify-between items-center">
                 <h3 class="font-bold text-sm tracking-wide uppercase"><i class="fa-solid fa-user-plus mr-2 text-emerald-400"></i>New Patient Registration</h3>
                 <button onclick="UI.closeModal('modal-patient')" class="text-white/80 hover:text-white transition cursor-pointer text-xl"><i class="fa-solid fa-xmark"></i></button>
             </div>
@@ -656,17 +658,17 @@
                 <form id="form-patient" class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm font-medium text-slate-700" onsubmit="UI.handlePatientSubmit(event)">
                     <div>
                         <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Patient Name *</label>
-                        <input type="text" id="p-name" required class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold">
+                        <input type="text" id="p-name" required class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-semibold">
                     </div>
                     <div>
                         <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Mobile Number *</label>
-                        <input type="text" id="p-mobile" required class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold">
+                        <input type="text" id="p-mobile" required class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-semibold">
                     </div>
                     <div>
                         <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Age *</label>
                         <div class="flex space-x-2">
-                            <input type="number" id="p-age-val" oninput="UI.handleAgeChange()" required min="0" class="w-2/3 p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-bold">
-                            <select id="p-age-unit" onchange="UI.handleAgeChange()" class="w-1/3 p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-bold">
+                            <input type="number" id="p-age-val" oninput="UI.handleAgeChange()" required min="0" class="w-2/3 p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-bold">
+                            <select id="p-age-unit" onchange="UI.handleAgeChange()" class="w-1/3 p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-bold">
                                 <option value="Years">Years</option>
                                 <option value="Months">Months</option>
                             </select>
@@ -674,7 +676,7 @@
                     </div>
                     <div>
                         <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Sex *</label>
-                        <select id="p-gender" required class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-bold">
+                        <select id="p-gender" required class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-bold">
                             <option value="Male">Male</option>
                             <option value="Female">Female</option>
                             <option value="Other">Other</option>
@@ -682,18 +684,18 @@
                     </div>
                     <div id="p-weight-container" class="hidden">
                         <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Weight Value (kg) *</label>
-                        <input type="number" step="0.1" id="p-weight" placeholder="Mandatory for age <= 15" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-bold">
+                        <input type="number" step="0.1" id="p-weight" placeholder="Mandatory for age <= 15" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-bold">
                     </div>
                     <div>
                         <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Address</label>
-                        <input type="text" id="p-address" placeholder="Flat/House No, Street, City" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all">
+                        <input type="text" id="p-address" placeholder="Flat/House No, Street, City" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all">
                     </div>
                     <div class="sm:col-span-2">
                         <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Remarks - BP/Sugar/Allergy</label>
-                        <textarea id="p-allergies" rows="2" placeholder="Penicillin sensitivity, diabetic metrics, systemic hypertension histories..." class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all"></textarea>
+                        <textarea id="p-allergies" rows="2" placeholder="Penicillin sensitivity, diabetic metrics, systemic hypertension histories..." class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"></textarea>
                     </div>
                     <div class="sm:col-span-2 pt-2">
-                        <button type="submit" class="w-full py-3 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white font-bold rounded-xl shadow-md transition-all cursor-pointer active:scale-[0.99]">Save New Patient</button>
+                        <button type="submit" class="w-full py-3 bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-800 hover:to-blue-900 text-white font-bold rounded-xl shadow-md transition-all cursor-pointer active:scale-[0.99]">Save New Patient</button>
                     </div>
                 </form>
             </div>
@@ -702,7 +704,7 @@
 
     <div id="modal-visit" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print">
         <div class="w-full max-w-3xl bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border border-slate-200 animate-zoom-in">
-            <div class="bg-gradient-to-r from-teal-800 to-teal-950 p-4 text-white flex justify-between items-center">
+            <div class="bg-gradient-to-r from-blue-800 to-blue-950 p-4 text-white flex justify-between items-center">
                 <h3 class="font-bold text-sm tracking-wide uppercase"><i class="fa-solid fa-notes-medical mr-2 text-emerald-400"></i>Patient Clinical Notes & Prescription</h3>
                 <button onclick="UI.closeModal('modal-visit')" class="text-white/80 hover:text-white transition cursor-pointer text-xl"><i class="fa-solid fa-xmark"></i></button>
             </div>
@@ -714,11 +716,11 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Chief Complaint</label>
-                            <input type="text" id="v-complaint" required placeholder="Patient presents with acute symptoms..." class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800">
+                            <input type="text" id="v-complaint" required placeholder="Patient presents with acute symptoms..." class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-semibold text-slate-800">
                         </div>
                         <div>
                             <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Clinical Impression / Diagnosis</label>
-                            <input type="text" id="v-diagnosis" required placeholder="Clinical findings evaluation..." class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800">
+                            <input type="text" id="v-diagnosis" required placeholder="Clinical findings evaluation..." class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-semibold text-slate-800">
                         </div>
                     </div>
 
@@ -727,19 +729,19 @@
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                             <div>
                                 <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">BP (mmHg)</label>
-                                <input type="text" id="v-bp" placeholder="e.g. 120/80" class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/10 font-bold">
+                                <input type="text" id="v-bp" placeholder="e.g. 120/80" class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/10 font-bold">
                             </div>
                             <div>
                                 <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Pulse (bpm)</label>
-                                <input type="text" id="v-pulse" placeholder="e.g. 72" class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/10 font-bold">
+                                <input type="text" id="v-pulse" placeholder="e.g. 72" class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/10 font-bold">
                             </div>
                             <div>
                                 <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">SpO2 (%)</label>
-                                <input type="text" id="v-spo2" placeholder="e.g. 98" class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/10 font-bold">
+                                <input type="text" id="v-spo2" placeholder="e.g. 98" class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/10 font-bold">
                             </div>
                             <div>
                                 <label class="flex items-center space-x-2 text-[10px] font-bold text-slate-500 uppercase mb-1 cursor-pointer select-none">
-                                    <input type="checkbox" id="v-rbs-check" onchange="UI.toggleRBS()" class="rounded border-slate-300 accent-teal-700"> <span>Check RBS?</span>
+                                    <input type="checkbox" id="v-rbs-check" onchange="UI.toggleRBS()" class="rounded border-slate-300 accent-blue-700"> <span>Check RBS?</span>
                                 </label>
                                 <input type="text" id="v-rbs" placeholder="RBS (mg/dL)" class="w-full p-2 border border-slate-200 rounded-lg bg-slate-100 focus:outline-none hidden font-bold">
                             </div>
@@ -749,7 +751,7 @@
                     <div class="border border-slate-200 p-4 rounded-xl bg-slate-50/50 space-y-3 shadow-inner">
                         <div class="flex justify-between items-center">
                             <label class="block text-xs font-black text-slate-600 uppercase tracking-wider">Stat In-Clinic Treatment</label>
-                            <select id="v-treatment-type" onchange="UI.toggleTreatment()" class="p-1.5 text-xs border border-slate-200 rounded-lg bg-white focus:outline-none font-bold text-teal-700 cursor-pointer">
+                            <select id="v-treatment-type" onchange="UI.toggleTreatment()" class="p-1.5 text-xs border border-slate-200 rounded-lg bg-white focus:outline-none font-bold text-blue-700 cursor-pointer">
                                 <option value="None">None</option>
                                 <option value="Injection">Injection</option>
                                 <option value="Drip">IV Drip Fluid</option>
@@ -833,12 +835,12 @@
                             
                             <div id="v-ml-container" class="hidden col-span-2 md:col-span-1">
                                 <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Dose (ML)</label>
-                                <input type="number" step="0.1" id="v-ml-input" placeholder="e.g. 2.5" class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-bold text-teal-700">
+                                <input type="number" step="0.1" id="v-ml-input" placeholder="e.g. 2.5" class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-bold text-blue-700">
                             </div>
                             
                             <div id="v-direct-qty-container" class="hidden col-span-2 md:col-span-1">
                                 <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Qty Given</label>
-                                <input type="number" step="0.1" id="v-direct-qty-input" placeholder="Total Qty" class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-bold text-teal-700">
+                                <input type="number" step="0.1" id="v-direct-qty-input" placeholder="Total Qty" class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-bold text-blue-700">
                             </div>
 
                             <div class="col-span-2 md:col-span-1">
@@ -867,7 +869,7 @@
                                 <input type="text" id="v-duration" placeholder="e.g. 5 days" class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-semibold">
                             </div>
                             <div class="col-span-2 md:col-span-4 flex justify-end">
-                                <button type="button" onclick="UI.addMedicineToPrescription()" class="px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 font-bold text-xs rounded-xl transition-all shadow-xs flex items-center cursor-pointer">
+                                <button type="button" onclick="UI.addMedicineToPrescription()" class="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs rounded-xl transition-all shadow-xs flex items-center cursor-pointer">
                                     <i class="fa-solid fa-plus mr-1"></i> Add to Prescription List
                                 </button>
                             </div>
@@ -880,7 +882,7 @@
                     </div>
 
                     <div class="pt-2 space-y-2">
-                        <button type="submit" class="w-full py-3 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white font-bold rounded-xl shadow-md transition-all cursor-pointer active:scale-[0.99]">Save Clinical Prescription Record</button>
+                        <button type="submit" class="w-full py-3 bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-800 hover:to-blue-900 text-white font-bold rounded-xl shadow-md transition-all cursor-pointer active:scale-[0.99]">Save Clinical Prescription Record</button>
                         <button type="button" onclick="document.getElementById('visit-scroll-area').scrollTo({top: 0, behavior: 'smooth'})" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl transition-all cursor-pointer text-xs active:scale-[0.99]"><i class="fa-solid fa-arrow-up mr-1.5"></i>Back to Top</button>
                     </div>
                 </form>
@@ -890,10 +892,10 @@
 
     <div id="modal-consultations" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print">
         <div class="w-full max-w-4xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden animate-zoom-in">
-            <div class="bg-gradient-to-r from-teal-800 to-teal-950 text-white px-5 py-4 flex items-center justify-between">
+            <div class="bg-gradient-to-r from-blue-800 to-blue-950 text-white px-5 py-4 flex items-center justify-between">
                 <div>
                     <h3 class="font-bold text-sm uppercase tracking-wide"><i class="fa-solid fa-file-waveform mr-2 text-emerald-400"></i>Patient Consultation Chronology</h3>
-                    <p id="consultations-patient-meta" class="text-xs text-teal-200 mt-1 font-medium">Historical audit tracking files</p>
+                    <p id="consultations-patient-meta" class="text-xs text-blue-200 mt-1 font-medium">Historical audit tracking files</p>
                 </div>
                 <button onclick="UI.closeModal('modal-consultations')" class="text-white/80 hover:text-white text-xl cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
@@ -905,7 +907,7 @@
 
     <div id="modal-medicine" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden flex flex-col max-h-[90vh] border border-slate-200 animate-zoom-in">
-            <div class="bg-gradient-to-r from-teal-800 to-teal-950 p-4 text-white flex justify-between items-center">
+            <div class="bg-gradient-to-r from-blue-800 to-blue-950 p-4 text-white flex justify-between items-center">
                 <h3 id="medicine-modal-title" class="font-bold text-sm uppercase tracking-wide"><i class="fa-solid fa-pills mr-2 text-emerald-400"></i>Register New Medicine</h3>
                 <button onclick="UI.closeModal('modal-medicine')" class="text-white/80 hover:text-white text-xl cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
@@ -915,7 +917,7 @@
                     
                     <div class="sm:col-span-2">
                         <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Medicine Type *</label>
-                        <select id="m-type" required onchange="UI.handleMedTypeChange()" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-700 cursor-pointer">
+                        <select id="m-type" required onchange="UI.handleMedTypeChange()" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-semibold text-slate-700 cursor-pointer">
                             <option value="" disabled selected>Select Type</option>
                             <option value="Tablet">Tablet</option>
                             <option value="Capsule">Capsule</option>
@@ -934,23 +936,23 @@
 
                     <div id="m-type-other-container" class="sm:col-span-2 hidden">
                         <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Specify Custom Category *</label>
-                        <input type="text" id="m-type-other" placeholder="e.g., Inhaler, Patch, Cream" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800">
+                        <input type="text" id="m-type-other" placeholder="e.g., Inhaler, Patch, Cream" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-semibold text-slate-800">
                     </div>
 
                     <div class="sm:col-span-2">
                         <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Medicine Name *</label>
-                        <input type="text" id="m-name" required placeholder="e.g., Augmentin 625 Duo" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800">
+                        <input type="text" id="m-name" required placeholder="e.g., Augmentin 625 Duo" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-semibold text-slate-800">
                     </div>
                     
                     <div>
                         <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Medicine Supplier</label>
-                        <select id="m-supplier" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-700">
+                        <select id="m-supplier" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-semibold text-slate-700">
                             </select>
                     </div>
                     <div>
                         <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Expiry Date (MM-YYYY) *</label>
                         <div class="flex space-x-2">
-                            <select id="m-expiry-month" required class="w-1/2 p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-bold text-slate-700 cursor-pointer">
+                            <select id="m-expiry-month" required class="w-1/2 p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-bold text-slate-700 cursor-pointer">
                                 <option value="" disabled selected>MM</option>
                                 <option value="01">01 - Jan</option>
                                 <option value="02">02 - Feb</option>
@@ -965,7 +967,7 @@
                                 <option value="11">11 - Nov</option>
                                 <option value="12">12 - Dec</option>
                             </select>
-                            <select id="m-expiry-year" required class="w-1/2 p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-bold text-slate-700 cursor-pointer">
+                            <select id="m-expiry-year" required class="w-1/2 p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-bold text-slate-700 cursor-pointer">
                                 </select>
                         </div>
                     </div>
@@ -975,7 +977,7 @@
                     <div class="sm:col-span-2">
                         <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Package Type & Units per Pkg *</label>
                         <div class="flex space-x-2">
-                            <select id="m-unit-type" class="w-1/2 p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-bold text-slate-700">
+                            <select id="m-unit-type" class="w-1/2 p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-bold text-slate-700">
                                 <option value="Strip">Strip</option>
                                 <option value="ML">ML</option>
                                 <option value="Box">Box</option>
@@ -992,7 +994,7 @@
                     </div>
                     <div>
                         <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Total Inventory</label>
-                        <input type="number" id="m-total-qty" readonly class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-100 focus:outline-none font-black text-teal-700">
+                        <input type="number" id="m-total-qty" readonly class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-100 focus:outline-none font-black text-blue-700">
                     </div>
                     <div>
                         <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">PTR (₹) *</label>
@@ -1003,7 +1005,7 @@
                         <input type="number" step="0.01" id="m-selling" required class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none font-bold text-slate-800">
                     </div>
                     <div class="sm:col-span-2 pt-2 space-y-2">
-                        <button type="submit" id="medicine-submit-btn" class="w-full py-3 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white font-bold rounded-xl shadow-md transition-all cursor-pointer active:scale-[0.99]">Save & Add Medicine</button>
+                        <button type="submit" id="medicine-submit-btn" class="w-full py-3 bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-800 hover:to-blue-900 text-white font-bold rounded-xl shadow-md transition-all cursor-pointer active:scale-[0.99]">Save & Add Medicine</button>
                         <button type="button" onclick="document.getElementById('medicine-scroll-area').scrollTo({top: 0, behavior: 'smooth'})" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl transition-all cursor-pointer text-xs active:scale-[0.99]"><i class="fa-solid fa-arrow-up mr-1.5"></i>Back to Top</button>
                     </div>
                 </form>
@@ -1013,12 +1015,12 @@
 
     <div id="modal-vendors" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print">
         <div class="w-full max-w-3xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden animate-zoom-in">
-            <div class="bg-gradient-to-r from-teal-800 to-teal-950 text-white px-5 py-4 flex items-center justify-between">
+            <div class="bg-gradient-to-r from-blue-800 to-blue-950 text-white px-5 py-4 flex items-center justify-between">
                 <div>
                     <h3 class="font-bold text-sm uppercase tracking-wide"><i class="fa-solid fa-truck-field mr-2 text-emerald-400"></i>Supplier Network</h3>
                 </div>
                 <div class="flex items-center gap-3">
-                    <button onclick="UI.openAddVendorFromNetwork()" class="px-3 py-1.5 bg-white text-teal-900 rounded-lg text-xs font-bold hover:bg-slate-50 transition-all shadow-xs cursor-pointer active:scale-[0.96]">Add Supplier</button>
+                    <button onclick="UI.openAddVendorFromNetwork()" class="px-3 py-1.5 bg-white text-blue-900 rounded-lg text-xs font-bold hover:bg-slate-50 transition-all shadow-xs cursor-pointer active:scale-[0.96]">Add Supplier</button>
                     <button onclick="UI.closeModal('modal-vendors')" class="text-white/80 hover:text-white text-xl cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
                 </div>
             </div>
@@ -1030,7 +1032,7 @@
 
     <div id="modal-supplier" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col border border-slate-200 animate-zoom-in">
-            <div class="bg-gradient-to-r from-teal-800 to-teal-950 p-4 text-white flex justify-between items-center">
+            <div class="bg-gradient-to-r from-blue-800 to-blue-950 p-4 text-white flex justify-between items-center">
                 <h3 id="supplier-modal-title" class="font-bold text-sm uppercase tracking-wide"><i class="fa-solid fa-truck-field mr-2 text-emerald-400"></i>Create Vendor Profile</h3>
                 <button onclick="UI.closeModal('modal-supplier')" class="text-white/80 hover:text-white text-xl cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
@@ -1039,7 +1041,7 @@
                     <input type="hidden" id="s-edit-index" value="">
                     <div>
                         <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Supplier Name *</label>
-                        <input type="text" id="s-name" required placeholder="e.g., Balaji Pharma Distributors" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-semibold text-slate-800">
+                        <input type="text" id="s-name" required placeholder="e.g., Balaji Pharma Distributors" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-semibold text-slate-800">
                     </div>
                     <div>
                         <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Supplier Address</label>
@@ -1047,10 +1049,10 @@
                     </div>
                     <div>
                         <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Mobile Number *</label>
-                        <input type="text" id="s-phone" required placeholder="e.g., 9876543211" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all font-bold text-slate-800">
+                        <input type="text" id="s-phone" required placeholder="e.g., 9876543211" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-bold text-slate-800">
                     </div>
                     <div class="pt-2">
-                        <button type="submit" class="w-full py-3 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white font-bold rounded-xl shadow-md transition-all cursor-pointer active:scale-[0.99]"><span id="supplier-submit-text">Commit Vendor Profile</span></button>
+                        <button type="submit" class="w-full py-3 bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-800 hover:to-blue-900 text-white font-bold rounded-xl shadow-md transition-all cursor-pointer active:scale-[0.99]"><span id="supplier-submit-text">Commit Vendor Profile</span></button>
                     </div>
                 </form>
             </div>
@@ -1093,7 +1095,7 @@
 
     <div id="modal-credits" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print">
         <div class="w-full max-w-3xl bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border border-slate-200 animate-zoom-in">
-            <div class="bg-gradient-to-r from-teal-800 to-teal-950 p-4 text-white flex justify-between items-center">
+            <div class="bg-gradient-to-r from-blue-800 to-blue-950 p-4 text-white flex justify-between items-center">
                 <h3 class="font-bold text-sm uppercase tracking-wide"><i class="fa-solid fa-hand-holding-dollar mr-2 text-emerald-400"></i>Credit Logs</h3>
                 <button onclick="UI.closeModal('modal-credits')" class="text-white/80 hover:text-white text-xl cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
@@ -1479,7 +1481,7 @@
 
                 const treatmentHtml = latestVisit?.treatmentType && latestVisit.treatmentType !== 'None' ? `
                     <div style="margin-bottom:12px;">
-                        <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:#0f766e;text-transform:uppercase;margin-bottom:5px;">In-Clinic Treatment</div>
+                        <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:#1d4ed8;text-transform:uppercase;margin-bottom:5px;">In-Clinic Treatment</div>
                         <div style="min-height:40px;border:1px solid #cbd5e1;border-radius:10px;padding:10px 12px;font-size:14px;line-height:1.6;background:#fef2f2;white-space:pre-wrap;">${latestVisit.treatmentPlan || 'No records'}</div>
                     </div>` : '';
 
@@ -1497,9 +1499,9 @@
 
                 return `
                     <div id="patient-export-sheet" style="font-family:'Arial',sans-serif;background:#ffffff;color:#0f172a;width:100%;box-sizing:border-box;">
-                        <div style="border:2px solid #0f766e;border-radius:14px;overflow:hidden;box-sizing:border-box;width:100%;">
-                            <div style="padding:18px 22px;border-bottom:3px solid #0f766e;text-align:center;background:#f0fdfa;">
-                                <div style="font-size:28px;font-weight:800;letter-spacing:.3px;color:#0f766e;text-transform:uppercase;">${clinic.name || 'Clinic Name'}</div>
+                        <div style="border:2px solid #1d4ed8;border-radius:14px;overflow:hidden;box-sizing:border-box;width:100%;">
+                            <div style="padding:18px 22px;border-bottom:3px solid #1d4ed8;text-align:center;background:#eff6ff;">
+                                <div style="font-size:28px;font-weight:800;letter-spacing:.3px;color:#1d4ed8;text-transform:uppercase;">${clinic.name || 'Clinic Name'}</div>
                                 <div style="font-size:13px;color:#334155;margin-top:6px;">${clinic.address || 'Clinic Address'}</div>
                                 <div style="font-size:13px;color:#334155;margin-top:4px;">Consultant: ${docName} | Reg. No.: ${clinic.regno || 'Not set'} | Contact: ${clinic.mobile || 'Not set'}</div>
                             </div>
@@ -1515,20 +1517,20 @@
                                 <div style="margin-top:14px;display:grid;gap:12px;">
                                     ${vitalsHtml}
                                     <div>
-                                        <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:#0f766e;text-transform:uppercase;margin-bottom:5px;">Complaint</div>
+                                        <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:#1d4ed8;text-transform:uppercase;margin-bottom:5px;">Complaint</div>
                                         <div style="min-height:48px;border:1px solid #cbd5e1;border-radius:10px;padding:10px 12px;font-size:14px;line-height:1.6;background:#f8fafc;">${complaint}</div>
                                     </div>
                                     <div>
-                                        <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:#0f766e;text-transform:uppercase;margin-bottom:5px;">Diagnosis</div>
+                                        <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:#1d4ed8;text-transform:uppercase;margin-bottom:5px;">Diagnosis</div>
                                         <div style="min-height:48px;border:1px solid #cbd5e1;border-radius:10px;padding:10px 12px;font-size:14px;line-height:1.6;background:#f8fafc;">${diagnosis}</div>
                                     </div>
                                     ${treatmentHtml}
                                     <div>
-                                        <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:#0f766e;text-transform:uppercase;margin-bottom:5px;">Prescription</div>
+                                        <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:#1d4ed8;text-transform:uppercase;margin-bottom:5px;">Prescription</div>
                                         <div style="min-height:220px;border:1.5px solid #94a3b8;border-radius:10px;padding:14px 14px 16px;font-size:15px;line-height:1.9;white-space:pre-wrap;background:#ffffff;">℞\n${rxText}</div>
                                     </div>
                                     <div>
-                                        <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:#0f766e;text-transform:uppercase;margin-bottom:5px;">Clinical Notes</div>
+                                        <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:#1d4ed8;text-transform:uppercase;margin-bottom:5px;">Clinical Notes</div>
                                         <div style="min-height:40px;border:1px dashed #cbd5e1;border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.6;background:#fcfcfd;">History / Allergies: ${patient.allergies || 'None recorded'}</div>
                                     </div>
                                 </div>
@@ -1832,12 +1834,12 @@
                     return `
                     <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-xs flex flex-col md:flex-row justify-between items-center gap-4">
                         <div class="flex-1 w-full text-left">
-                            <div class="text-[10px] font-black uppercase tracking-wide text-teal-600">${c.ref} • ${c.date}</div>
+                            <div class="text-[10px] font-black uppercase tracking-wide text-blue-600">${c.ref} • ${c.date}</div>
                             <div class="text-sm font-bold text-slate-800 mt-0.5">${c.patientName}</div>
                             <div class="text-xs text-slate-500 mt-1 font-medium">Total: ₹${c.totalAmount.toFixed(2)} | Paid: ₹${c.paidAmount.toFixed(2)} | <span class="text-rose-600 font-bold">Remaining: ₹${remaining.toFixed(2)}</span></div>
                         </div>
                         <div class="flex items-center gap-2 self-start md:self-auto w-full md:w-auto">
-                            <input type="number" id="pay-input-${c.id}" max="${remaining}" placeholder="Enter amount" class="w-full md:w-32 p-2 border border-slate-200 rounded-lg text-sm font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-teal-500/20">
+                            <input type="number" id="pay-input-${c.id}" max="${remaining}" placeholder="Enter amount" class="w-full md:w-32 p-2 border border-slate-200 rounded-lg text-sm font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20">
                             <button onclick="UI.receiveCreditPayment('${c.id}')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg transition-all shadow-xs cursor-pointer active:scale-[0.96] whitespace-nowrap">Receive</button>
                         </div>
                     </div>
@@ -2043,11 +2045,11 @@
                             <div class="text-[11px] text-slate-400 font-medium">History/Allergies: ${p.allergies || 'None recorded'}</div>
                         </td>
                         <td class="p-4 text-xs font-semibold text-slate-700">${p.ageVal} ${p.ageUnit}</td>
-                        <td class="p-4 text-xs font-bold text-teal-700">${p.weight ? p.weight + ' kg' : '--'}</td>
-                        <td class="p-4 text-center"><button onclick="UI.viewPatientConsultations('${p.id}')" class="bg-slate-100 hover:bg-teal-50 text-slate-700 hover:text-teal-700 font-bold px-3 py-1 rounded-full text-[11px] transition-all cursor-pointer">${visitsCount} Prescriptions</button></td>
+                        <td class="p-4 text-xs font-bold text-blue-700">${p.weight ? p.weight + ' kg' : '--'}</td>
+                        <td class="p-4 text-center"><button onclick="UI.viewPatientConsultations('${p.id}')" class="bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 font-bold px-3 py-1 rounded-full text-[11px] transition-all cursor-pointer">${visitsCount} Prescriptions</button></td>
                         <td class="p-4 align-middle">
                             <div class="flex justify-center items-center gap-1.5 flex-wrap">
-                                <button onclick="UI.initiateVisitModal('${p.id}')" title="Clinical Notes" class="px-2.5 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 font-bold text-xs rounded-xl transition-all cursor-pointer"><i class="fa-solid fa-notes-medical"></i></button>
+                                <button onclick="UI.initiateVisitModal('${p.id}')" title="Clinical Notes" class="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs rounded-xl transition-all cursor-pointer"><i class="fa-solid fa-notes-medical"></i></button>
                                 <button onclick="UI.editLatestPrescription('${p.id}')" title="Edit Prescription" class="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold text-xs rounded-xl transition-all cursor-pointer"><i class="fa-solid fa-pen-to-square"></i></button>
                                 <button onclick="UI.sharePatientPrescriptionWhatsApp('${p.id}')" title="Share WhatsApp" class="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs rounded-xl transition-all cursor-pointer"><i class="fa-brands fa-whatsapp"></i></button>
                                 <button onclick="UI.printPatientPrescription('${p.id}')" title="Print Prescription" class="px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-xl transition-all cursor-pointer"><i class="fa-solid fa-print"></i></button>
@@ -2097,7 +2099,7 @@
                     <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs">
                         <div class="flex items-center justify-between gap-3 mb-3">
                             <div>
-                                <div class="text-[10px] font-black uppercase tracking-wider text-teal-600">Consultation ${visits.length - index}</div>
+                                <div class="text-[10px] font-black uppercase tracking-wider text-blue-600">Consultation ${visits.length - index}</div>
                                 <div class="text-xs font-bold text-slate-800 mt-0.5">Date Vector: ${visit.date}</div>
                             </div>
                             <span class="text-[10px] px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 font-bold font-mono">${visit.id}</span>
@@ -2209,8 +2211,8 @@
 
                 let html = `
                     <div style="font-family:'Arial',sans-serif;background:#ffffff;color:#0f172a;width:100%;box-sizing:border-box;padding:20px;">
-                        <div style="text-align:center; margin-bottom: 20px; border-bottom: 2px solid #0f766e; padding-bottom: 10px;">
-                            <h2 style="margin:0; font-size: 24px; color: #0f766e; text-transform: uppercase; font-weight:800;">${clinic.name || 'Clinic Stock Report'}</h2>
+                        <div style="text-align:center; margin-bottom: 20px; border-bottom: 2px solid #1d4ed8; padding-bottom: 10px;">
+                            <h2 style="margin:0; font-size: 24px; color: #1d4ed8; text-transform: uppercase; font-weight:800;">${clinic.name || 'Clinic Stock Report'}</h2>
                             <p style="margin:5px 0 0; font-size: 13px; color: #475569;">${clinic.address || ''}</p>
                             <p style="margin:8px 0 0; font-size: 15px; font-weight: bold; color:#0f172a;">Current Stock Inventory Ledger</p>
                             <p style="margin:4px 0 0; font-size: 11px; color: #64748b;">Generated on: ${printDate}</p>
@@ -2247,7 +2249,7 @@
                                 <td style="padding: 8px; border: 1px solid #e2e8f0; ${qtyStyle}">${parseFloat(Number(i.qty).toFixed(2))}</td>
                                 <td style="padding: 8px; border: 1px solid #e2e8f0; color:#475569;">${Number(i.purchase).toFixed(2)}</td>
                                 <td style="padding: 8px; border: 1px solid #e2e8f0; color:#475569;">${Number(i.selling).toFixed(2)}</td>
-                                <td style="padding: 8px; border: 1px solid #e2e8f0; font-weight:bold; color:#0f766e;">${((i.qty / (i.unitQty || 1)) * i.purchase).toFixed(2)}</td>
+                                <td style="padding: 8px; border: 1px solid #e2e8f0; font-weight:bold; color:#1d4ed8;">${((i.qty / (i.unitQty || 1)) * i.purchase).toFixed(2)}</td>
                             </tr>
                         `;
                     });
@@ -2336,14 +2338,14 @@
                     tr.className = "border-b border-slate-200 hover:bg-slate-50/50 text-slate-600 font-medium transition-colors text-xs";
                     tr.innerHTML = `
                         <td class="p-4">
-                            <div class="font-bold text-slate-800 text-sm"><span class="text-teal-600 mr-1.5">[${i.type || 'N/A'}]</span>${i.name}</div>
+                            <div class="font-bold text-slate-800 text-sm"><span class="text-blue-600 mr-1.5">[${i.type || 'N/A'}]</span>${i.name}</div>
                             <div class="text-[11px] text-slate-400 font-medium mt-0.5">Unit: ${i.unitType || 'Pkg'} • ${i.unitQty ? i.unitQty + ' Units/Pkg' : ''}</div>
                         </td>
                         <td class="p-4 text-slate-500 font-semibold">${i.supplier || 'N/A'}</td>
                         <td class="p-4 font-bold text-slate-700 font-mono">${i.expiry}</td>
                         <td class="p-4 text-center font-black text-slate-800">${parseFloat(Number(i.qty).toFixed(2))} total units</td>
                         <td class="p-4 text-right leading-relaxed font-semibold">PTR: <span class="text-slate-500">₹${Number(i.purchase).toFixed(2)}</span><br><span class="text-slate-900 font-black">MRP: ₹${Number(i.selling).toFixed(2)}</span></td>
-                        <td class="p-4 text-right font-black text-teal-700">₹${totalPTRValue.toFixed(2)}</td>
+                        <td class="p-4 text-right font-black text-blue-700">₹${totalPTRValue.toFixed(2)}</td>
                         <td class="p-4 text-center">${statusBadge}</td>
                         <td class="p-4 text-right space-x-1 whitespace-nowrap">
                             <button onclick="UI.editInventoryRecord('${i.id}')" title="Edit Stock Item" class="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold text-xs rounded-xl transition-all cursor-pointer"><i class="fa-solid fa-pen-to-square"></i></button>
@@ -3070,8 +3072,8 @@
                         labels: ['Inbound Operational Fees', 'Overhead Expenses Drain'],
                         datasets: [{
                             data: [revenue, expenses],
-                            backgroundColor: ['rgba(13, 148, 136, 0.85)', 'rgba(244, 63, 94, 0.85)'],
-                            borderColor: ['rgb(13, 148, 136)', 'rgb(244, 63, 94)'],
+                            backgroundColor: ['rgba(29, 78, 216, 0.85)', 'rgba(244, 63, 94, 0.85)'],
+                            borderColor: ['rgb(29, 78, 216)', 'rgb(244, 63, 94)'],
                             borderWidth: 1.5,
                             borderRadius: 8
                         }]
@@ -3107,8 +3109,8 @@
                             <div class="text-slate-400 mt-0.5 font-semibold">Diagnosis: ${v.diagnosis}</div>
                         </div>
                         <div class="text-right font-medium">
-                            <span class="text-teal-700 font-bold block">${v.date}</span>
-                            <button onclick="UI.printPatientPrescription('${v.patientId}')" class="text-[10px] text-slate-500 hover:text-teal-700 underline font-bold transition-colors cursor-pointer mt-0.5">Print Sheet</button>
+                            <span class="text-blue-700 font-bold block">${v.date}</span>
+                            <button onclick="UI.printPatientPrescription('${v.patientId}')" class="text-[10px] text-slate-500 hover:text-blue-700 underline font-bold transition-colors cursor-pointer mt-0.5">Print Sheet</button>
                         </div>
                     `;
                     container.appendChild(item);
