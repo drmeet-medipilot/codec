@@ -316,35 +316,46 @@ Stay hydrated and consult a doctor immediately. Do not self-medicate.
         });
 
         // 2. AI Image Generation Logic (Connecting to internet for real images)
-        function generateAIImage() {
+function generateAIImage() {
             // Show loading animation
             loadingAnimation.style.display = 'block';
             outImage.style.display = 'none';
-            aiBtn.innerText = "⏳ Generating AI Image...";
+            aiBtn.innerText = "⏳ AI is drawing your image...";
 
-            // Get the keyword from the category dropdown value
             const keyword = categorySelect.value;
-            
-            // Use Unsplash API to fetch a professional, copyright-free stock image based on the keyword
-            // Adding a random timestamp prevents the browser from caching the same image
-            const imageUrl = `https://loremflickr.com/800/500/${keyword}?random=${new Date().getTime()}`;
+            let aiPrompt = "";
 
-            // Load the image
+            // Create a highly detailed prompt for the AI to draw based on the selected category
+            if (keyword === "virus") {
+                aiPrompt = "highly detailed 3d medical illustration of a virus cell, microscopic view, clean clinical blue background, 8k resolution, professional healthcare visual";
+            } else if (keyword === "laboratory") {
+                aiPrompt = "modern medical laboratory equipment, glowing blue lights, clean professional hospital setting, photorealistic, cinematic lighting";
+            } else if (keyword === "pediatrics") {
+                aiPrompt = "beautiful 3d illustration of a healthy happy child, soft bright lighting, pediatric healthcare concept, clean background";
+            } else {
+                aiPrompt = "professional doctor stethoscope on a clean desk, modern hospital background, photorealistic, 8k, highly detailed";
+            }
+
+            // Encode the text so it works safely inside a URL
+            const encodedPrompt = encodeURIComponent(aiPrompt);
+
+            // Fetch the image from a real AI Generative Engine (Stable Diffusion)
+            // nologo=true removes the watermark, and we pass the exact width and height we need
+            const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=800&height=500&nologo=true&seed=${new Date().getTime()}`;
+
             const img = new Image();
-            img.crossOrigin = "Anonymous"; // Crucial for downloading later
+            img.crossOrigin = "Anonymous"; 
             img.src = imageUrl;
 
             img.onload = () => {
-                // Once loaded, hide animation and show image
                 outImage.src = imageUrl;
                 loadingAnimation.style.display = 'none';
                 outImage.style.display = 'block';
-                aiBtn.innerText = "✨ Regenerate Image";
+                aiBtn.innerText = "✨ Generate Another AI Image";
             };
 
             img.onerror = () => {
-                // Fallback in case of internet error
-                aiBtn.innerText = "⚠️ Network Error. Try Again.";
+                aiBtn.innerText = "⚠️ AI Server Busy. Try Again.";
                 loadingAnimation.style.display = 'block';
             };
         }
