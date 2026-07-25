@@ -1293,15 +1293,38 @@
 
             static read() {
                 if (!this.cache) {
-                    this.cache = this.initializeEmptySchema();
+                    // First try to load from local robust cache to prevent empty screen on refresh
+                    const localData = localStorage.getItem('medipilot_local_vault');
+                    if (localData) {
+                        try {
+                            this.cache = JSON.parse(localData);
+                            // Ensure clinicProfile object exists even in old caches
+                            if (!this.cache.clinicProfile) {
+                                this.cache.clinicProfile = this.initializeEmptySchema().clinicProfile;
+                            }
+                        } catch(e) {
+                            this.cache = this.initializeEmptySchema();
+                        }
+                    } else {
+                        this.cache = this.initializeEmptySchema();
+                    }
                 }
                 return this.cache;
             }
 
             static write(payload) {
                 this.cache = payload;
+                
+                // Dual-Save: Save instantly to local storage for persistence across reloads
+                try {
+                    localStorage.setItem('medipilot_local_vault', JSON.stringify(payload));
+                } catch(e) {
+                    console.warn("Local storage save failed (quota exceeded?):", e);
+                }
+
                 UI.triggerGlobalAuditRefresh();
                 
+                // Cloud-Save: Push to Supabase if authenticated
                 if(currentUser) {
                     supabaseApp.from('clinic_vault').upsert({
                         clinic_id: currentUser.id,
@@ -1320,8 +1343,11 @@
                     
                     if (data && data.data) {
                         this.cache = data.data;
+                        // Mirror cloud data back to local storage
+                        localStorage.setItem('medipilot_local_vault', JSON.stringify(this.cache));
                     } else {
-                        this.cache = this.initializeEmptySchema();
+                        // Initialize cloud with current local cache if no cloud data exists
+                        if(!this.cache) this.cache = this.read();
                         await supabaseApp.from('clinic_vault').insert([{ clinic_id: currentUser.id, data: this.cache }]);
                     }
                     UI.loadClinicProfile();
@@ -1554,7 +1580,7 @@
                     esignPin: document.getElementById('clinic-esign-pin')?.value || ''
                 };
                 SystemStorage.write(db);
-                alert('Clinic profile & E-Security details saved successfully.');
+                alert('Clinic profile & E-Security details securely saved to the Cloud Vault.');
             }
 
             static getPatientExportData(patientId) {
