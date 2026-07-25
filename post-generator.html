@@ -238,7 +238,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
     // ----------------------------------------------------
-    // IMPORTANT: PASTE YOUR GOOGLE API KEY HERE
+    // YOUR LIVE GOOGLE AI KEY
     // ----------------------------------------------------
     const AI_API_KEY = "AQ.Ab8RN6JXx4mTnra9vRr0Hq9FvL9wsYUd097bc0hnlCHahkwPzw"; 
 
@@ -289,7 +289,7 @@
         const promptText = `Act as a professional medical expert. Provide exactly 4 short symptoms, 4 short causes, and 4 short precautions for the medical topic: "${topicInput}". Return ONLY a valid JSON object in this exact format: {"symptoms":["","","",""],"causes":["","","",""],"precautions":["","","",""]}.`;
 
         try {
-            if(!AI_API_KEY || AI_API_KEY === "AQ.Ab8RN6JXx4mTnra9vRr0Hq9FvL9wsYUd097bc0hnlCHahkwPzw") {
+            if(!AI_API_KEY || AI_API_KEY === "YOUR_API_KEY_HERE") {
                 throw new Error("Missing_Key");
             }
 
@@ -326,7 +326,7 @@
         } catch (error) {
             console.error("AI Error:", error);
             if(error.message === "Missing_Key") {
-                alert("Please paste your free Google AI Key into the code where it says 'AQ.Ab8RN6JXx4mTnra9vRr0Hq9FvL9wsYUd097bc0hnlCHahkwPzw'.");
+                alert("Please paste your free Google AI Key into the code where it says 'YOUR_API_KEY_HERE'.");
             } else {
                 alert("AI encountered an issue. Please wait a moment and try again.");
             }
