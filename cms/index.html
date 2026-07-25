@@ -1287,21 +1287,20 @@
                     credits: [],
                     suppliers: [],
                     clinicProfile: { name: '', address: '', mobile: '', regno: '', doctor: '', degree: '', esignBase64: '', estampBase64: '', esignPin: '' },
-                    metadata: { initializedAt: new Date().toISOString(), softwareVersion: "2026.7.4 (Cloud Vault)" }
+                    metadata: { lastUpdated: new Date().getTime(), softwareVersion: "2026.7.4 (Cloud Vault V2)" }
                 };
             }
 
             static read() {
                 if (!this.cache) {
-                    // First try to load from local robust cache to prevent empty screen on refresh
                     const localData = localStorage.getItem('medipilot_local_vault');
                     if (localData) {
                         try {
-                            this.cache = JSON.parse(localData);
-                            // Ensure clinicProfile object exists even in old caches
-                            if (!this.cache.clinicProfile) {
-                                this.cache.clinicProfile = this.initializeEmptySchema().clinicProfile;
-                            }
+                            const parsed = JSON.parse(localData);
+                            const empty = this.initializeEmptySchema();
+                            this.cache = { ...empty, ...parsed };
+                            this.cache.clinicProfile = { ...empty.clinicProfile, ...(parsed.clinicProfile || {}) };
+                            this.cache.metadata = { ...empty.metadata, ...(parsed.metadata || {}) };
                         } catch(e) {
                             this.cache = this.initializeEmptySchema();
                         }
@@ -1313,18 +1312,19 @@
             }
 
             static write(payload) {
+                if(!payload.metadata) payload.metadata = {};
+                payload.metadata.lastUpdated = new Date().getTime(); 
+                
                 this.cache = payload;
                 
-                // Dual-Save: Save instantly to local storage for persistence across reloads
                 try {
                     localStorage.setItem('medipilot_local_vault', JSON.stringify(payload));
                 } catch(e) {
-                    console.warn("Local storage save failed (quota exceeded?):", e);
+                    console.warn("Local storage save failed:", e);
                 }
 
                 UI.triggerGlobalAuditRefresh();
                 
-                // Cloud-Save: Push to Supabase if authenticated
                 if(currentUser) {
                     supabaseApp.from('clinic_vault').upsert({
                         clinic_id: currentUser.id,
@@ -1341,19 +1341,40 @@
                     const { data, error } = await supabaseApp.from('clinic_vault')
                         .select('data').eq('clinic_id', currentUser.id).single();
                     
-                    if (data && data.data) {
-                        this.cache = data.data;
-                        // Mirror cloud data back to local storage
+                    let cloudData = data?.data;
+                    let localData = null;
+                    
+                    try {
+                        const localStr = localStorage.getItem('medipilot_local_vault');
+                        if(localStr) localData = JSON.parse(localStr);
+                    } catch(e) {}
+
+                    // Smart Merge: Compare Timestamps to prevent Cloud from overwriting newer Local saves
+                    let cloudTime = cloudData?.metadata?.lastUpdated || 0;
+                    let localTime = localData?.metadata?.lastUpdated || 0;
+
+                    const empty = this.initializeEmptySchema();
+
+                    if (cloudData && cloudTime >= localTime) {
+                        this.cache = { ...empty, ...cloudData };
+                        this.cache.clinicProfile = { ...empty.clinicProfile, ...(cloudData.clinicProfile || {}) };
                         localStorage.setItem('medipilot_local_vault', JSON.stringify(this.cache));
+                    } else if (localData && localTime > cloudTime) {
+                        this.cache = { ...empty, ...localData };
+                        this.cache.clinicProfile = { ...empty.clinicProfile, ...(localData.clinicProfile || {}) };
+                        await supabaseApp.from('clinic_vault').upsert({ clinic_id: currentUser.id, data: this.cache }, { onConflict: 'clinic_id' });
                     } else {
-                        // Initialize cloud with current local cache if no cloud data exists
-                        if(!this.cache) this.cache = this.read();
+                        this.cache = empty;
                         await supabaseApp.from('clinic_vault').insert([{ clinic_id: currentUser.id, data: this.cache }]);
                     }
+                    
                     UI.loadClinicProfile();
                     UI.triggerGlobalAuditRefresh();
                 } catch (e) {
-                    console.error("Cloud Fetch Failed", e);
+                    console.error("Cloud Fetch Failed - Using Local", e);
+                    this.cache = this.read();
+                    UI.loadClinicProfile();
+                    UI.triggerGlobalAuditRefresh();
                 }
             }
 
@@ -1540,7 +1561,13 @@
                 };
                 Object.entries(map).forEach(([id, value]) => {
                     const el = document.getElementById(id);
-                    if (el) el.value = value;
+                    if (el) {
+                        if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                            el.value = value;
+                        } else {
+                            el.innerText = value;
+                        }
+                    }
                 });
 
                 const previewSign = document.getElementById('esign-preview');
