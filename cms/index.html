@@ -751,6 +751,100 @@
                         </div>
                     </div>
 
+                    <!-- INVESTIGATIONS ADDITION MODULE -->
+                    <div class="border border-slate-200 p-4 rounded-xl bg-slate-50/50 space-y-3 shadow-inner mt-4">
+                        <div class="flex justify-between items-center">
+                            <label class="flex items-center space-x-2 text-xs font-black text-slate-600 uppercase tracking-wider cursor-pointer select-none">
+                                <input type="checkbox" id="v-inv-check" onchange="UI.toggleInvestigation()" class="rounded border-slate-300 accent-blue-700"> 
+                                <span>Add Investigation?</span>
+                            </label>
+                        </div>
+                        <div id="inv-container" class="hidden space-y-3 pt-3 border-t border-slate-200">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <div class="md:col-span-1">
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Investigation Type</label>
+                                    <select id="v-inv-type" onchange="UI.handleInvTypeChange()" class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-semibold">
+                                        <option value="">-- Select --</option>
+                                        <option value="Pathology & Microbiology">Pathology & Microbiology</option>
+                                        <option value="Radiology">Radiology</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Pathology Section -->
+                            <div id="inv-path-section" class="hidden grid grid-cols-1 md:grid-cols-4 gap-3">
+                                <div class="md:col-span-1">
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Select Report</label>
+                                    <select id="v-path-report" onchange="UI.handlePathReportChange()" class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-semibold">
+                                        <option value="">-- Select --</option>
+                                        <option value="CBC">CBC</option>
+                                        <option value="CRP">CRP</option>
+                                        <option value="SGPT">SGPT</option>
+                                        <option value="Widal Slide">Widal Slide</option>
+                                        <option value="TSH">TSH</option>
+                                        <option value="T3">T3</option>
+                                        <option value="T4">T4</option>
+                                        <option value="Lipid Profile">Lipid Profile</option>
+                                        <option value="FBS">FBS</option>
+                                        <option value="PP2BS">PP2BS</option>
+                                        <option value="HBA1C">HBA1C</option>
+                                        <option value="Dengue">Dengue</option>
+                                        <option value="MP">MP</option>
+                                        <option value="S. Create">S. Create</option>
+                                        <option value="Uric Acid">Uric Acid</option>
+                                        <option value="Urine R & M">Urine R & M</option>
+                                        <option value="RBS">RBS</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div id="inv-path-other-container" class="hidden md:col-span-1">
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Specify Report</label>
+                                    <input type="text" id="v-path-other" placeholder="Report name..." class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-semibold">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Report Values (Remark)</label>
+                                    <input type="text" id="v-path-remark" placeholder="Specify report values..." class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-semibold">
+                                </div>
+                            </div>
+
+                            <!-- Radiology Section -->
+                            <div id="inv-rad-section" class="hidden grid grid-cols-1 md:grid-cols-4 gap-3">
+                                <div class="md:col-span-1">
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Select Report</label>
+                                    <select id="v-rad-report" onchange="UI.handleRadReportChange()" class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-semibold">
+                                        <option value="">-- Select --</option>
+                                        <option value="Xray">Xray</option>
+                                        <option value="USG">USG</option>
+                                        <option value="CT Scan">CT Scan</option>
+                                        <option value="MRI">MRI</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div id="inv-rad-other-container" class="hidden md:col-span-1">
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Specify Report</label>
+                                    <input type="text" id="v-rad-other" placeholder="Report name..." class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-semibold">
+                                </div>
+                                <div class="md:col-span-1">
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Type/Part of Body</label>
+                                    <input type="text" id="v-rad-part" placeholder="e.g. Chest, Knee" class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-semibold">
+                                </div>
+                                <div class="md:col-span-1">
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Findings (Remark)</label>
+                                    <input type="text" id="v-rad-remark" placeholder="Findings..." class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none font-semibold">
+                                </div>
+                            </div>
+
+                            <div class="flex justify-end mt-2">
+                                <button type="button" onclick="UI.addInvestigationToPlan()" class="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-xl transition-all shadow-xs flex items-center cursor-pointer">
+                                    <i class="fa-solid fa-plus mr-1"></i> Add to Investigation Plan
+                                </button>
+                            </div>
+                            
+                            <textarea id="v-investigation-plan" rows="2" placeholder="Added investigations will appear here..." class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none text-xs font-semibold font-mono text-slate-700 mt-2"></textarea>
+                        </div>
+                    </div>
+                    <!-- /INVESTIGATIONS END -->
+
                     <div class="border border-slate-200 p-4 rounded-xl bg-slate-50/50 space-y-3 shadow-inner">
                         <div class="flex justify-between items-center">
                             <label class="block text-xs font-black text-slate-600 uppercase tracking-wider">Stat In-Clinic Treatment</label>
@@ -1482,6 +1576,12 @@
                         ${latestVisit.vitals.rbs ? `<div><b>RBS:</b> ${latestVisit.vitals.rbs} mg/dL</div>` : ''}
                     </div>` : '';
 
+                const invHtml = latestVisit?.investigations ? `
+                    <div style="margin-bottom:12px;">
+                        <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:#1d4ed8;text-transform:uppercase;margin-bottom:5px;">Investigations</div>
+                        <div style="min-height:40px;border:1px solid #cbd5e1;border-radius:10px;padding:10px 12px;font-size:14px;line-height:1.6;background:#f0fdf4;white-space:pre-wrap;">${latestVisit.investigations}</div>
+                    </div>` : '';
+
                 const treatmentHtml = latestVisit?.treatmentType && latestVisit.treatmentType !== 'None' ? `
                     <div style="margin-bottom:12px;">
                         <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:#1d4ed8;text-transform:uppercase;margin-bottom:5px;">In-Clinic Treatment</div>
@@ -1527,6 +1627,7 @@
                                         <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:#1d4ed8;text-transform:uppercase;margin-bottom:5px;">Diagnosis</div>
                                         <div style="min-height:48px;border:1px solid #cbd5e1;border-radius:10px;padding:10px 12px;font-size:14px;line-height:1.6;background:#f8fafc;">${diagnosis}</div>
                                     </div>
+                                    ${invHtml}
                                     ${treatmentHtml}
                                     <div>
                                         <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:#1d4ed8;text-transform:uppercase;margin-bottom:5px;">Prescription</div>
@@ -2092,6 +2193,12 @@
                             ${visit.vitals.rbs ? `<div><span class="text-slate-400 font-extrabold uppercase">RBS:</span> ${visit.vitals.rbs}</div>` : ''}
                         </div>` : '';
                     
+                    let invHtml = visit.investigations ? `
+                        <div class="mt-2">
+                            <div class="text-[10px] font-extrabold uppercase tracking-wide text-indigo-600 mb-1">Investigations</div>
+                            <div class="text-indigo-700 bg-indigo-50/60 p-2.5 rounded-xl text-xs font-mono font-medium whitespace-pre-wrap border border-indigo-100">${visit.investigations}</div>
+                        </div>` : '';
+
                     let treatHtml = visit.treatmentType && visit.treatmentType !== 'None' ? `
                         <div class="mt-2">
                             <div class="text-[10px] font-extrabold uppercase tracking-wide text-rose-600 mb-1">In-Clinic Treatment</div>
@@ -2117,6 +2224,7 @@
                                 <div class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-0.5">Diagnosis evaluations</div>
                                 <div class="text-slate-700 text-xs font-medium">${visit.diagnosis || 'Not recorded'}</div>
                             </div>
+                            ${invHtml}
                             ${treatHtml}
                             <div>
                                 <div class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Prescription Directives Matrix</div>
@@ -2776,17 +2884,121 @@
                 }
             }
 
+            static toggleInvestigation() {
+                const chk = document.getElementById('v-inv-check');
+                const container = document.getElementById('inv-container');
+                if(chk && container) {
+                    if(chk.checked) {
+                        container.classList.remove('hidden');
+                    } else {
+                        container.classList.add('hidden');
+                    }
+                }
+            }
+
+            static handleInvTypeChange() {
+                const type = document.getElementById('v-inv-type').value;
+                const pathSec = document.getElementById('inv-path-section');
+                const radSec = document.getElementById('inv-rad-section');
+                
+                if(type === 'Pathology & Microbiology') {
+                    pathSec.classList.remove('hidden');
+                    radSec.classList.add('hidden');
+                } else if (type === 'Radiology') {
+                    radSec.classList.remove('hidden');
+                    pathSec.classList.add('hidden');
+                } else {
+                    pathSec.classList.add('hidden');
+                    radSec.classList.add('hidden');
+                }
+            }
+
+            static handlePathReportChange() {
+                const rep = document.getElementById('v-path-report').value;
+                const other = document.getElementById('inv-path-other-container');
+                if(rep === 'Other') {
+                    other.classList.remove('hidden');
+                } else {
+                    other.classList.add('hidden');
+                }
+            }
+
+            static handleRadReportChange() {
+                const rep = document.getElementById('v-rad-report').value;
+                const other = document.getElementById('inv-rad-other-container');
+                if(rep === 'Other') {
+                    other.classList.remove('hidden');
+                } else {
+                    other.classList.add('hidden');
+                }
+            }
+
+            static addInvestigationToPlan() {
+                const type = document.getElementById('v-inv-type').value;
+                let lineContent = "";
+                const planArea = document.getElementById('v-investigation-plan');
+
+                if(!type) { alert("Select Investigation Type first."); return; }
+
+                if(type === 'Pathology & Microbiology') {
+                    let report = document.getElementById('v-path-report').value;
+                    if(!report) { alert("Select a report."); return; }
+                    if(report === 'Other') {
+                        report = document.getElementById('v-path-other').value;
+                        if(!report) { alert("Specify the other report."); return; }
+                    }
+                    const remark = document.getElementById('v-path-remark').value;
+                    lineContent = `Pathology: ${report}` + (remark ? ` - Values/Remark: ${remark}` : '');
+                    
+                    // Reset fields
+                    document.getElementById('v-path-report').selectedIndex = 0;
+                    document.getElementById('v-path-other').value = '';
+                    document.getElementById('v-path-remark').value = '';
+                    this.handlePathReportChange();
+                } else if(type === 'Radiology') {
+                    let report = document.getElementById('v-rad-report').value;
+                    if(!report) { alert("Select a report."); return; }
+                    if(report === 'Other') {
+                        report = document.getElementById('v-rad-other').value;
+                        if(!report) { alert("Specify the other report."); return; }
+                    }
+                    const part = document.getElementById('v-rad-part').value;
+                    const remark = document.getElementById('v-rad-remark').value;
+                    
+                    lineContent = `Radiology: ${report}` + (part ? ` (${part})` : '') + (remark ? ` - Findings: ${remark}` : '');
+                    
+                    // Reset fields
+                    document.getElementById('v-rad-report').selectedIndex = 0;
+                    document.getElementById('v-rad-other').value = '';
+                    document.getElementById('v-rad-part').value = '';
+                    document.getElementById('v-rad-remark').value = '';
+                    this.handleRadReportChange();
+                }
+
+                const currentText = planArea.value.trim();
+                const nextNum = currentText ? currentText.split('\n').length + 1 : 1;
+                const finalLine = `${nextNum}. ${lineContent}`;
+                
+                planArea.value = currentText ? currentText + "\n" + finalLine : finalLine;
+            }
+
             static initiateVisitModal(patientId) {
                 document.getElementById('form-visit').reset();
                 document.getElementById('v-patient-id').value = patientId;
                 document.getElementById('v-visit-id').value = ""; // Clear for new visits
                 document.getElementById('v-prescription').value = "";
                 document.getElementById('v-treatment-plan').value = "";
+                document.getElementById('v-investigation-plan').value = "";
                 document.getElementById('v-treatment-qty').value = "";
                 document.getElementById('v-stitches-count').value = "";
                 
                 this.toggleRBS();
                 this.toggleTreatment();
+                
+                document.getElementById('v-inv-check').checked = false;
+                this.toggleInvestigation();
+                document.getElementById('v-inv-type').value = "";
+                this.handleInvTypeChange();
                 
                 if(document.getElementById('v-treatment-med-type')) {
                     this.filterVisitMedicineOptions('v-treatment-medicine', document.getElementById('v-treatment-med-type').value);
@@ -3002,6 +3214,7 @@
                         spo2: document.getElementById('v-spo2').value.trim(),
                         rbs: document.getElementById('v-rbs-check').checked ? document.getElementById('v-rbs').value.trim() : ""
                     },
+                    investigations: document.getElementById('v-investigation-plan').value.trim(),
                     treatmentType: document.getElementById('v-treatment-type').value,
                     treatmentPlan: document.getElementById('v-treatment-plan').value.trim(),
                     prescription: document.getElementById('v-prescription').value.trim()
@@ -3053,6 +3266,12 @@
                     document.getElementById('v-rbs-check').checked = true;
                     this.toggleRBS();
                     document.getElementById('v-rbs').value = latest.vitals.rbs;
+                }
+
+                document.getElementById('v-investigation-plan').value = latest.investigations || '';
+                if(latest.investigations) {
+                    document.getElementById('v-inv-check').checked = true;
+                    this.toggleInvestigation();
                 }
 
                 document.getElementById('v-treatment-type').value = latest.treatmentType || 'None';
