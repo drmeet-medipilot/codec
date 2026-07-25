@@ -240,7 +240,7 @@
     // ----------------------------------------------------
     // YOUR LIVE GOOGLE AI KEY
     // ----------------------------------------------------
-    const AI_API_KEY = "AQ.Ab8RN6JXx4mTnra9vRr0Hq9FvL9wsYUd097bc0hnlCHahkwPzw"; 
+    const AI_API_KEY = "AQ.Ab8RN6JpPNKlXV0cLHioTS5YBZK5mikH8EhDddadaiv_dFZIxw"; 
 
     // Scale canvas for preview
     function resizeCanvasPreview() {
@@ -272,7 +272,7 @@
     };
 
     // ----------------------------------------------------
-    // LIVE AI INTEGRATION (Failsafe Version)
+    // LIVE AI INTEGRATION (With On-Screen Error Details)
     // ----------------------------------------------------
     async function generateAIPost() {
         const topicInput = document.getElementById('in-topic').value.trim();
@@ -293,7 +293,7 @@
                 throw new Error("Missing_Key");
             }
 
-            // Using the ultra-stable 1.5-flash model to avoid Quota Limits
+            // Using the ultra-stable 1.5-flash model
             const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${AI_API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -326,12 +326,13 @@
         } catch (error) {
             console.error("AI Error:", error);
             if(error.message === "Missing_Key") {
-                alert("Please paste your free Google AI Key into the code where it says 'YOUR_API_KEY_HERE'.");
+                alert("Please paste your Google AI Key into the code.");
             } else {
-                alert("AI encountered an issue. Please wait a moment and try again.");
+                // THIS WILL SHOW YOU THE EXACT ERROR ON SCREEN
+                alert("AI Error Details: " + error.message);
             }
         } finally {
-            // BULLETPROOF BUTTON RESET: This will ALWAYS run even if everything above crashes.
+            // BULLETPROOF BUTTON RESET
             btn.innerHTML = originalBtnText;
             btn.disabled = false;
         }
@@ -363,20 +364,20 @@
         clone.style.position = 'relative';
         clone.style.top = '0';
         clone.style.left = '0';
-        clone.classList.remove('animate'); // Stop it from moving while trying to take a picture
+        clone.classList.remove('animate'); 
         
         hiddenContainer.appendChild(clone);
 
         // 3. Give the browser 300ms to load the fonts inside the hidden box, then capture
         setTimeout(() => {
             html2canvas(clone, {
-                scale: 2,               // Double resolution for crisp text (2160x2160)
+                scale: 2,               
                 useCORS: true,          
                 allowTaint: true,       
                 backgroundColor: '#ffffff',
                 width: 1080,            
                 height: 1080,           
-                windowWidth: 1080,      // Forces html2canvas to ignore your device's screen size
+                windowWidth: 1080,      
                 windowHeight: 1080
             }).then(canvas => {
                 
@@ -399,6 +400,7 @@
         }, 300); 
     }
 
+    // Run on load
     updateLivePreview();
 </script>
 </body>
