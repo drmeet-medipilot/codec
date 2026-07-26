@@ -2371,7 +2371,12 @@
 
                 const typeFilter = document.getElementById('inventory-type-filter');
                 if (typeFilter && typeFilter.value !== 'ALL') {
-                    datasets = datasets.filter(i => i.type === typeFilter.value);
+                    if (typeFilter.value === 'Other') {
+                        const standardTypes = ['Tablet', 'Capsule', 'Syrup', 'Ointment', 'Drop', 'Vial', 'Ampule', 'SN', 'Lotion', 'Sachet', 'Nab'];
+                        datasets = datasets.filter(i => !standardTypes.includes(i.type));
+                    } else {
+                        datasets = datasets.filter(i => i.type === typeFilter.value);
+                    }
                 }
 
                 const clinic = db.clinicProfile || {};
@@ -2487,7 +2492,12 @@
 
                 const typeFilter = document.getElementById('inventory-type-filter');
                 if (typeFilter && typeFilter.value !== 'ALL') {
-                    datasets = datasets.filter(i => i.type === typeFilter.value);
+                    if (typeFilter.value === 'Other') {
+                        const standardTypes = ['Tablet', 'Capsule', 'Syrup', 'Ointment', 'Drop', 'Vial', 'Ampule', 'SN', 'Lotion', 'Sachet', 'Nab'];
+                        datasets = datasets.filter(i => !standardTypes.includes(i.type));
+                    } else {
+                        datasets = datasets.filter(i => i.type === typeFilter.value);
+                    }
                 }
 
                 if(datasets.length === 0) {
