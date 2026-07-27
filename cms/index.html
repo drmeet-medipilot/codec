@@ -1268,8 +1268,13 @@
             }
         }
         
-        // LOGOUT LOGIC
+        // LOGOUT LOGIC (FIXED: Clears local vaults immediately to prevent cross-account contamination)
         async function processLogout() {
+            if (currentUser) {
+                localStorage.removeItem(`medipilot_vault_${currentUser.id}`);
+            }
+            localStorage.removeItem('medipilot_local_vault'); // Also clean the legacy generic key
+            SystemStorage.cache = null;
             await supabaseApp.auth.signOut();
             window.location.reload(); 
         }
@@ -1303,9 +1308,11 @@
                 };
             }
 
+            // Fixed: Dynamically generate LocalStorage key based on logged-in user
             static read() {
                 if (!this.cache) {
-                    const localData = localStorage.getItem('medipilot_local_vault');
+                    const storageKey = currentUser ? `medipilot_vault_${currentUser.id}` : 'medipilot_local_vault';
+                    const localData = localStorage.getItem(storageKey);
                     if (localData) {
                         try {
                             const parsed = JSON.parse(localData);
@@ -1323,6 +1330,7 @@
                 return this.cache;
             }
 
+            // Fixed: Save securely ONLY to the specific user's vault key
             static write(payload) {
                 if(!payload.metadata) payload.metadata = {};
                 payload.metadata.lastUpdated = new Date().getTime(); 
@@ -1330,7 +1338,8 @@
                 this.cache = payload;
                 
                 try {
-                    localStorage.setItem('medipilot_local_vault', JSON.stringify(payload));
+                    const storageKey = currentUser ? `medipilot_vault_${currentUser.id}` : 'medipilot_local_vault';
+                    localStorage.setItem(storageKey, JSON.stringify(payload));
                 } catch(e) {
                     console.warn("Local storage save failed:", e);
                 }
@@ -1347,8 +1356,10 @@
                 }
             }
 
+            // Fixed: Cloud Sync looks ONLY inside the specific user's secure vault
             static async syncFromCloud() {
                 if(!currentUser) return;
+                const storageKey = `medipilot_vault_${currentUser.id}`;
                 try {
                     const { data, error } = await supabaseApp.from('clinic_vault')
                         .select('data').eq('clinic_id', currentUser.id).single();
@@ -1357,7 +1368,7 @@
                     let localData = null;
                     
                     try {
-                        const localStr = localStorage.getItem('medipilot_local_vault');
+                        const localStr = localStorage.getItem(storageKey);
                         if(localStr) localData = JSON.parse(localStr);
                     } catch(e) {}
 
@@ -1370,7 +1381,7 @@
                     if (cloudData && cloudTime >= localTime) {
                         this.cache = { ...empty, ...cloudData };
                         this.cache.clinicProfile = { ...empty.clinicProfile, ...(cloudData.clinicProfile || {}) };
-                        localStorage.setItem('medipilot_local_vault', JSON.stringify(this.cache));
+                        localStorage.setItem(storageKey, JSON.stringify(this.cache));
                     } else if (localData && localTime > cloudTime) {
                         this.cache = { ...empty, ...localData };
                         this.cache.clinicProfile = { ...empty.clinicProfile, ...(localData.clinicProfile || {}) };
