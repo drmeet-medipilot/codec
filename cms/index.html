@@ -1114,11 +1114,11 @@
                         </div>
                     </div>
                     <div>
-                        <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Total Units Per Box/Packages *</label>
+                        <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Total Packages / Boxes *</label>
                         <input type="number" id="m-qty" oninput="UI.calculateTotalQty()" required placeholder="e.g. 5" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none font-bold text-slate-800">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Total Inventory</label>
+                        <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Total Calculated Units</label>
                         <input type="number" id="m-total-qty" readonly class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-100 focus:outline-none font-black text-blue-700">
                     </div>
                     <div>
@@ -2554,14 +2554,15 @@
                 window.print();
             }
 
+            // Fixed: Now accurately captures and exports the Base Unit configurations required for correct financial math.
             static exportInventoryCSV() {
                 const db = SystemStorage.read();
                 let csvContent = "data:text/csv;charset=utf-8,";
-                csvContent += "Medicine Type,Medicine Name,Supplier,Expiry Date,Total Qty,PTR (Purchase),MRP (Selling),Total Value (PTR),Stock Status\n";
+                csvContent += "Medicine Type,Medicine Name,Supplier,Expiry Date,Total Inventory Qty,Unit Type,Units per Pkg,PTR (Purchase per Pkg),MRP (Selling per Pkg),Total Value (PTR),Stock Status\n";
                 db.inventory.forEach(i => {
                     let status = (i.qty <= 0) ? "Depleted" : (i.qty <= 15 ? "Low Level" : "In Stock");
                     let totalVal = ((i.qty / (i.unitQty || 1)) * i.purchase).toFixed(2);
-                    let row = `"${i.type || ''}","${i.name}","${i.supplier || ''}","${i.expiry}","${i.qty}","${i.purchase}","${i.selling}","${totalVal}","${status}"`;
+                    let row = `"${i.type || ''}","${i.name}","${i.supplier || ''}","${i.expiry}","${i.qty}","${i.unitType || 'Piece'}","${i.unitQty || 1}","${i.purchase}","${i.selling}","${totalVal}","${status}"`;
                     csvContent += row + "\r\n";
                 });
                 const encodedUri = encodeURI(csvContent);
@@ -2573,6 +2574,7 @@
                 link.remove();
             }
             
+            // Fixed: Now capable of reading the new Unit Base configs from the new CSV schema, while safely maintaining backward compatibility with older CSV imports.
             static importInventoryCSV(event) {
                 const file = event.target.files[0];
                 if (!file) return;
@@ -2588,17 +2590,33 @@
                         const cols = this.parseCSVRow(rows[i]);
                         if(cols.length < 7) continue; 
                         
+                        let qty, unitType, unitQty, purchase, selling;
+                        
+                        if (cols.length >= 11) {
+                            qty = parseFloat(cols[4]) || 0;
+                            unitType = cols[5] || 'Piece';
+                            unitQty = parseFloat(cols[6]) || 1;
+                            purchase = parseFloat(cols[7]) || 0;
+                            selling = parseFloat(cols[8]) || 0;
+                        } else {
+                            qty = parseFloat(cols[4]) || 0;
+                            unitType = 'Piece';
+                            unitQty = 1;
+                            purchase = parseFloat(cols[5]) || 0;
+                            selling = parseFloat(cols[6]) || 0;
+                        }
+                        
                         db.inventory.push({
                             id: `MED-${Math.floor(1000 + Math.random() * 9000)}`,
                             type: cols[0] || 'Other',
                             name: cols[1],
                             supplier: cols[2] || '',
                             expiry: cols[3] || '12-2099',
-                            qty: parseFloat(cols[4]) || 0,
-                            unitType: 'Piece', 
-                            unitQty: 1, 
-                            purchase: parseFloat(cols[5]) || 0,
-                            selling: parseFloat(cols[6]) || 0
+                            qty: qty,
+                            unitType: unitType, 
+                            unitQty: unitQty, 
+                            purchase: purchase,
+                            selling: selling
                         });
                         importedCount++;
                     }
