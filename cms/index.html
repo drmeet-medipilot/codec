@@ -660,6 +660,14 @@
                         </div>
                     </div>
 
+                    <div class="md:col-span-2 pt-4 border-t border-slate-100 mt-2">
+                        <h3 class="font-bold text-sm text-slate-800 mb-3"><i class="fa-solid fa-triangle-exclamation text-rose-600 mr-2"></i>Danger Zone</h3>
+                        <button onclick="UI.factoryResetData()" class="px-5 py-3 bg-white border border-rose-200 text-rose-600 font-bold rounded-xl shadow-sm hover:bg-rose-50 transition-all cursor-pointer active:scale-[0.99] flex items-center justify-center w-full md:w-auto text-xs">
+                            <i class="fa-solid fa-trash-can mr-2"></i> Wipe All Clinic Data (Factory Reset)
+                        </button>
+                        <p class="text-[10px] text-slate-400 mt-2 font-medium">Use this to clear corrupted demo accounts. This permanently deletes all patient and inventory data.</p>
+                    </div>
+
                     <div class="md:col-span-2 pt-3">
                         <button onclick="UI.saveClinicProfile()" class="px-5 py-3 bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-800 hover:to-blue-900 text-white font-bold rounded-xl shadow-md transition-all cursor-pointer active:scale-[0.99] flex items-center justify-center w-full md:w-auto">
                             <i class="fa-solid fa-floppy-disk mr-2"></i> Save Settings
@@ -1268,26 +1276,16 @@
             }
         }
         
-        // LOGOUT LOGIC (FIXED: Clears local vaults immediately to prevent cross-account contamination)
+        // LOGOUT LOGIC (Safely clears device memory to prevent account contamination)
         async function processLogout() {
             if (currentUser) {
                 localStorage.removeItem(`medipilot_vault_${currentUser.id}`);
             }
-            localStorage.removeItem('medipilot_local_vault'); // Also clean the legacy generic key
+            localStorage.removeItem('medipilot_local_vault'); 
             SystemStorage.cache = null;
             await supabaseApp.auth.signOut();
             window.location.reload(); 
         }
-
-        // INIT SESSION ON LOAD
-        window.addEventListener('DOMContentLoaded', async () => {
-            const { data: { session } } = await supabaseApp.auth.getSession();
-            if (session) {
-                currentUser = session.user;
-                document.getElementById('login-overlay').classList.add('hidden');
-                await SystemStorage.syncFromCloud();
-            }
-        });
 
         /**
          * CLOUD VAULT SYSTEM (JSONB ENGINE)
@@ -1308,11 +1306,14 @@
                 };
             }
 
-            // Fixed: Dynamically generate LocalStorage key based on logged-in user
+            // Fixed: Failsafe ensures no ghost data loads before user logs in
             static read() {
                 if (!this.cache) {
-                    const storageKey = currentUser ? `medipilot_vault_${currentUser.id}` : 'medipilot_local_vault';
+                    if (!currentUser) return this.initializeEmptySchema(); 
+                    
+                    const storageKey = `medipilot_vault_${currentUser.id}`;
                     const localData = localStorage.getItem(storageKey);
+                    
                     if (localData) {
                         try {
                             const parsed = JSON.parse(localData);
@@ -1330,15 +1331,17 @@
                 return this.cache;
             }
 
-            // Fixed: Save securely ONLY to the specific user's vault key
+            // Fixed: Safely bounds written data directly to the logged-in user
             static write(payload) {
+                if (!currentUser) return; // Hard failsafe
+                
                 if(!payload.metadata) payload.metadata = {};
                 payload.metadata.lastUpdated = new Date().getTime(); 
                 
                 this.cache = payload;
                 
                 try {
-                    const storageKey = currentUser ? `medipilot_vault_${currentUser.id}` : 'medipilot_local_vault';
+                    const storageKey = `medipilot_vault_${currentUser.id}`;
                     localStorage.setItem(storageKey, JSON.stringify(payload));
                 } catch(e) {
                     console.warn("Local storage save failed:", e);
@@ -1346,20 +1349,18 @@
 
                 UI.triggerGlobalAuditRefresh();
                 
-                if(currentUser) {
-                    supabaseApp.from('clinic_vault').upsert({
-                        clinic_id: currentUser.id,
-                        data: payload
-                    }, { onConflict: 'clinic_id' }).then(({error}) => {
-                        if(error) console.error("Cloud Sync Error:", error);
-                    });
-                }
+                supabaseApp.from('clinic_vault').upsert({
+                    clinic_id: currentUser.id,
+                    data: payload
+                }, { onConflict: 'clinic_id' }).then(({error}) => {
+                    if(error) console.error("Cloud Sync Error:", error);
+                });
             }
 
-            // Fixed: Cloud Sync looks ONLY inside the specific user's secure vault
             static async syncFromCloud() {
                 if(!currentUser) return;
                 const storageKey = `medipilot_vault_${currentUser.id}`;
+                
                 try {
                     const { data, error } = await supabaseApp.from('clinic_vault')
                         .select('data').eq('clinic_id', currentUser.id).single();
@@ -1372,7 +1373,7 @@
                         if(localStr) localData = JSON.parse(localStr);
                     } catch(e) {}
 
-                    // Smart Merge: Compare Timestamps to prevent Cloud from overwriting newer Local saves
+                    // Smart Merge: Compare Timestamps
                     let cloudTime = cloudData?.metadata?.lastUpdated || 0;
                     let localTime = localData?.metadata?.lastUpdated || 0;
 
@@ -1400,20 +1401,6 @@
                     UI.triggerGlobalAuditRefresh();
                 }
             }
-
-            static exportDatabaseVault() {
-                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.read(), null, 2));
-                const downloadAnchor = document.createElement('a');
-                downloadAnchor.setAttribute("href", dataStr);
-                downloadAnchor.setAttribute("download", `MediPilot_Cloud_Vault_${new Date().toISOString().split('T')[0]}.json`);
-                document.body.appendChild(downloadAnchor);
-                downloadAnchor.click();
-                downloadAnchor.remove();
-            }
-
-            static importDatabaseVault() {
-                alert("Aa ek Cloud system chhe, aama data auto-save thay chhe. Offline import Cloud maa bandh chhe.");
-            }
         }
 
         /**
@@ -1436,7 +1423,6 @@
                 return new Date(dateStr);
             }
 
-            // CSV Parsing Helper to accurately digest commas contained inside quotes
             static parseCSVRow(row) {
                 let insideQuote = false;
                 let entries = [];
@@ -1453,6 +1439,27 @@
                 }
                 entries.push(entry.trim());
                 return entries;
+            }
+
+            // --- DATA WIPE FIX ---
+            static async factoryResetData() {
+                if(!currentUser) return;
+                
+                if(confirm("CRITICAL WARNING: This will permanently wipe ALL Patients, Inventory, Finance, and Settings for this account from the cloud and local storage. Type 'YES' to confirm.")) {
+                    const verification = prompt("Type 'YES' to confirm data wipe:");
+                    if(verification === 'YES') {
+                        const empty = SystemStorage.initializeEmptySchema();
+                        SystemStorage.cache = empty;
+                        
+                        localStorage.removeItem(`medipilot_vault_${currentUser.id}`);
+                        await supabaseApp.from('clinic_vault').upsert({ clinic_id: currentUser.id, data: empty }, { onConflict: 'clinic_id' });
+                        
+                        UI.triggerGlobalAuditRefresh();
+                        alert("Account data has been completely wiped and factory reset.");
+                    } else {
+                        alert("Reset cancelled. You did not type 'YES'.");
+                    }
+                }
             }
 
             static renderGreeting() {
