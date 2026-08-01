@@ -149,6 +149,10 @@
             <button data-target="finance" class="nav-link w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-600 rounded-xl hover:bg-slate-50 transition-all cursor-pointer">
                 <i class="fa-solid fa-wallet w-5 text-center text-base"></i> <span>Accounts & Ledger</span>
             </button>
+            <!-- ADDED PROFIT MARGIN MENU ITEM -->
+            <button data-target="profit" class="nav-link w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-600 rounded-xl hover:bg-slate-50 transition-all cursor-pointer">
+                <i class="fa-solid fa-chart-line w-5 text-center text-base"></i> <span>Profit Margin</span>
+            </button>
             <button data-target="settings" class="nav-link w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-600 rounded-xl hover:bg-slate-50 transition-all cursor-pointer">
                 <i class="fa-solid fa-gear w-5 text-center text-base"></i> <span>Clinic Settings</span>
             </button>
@@ -486,7 +490,7 @@
                                 <th class="p-3">Reference / Patient</th>
                                 <th class="p-3">Payment Mode</th>
                                 <th class="p-3 text-right">Amount (₹)</th>
-                                <th class="p-3 text-center">Actions</th> <!-- ADDED ACTIONS HEADER -->
+                                <th class="p-3 text-center">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="otc-summary-body">
@@ -597,8 +601,7 @@
                 </div>
             </div>
         </section>
-
-        <section id="mod-finance" class="erp-section hidden space-y-6">
+    <section id="mod-finance" class="erp-section hidden space-y-6">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-5 gap-4">
                 <div>
                     <h2 class="text-3xl font-black animated-heading pb-1">Accounts & Ledger</h2>
@@ -648,6 +651,70 @@
                             <span id="fin-net-profit" class="text-blue-700">₹0.00</span>
                         </div>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PROFIT MARGIN MODULE -->
+        <section id="mod-profit" class="erp-section hidden space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-5 gap-4">
+                <div>
+                    <h2 class="text-3xl font-black animated-heading pb-1">Profit & Margin Analysis</h2>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row items-center gap-3">
+                    <select id="profit-timeframe" onchange="UI.renderProfitMargin()" class="text-xs font-bold bg-white px-3 py-2.5 border border-slate-200 rounded-xl text-blue-800 shadow-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition cursor-pointer">
+                        <option value="TODAY" selected>Today</option>
+                        <option value="YESTERDAY">Yesterday</option>
+                        <option value="THIS_WEEK">This Week</option>
+                        <option value="THIS_MONTH">This Month</option>
+                        <option value="THIS_YEAR">This Year</option>
+                        <option value="ALL_TIME">All Time</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between transition-all hover:shadow-md">
+                    <div>
+                        <p class="text-[11px] font-extrabold tracking-wider uppercase text-slate-400">Total Sales Revenue</p>
+                        <h3 id="pm-total-revenue" class="text-2xl font-black text-emerald-600 mt-1">₹0.00</h3>
+                    </div>
+                    <div class="h-12 w-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-xl shadow-inner"><i class="fa-solid fa-money-bill-trend-up"></i></div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between transition-all hover:shadow-md">
+                    <div>
+                        <p class="text-[11px] font-extrabold tracking-wider uppercase text-slate-400">Total PTR Expense</p>
+                        <h3 id="pm-total-ptr" class="text-2xl font-black text-rose-600 mt-1">₹0.00</h3>
+                    </div>
+                    <div class="h-12 w-12 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center text-xl shadow-inner"><i class="fa-solid fa-boxes-stacked"></i></div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between transition-all hover:shadow-md">
+                    <div>
+                        <p class="text-[11px] font-extrabold tracking-wider uppercase text-slate-400">Net Margin</p>
+                        <h3 id="pm-net-margin" class="text-2xl font-black text-blue-700 mt-1">₹0.00</h3>
+                    </div>
+                    <div class="h-12 w-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-xl shadow-inner"><i class="fa-solid fa-percent"></i></div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-500 uppercase font-bold text-[11px] tracking-wider border-b border-slate-200">
+                                <th class="p-4">Date</th>
+                                <th class="p-4">Transaction / Patient</th>
+                                <th class="p-4">Type</th>
+                                <th class="p-4 text-right">Revenue (₹)</th>
+                                <th class="p-4 text-right">PTR Expense (₹)</th>
+                                <th class="p-4 text-right">Profit (₹)</th>
+                                <th class="p-4 text-right">Margin %</th>
+                            </tr>
+                        </thead>
+                        <tbody id="profit-table-body">
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </section>
@@ -826,7 +893,6 @@
                         </div>
                     </div>
 
-                    <!-- INVESTIGATIONS ADDITION MODULE -->
                     <div class="border border-slate-200 p-4 rounded-xl bg-slate-50/50 space-y-3 shadow-inner mt-4">
                         <div class="flex justify-between items-center">
                             <label class="flex items-center space-x-2 text-xs font-black text-slate-600 uppercase tracking-wider cursor-pointer select-none">
@@ -846,7 +912,6 @@
                                 </div>
                             </div>
 
-                            <!-- Pathology Section -->
                             <div id="inv-path-section" class="hidden grid grid-cols-1 md:grid-cols-4 gap-3">
                                 <div class="md:col-span-1">
                                     <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Select Report</label>
@@ -882,7 +947,6 @@
                                 </div>
                             </div>
 
-                            <!-- Radiology Section -->
                             <div id="inv-rad-section" class="hidden grid grid-cols-1 md:grid-cols-4 gap-3">
                                 <div class="md:col-span-1">
                                     <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Select Report</label>
@@ -918,7 +982,6 @@
                             <textarea id="v-investigation-plan" rows="2" placeholder="Added investigations will appear here..." class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none text-xs font-semibold font-mono text-slate-700 mt-2"></textarea>
                         </div>
                     </div>
-                    <!-- /INVESTIGATIONS END -->
 
                     <div class="border border-slate-200 p-4 rounded-xl bg-slate-50/50 space-y-3 shadow-inner">
                         <div class="flex justify-between items-center">
@@ -1280,7 +1343,6 @@
 
     <div id="print-area" class="hidden font-mono text-sm bg-white text-slate-900 w-full max-w-full">
         </div>
-
     <script>
         // =========================================================================
         // 1. SUPABASE CLOUD ENGINE
@@ -1463,7 +1525,8 @@
                 }
             }
         }
-    /**
+
+        /**
          * INTERFACE AND VIEW STATE LOGIC CONTROLLER MATRIX
          */
         class UI {
@@ -1503,7 +1566,6 @@
                         canvas.width = width;
                         canvas.height = height;
                         ctx.drawImage(img, 0, 0, width, height);
-                        // Save image as lightweight JPEG
                         callback(canvas.toDataURL('image/jpeg', 0.8));
                     };
                 };
@@ -1667,9 +1729,7 @@
             static handlePrescriptionMedicineChange() {
                 const select = document.getElementById('v-medicine');
                 const mlContainer = document.getElementById('v-ml-container');
-                const mlInput = document.getElementById('v-ml-input');
                 const directQtyContainer = document.getElementById('v-direct-qty-container');
-                const directQtyInput = document.getElementById('v-direct-qty-input');
                 
                 if(!select) return;
                 
@@ -2031,7 +2091,6 @@
                 document.getElementById('dash-date').innerText = new Date().toLocaleDateString('en-IN', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
                 document.getElementById('patient-search').addEventListener('input', (e) => UI.renderPatientsGrid(e.target.value));
 
-                // Updated E-Sign Upload Handler with compression
                 const esignFile = document.getElementById('clinic-esign-file');
                 if(esignFile) {
                     esignFile.addEventListener('change', function(e) {
@@ -2047,7 +2106,6 @@
                     });
                 }
 
-                // Updated E-Stamp Upload Handler with compression
                 const estampFile = document.getElementById('clinic-estamp-file');
                 if(estampFile) {
                     estampFile.addEventListener('change', function(e) {
@@ -2124,9 +2182,110 @@
                 this.syncBillingDropdowns(db);
                 this.syncOTCDropdowns(db);
                 this.renderOTCSummary();
+                this.renderProfitMargin();
                 
                 this.renderAnalyticsMatrixCharts(totalRevenue, totalExpenses);
                 this.renderDashboardRecentPatients(db, filteredVisits);
+            }
+
+            // Real-time Profit & Margin Calculation
+            static renderProfitMargin() {
+                const db = SystemStorage.read();
+                const timeframe = document.getElementById('profit-timeframe')?.value || 'TODAY';
+                const tbody = document.getElementById('profit-table-body');
+                
+                if(!tbody) return;
+
+                let totalRevenue = 0;
+                let totalPTRExpense = 0;
+                let allTransactions = [];
+                
+                // Fetch Finance Inflows (OTC & Billing Cash/UPI)
+                (db.finance || []).forEach(f => {
+                    if (f.type === 'INFLOW' && (f.category.includes('Billing') || f.category.includes('OTC Pharmacy'))) {
+                        let vMatch = f.category.match(/\[Visit: (VST-\d+)\]/);
+                        let vId = vMatch ? vMatch[1] : null;
+                        allTransactions.push({
+                            date: f.date,
+                            desc: f.category,
+                            revenue: parseFloat(f.amount) || 0,
+                            type: f.category.includes('OTC') ? 'OTC Sale' : 'Billing',
+                            visitId: vId,
+                            cartItems: f.cartItems || null
+                        });
+                    }
+                });
+                
+                // Fetch Credit Bills (Accounts Receivable)
+                if (db.credits) {
+                    db.credits.forEach(c => {
+                        allTransactions.push({
+                            date: c.date,
+                            desc: `Credit Bill - ${c.patientName} ${c.visitId ? `[Visit: ${c.visitId}]` : ''}`,
+                            revenue: parseFloat(c.totalAmount) || 0,
+                            type: 'Credit Billing',
+                            visitId: c.visitId || null,
+                            cartItems: null
+                        });
+                    });
+                }
+
+                allTransactions = allTransactions.filter(t => this.isDateInTimeframe(t.date, timeframe));
+
+                // Helper to fetch unit PTR from live inventory
+                const getMedPTR = (id, name) => {
+                    let med;
+                    if (id) med = db.inventory.find(i => i.id === id);
+                    if (!med && name) med = db.inventory.find(i => i.name === name);
+                    if (med) return (parseFloat(med.purchase) || 0) / (parseFloat(med.unitQty) || 1);
+                    return 0; 
+                };
+
+                const rowsHtml = allTransactions.sort((a,b) => this.parseIndianDate(b.date) - this.parseIndianDate(a.date)).map(t => {
+                    let ptrExpense = 0;
+                    
+                    if (t.type === 'OTC Sale' && t.cartItems) {
+                        t.cartItems.forEach(item => {
+                            ptrExpense += (parseFloat(item.qty) || 0) * getMedPTR(item.id, item.name);
+                        });
+                    } else if ((t.type === 'Billing' || t.type === 'Credit Billing') && t.visitId) {
+                        const visit = db.visits.find(v => v.id === t.visitId);
+                        if (visit && visit.deductions) {
+                            visit.deductions.forEach(ded => {
+                                ptrExpense += (parseFloat(ded.qty) || 0) * getMedPTR(null, ded.name);
+                            });
+                        }
+                    }
+
+                    let profit = t.revenue - ptrExpense;
+                    let marginPct = t.revenue > 0 ? ((profit / t.revenue) * 100).toFixed(1) : 0;
+                    
+                    totalRevenue += t.revenue;
+                    totalPTRExpense += ptrExpense;
+
+                    return `
+                    <tr class="border-b border-slate-100 hover:bg-slate-50 font-medium text-xs">
+                        <td class="p-4 text-slate-500">${t.date}</td>
+                        <td class="p-4 font-bold text-slate-700">${t.desc}</td>
+                        <td class="p-4"><span class="px-2 py-1 bg-slate-100 text-slate-600 rounded-md font-bold text-[10px] uppercase tracking-wider">${t.type}</span></td>
+                        <td class="p-4 text-right font-black text-emerald-600">₹${t.revenue.toFixed(2)}</td>
+                        <td class="p-4 text-right font-bold text-rose-500">₹${ptrExpense.toFixed(2)}</td>
+                        <td class="p-4 text-right font-black text-blue-700">₹${profit.toFixed(2)}</td>
+                        <td class="p-4 text-right font-bold ${profit >= 0 ? 'text-emerald-500' : 'text-rose-500'}">${marginPct}%</td>
+                    </tr>`;
+                }).join('');
+
+                if (allTransactions.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400 italic font-medium">No sales transactions found for this period.</td></tr>`;
+                } else {
+                    tbody.innerHTML = rowsHtml;
+                }
+
+                let netProfit = totalRevenue - totalPTRExpense;
+                
+                document.getElementById('pm-total-revenue').innerText = `₹${totalRevenue.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+                document.getElementById('pm-total-ptr').innerText = `₹${totalPTRExpense.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+                document.getElementById('pm-net-margin').innerText = `₹${netProfit.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
             }
 
             static syncOTCDropdowns(db) {
@@ -2147,7 +2306,7 @@
                 if(!tbody) return;
 
                 const otcSales = (db.finance || []).filter(f => f.category && f.category.includes("OTC Pharmacy"));
-                const sortedSales = [...otcSales].reverse(); // Ascending visual order (newest at the top, older at the bottom)
+                const sortedSales = [...otcSales].reverse();
 
                 if (sortedSales.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400 text-xs italic font-medium">No recent OTC sales recorded.</td></tr>`;
@@ -2176,7 +2335,6 @@
                 }).join('');
             }
 
-            // ADDED: Function to edit OTC Sale and restock items
             static editOTCSale(refCode) {
                 const db = SystemStorage.read();
                 const index = db.finance.findIndex(f => f.ref === refCode);
@@ -2191,7 +2349,6 @@
 
                 if (!confirm("Editing will reverse this sale, restock the items, and load them back into your cart for modification. Continue?")) return;
 
-                // 1. Restock items in DB
                 sale.cartItems.forEach(cartItem => {
                     const invItem = db.inventory.find(i => i.id === cartItem.id);
                     if (invItem) {
@@ -2199,11 +2356,9 @@
                     }
                 });
 
-                // 2. Load into current UI cart
                 this.otcCart = JSON.parse(JSON.stringify(sale.cartItems));
                 document.getElementById('otc-receive-amount').value = sale.amount;
 
-                // 3. Extract patient name and payment mode
                 const patParts = sale.category.split('] - ');
                 if (patParts.length > 1 && patParts[1] !== 'Walk-in') {
                     document.getElementById('otc-patient-name').value = patParts[1];
@@ -2216,17 +2371,14 @@
                     document.getElementById('otc-payment-mode').value = match[1];
                 }
 
-                // 4. Remove finance record from ledger
                 db.finance.splice(index, 1);
                 SystemStorage.write(db);
 
-                // 5. Update UI
                 this.renderOTCCart();
                 this.renderOTCSummary();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
 
-            // ADDED: Function to delete OTC Sale and restock items
             static deleteOTCSale(refCode) {
                 if (!confirm("Are you sure you want to delete this OTC Sale? Associated medicines will be restocked into inventory.")) return;
 
@@ -2237,7 +2389,6 @@
                 const sale = db.finance[index];
 
                 if (sale.cartItems && sale.cartItems.length > 0) {
-                    // Restock
                     sale.cartItems.forEach(cartItem => {
                         const invItem = db.inventory.find(i => i.id === cartItem.id);
                         if (invItem) {
@@ -2251,7 +2402,7 @@
                 db.finance.splice(index, 1);
                 SystemStorage.write(db);
                 this.renderOTCSummary();
-                this.triggerInventoryFilter(); // Update inventory charts
+                this.triggerInventoryFilter();
                 alert(`OTC Sale (${refCode}) has been deleted and the ledger updated.`);
             }
 
@@ -2447,7 +2598,7 @@
                     ref: refCode,
                     amount: manualAmount,
                     date: new Date().toLocaleDateString('en-IN'),
-                    cartItems: JSON.parse(JSON.stringify(this.otcCart)) // ADDED: Save items for edit/restock
+                    cartItems: JSON.parse(JSON.stringify(this.otcCart))
                 });
                 
                 SystemStorage.write(db);
@@ -2684,7 +2835,6 @@
                     const db = SystemStorage.read();
                     const visitToDelete = db.visits.find(v => v.id === vId);
                     
-                    // Restock inventory based on saved deductions
                     if (visitToDelete && visitToDelete.deductions) {
                         visitToDelete.deductions.forEach(deduction => {
                             const invItem = db.inventory.find(i => i.name === deduction.name);
@@ -2704,7 +2854,6 @@
                 if(confirm("Confirm action: Do you want to remove this patient file permanently? This wipes out associated diagnostic visit histories and RESTOCKS their prescribed medicines.")) {
                     const db = SystemStorage.read();
                     
-                    // Find all visits for this patient and restock their deductions
                     const patientVisits = db.visits.filter(v => v.patientId === id);
                     patientVisits.forEach(visit => {
                         if (visit.deductions) {
@@ -3331,7 +3480,6 @@
                     codeInput.value = `INV-${Math.floor(10000 + Math.random() * 90000)}`;
                 }
                 
-                // Clear visit fields on sync
                 const visitSelect = document.getElementById('bill-visit-date');
                 if(visitSelect) visitSelect.innerHTML = '<option value="">-- General Bill --</option>';
                 const visitIdInput = document.getElementById('bill-visit-id');
@@ -3416,7 +3564,8 @@
                         ref: invCode,
                         totalAmount: amt,
                         paidAmount: 0,
-                        date: new Date().toLocaleDateString('en-IN')
+                        date: new Date().toLocaleDateString('en-IN'),
+                        visitId: visitId || null
                     });
                 } else {
                     db.finance.push({
@@ -3476,7 +3625,6 @@
                 alert(`Patient profile ${editId ? 'updated' : 'registered'} safely (System Reference: ${newId}).`);
 
                 if (!editId) {
-                    // WHATSAPP WELCOME MESSAGE AUTO SEND
                     const clinicName = db.clinicProfile?.name || 'our clinic';
                     const msgText = `Hello ${pName},\nWelcome to ${clinicName}!\nYour Patient Registration Number is: ${newId}\nPlease keep this number safe for future visits.`;
                     
@@ -3556,7 +3704,6 @@
                     const remark = document.getElementById('v-path-remark').value;
                     lineContent = `Pathology: ${report}` + (remark ? ` - Values/Remark: ${remark}` : '');
                     
-                    // Reset fields
                     document.getElementById('v-path-report').selectedIndex = 0;
                     document.getElementById('v-path-other').value = '';
                     document.getElementById('v-path-remark').value = '';
@@ -3573,7 +3720,6 @@
                     
                     lineContent = `Radiology: ${report}` + (part ? ` (${part})` : '') + (remark ? ` - Findings: ${remark}` : '');
                     
-                    // Reset fields
                     document.getElementById('v-rad-report').selectedIndex = 0;
                     document.getElementById('v-rad-other').value = '';
                     document.getElementById('v-rad-part').value = '';
@@ -3591,7 +3737,7 @@
             static initiateVisitModal(patientId) {
                 document.getElementById('form-visit').reset();
                 document.getElementById('v-patient-id').value = patientId;
-                document.getElementById('v-visit-id').value = ""; // Clear for new visits
+                document.getElementById('v-visit-id').value = "";
                 document.getElementById('v-prescription').value = "";
                 document.getElementById('v-treatment-plan').value = "";
                 document.getElementById('v-investigation-plan').value = "";
@@ -3804,7 +3950,6 @@
 
                 let visitDate = new Date().toLocaleDateString('en-IN');
                 
-                // If editing an existing visit, reverse old deductions first
                 if (vId) {
                     const existingVisit = db.visits.find(v => v.id === vId);
                     if (existingVisit) {
@@ -3836,10 +3981,9 @@
                     treatmentType: document.getElementById('v-treatment-type').value,
                     treatmentPlan: document.getElementById('v-treatment-plan').value.trim(),
                     prescription: document.getElementById('v-prescription').value.trim(),
-                    deductions: [...this.pendingStockDeductions] // Save deductions for future restocking
+                    deductions: [...this.pendingStockDeductions]
                 };
 
-                // Apply new deductions
                 this.pendingStockDeductions.forEach(deduction => {
                     const invItem = db.inventory.find(i => i.name === deduction.name);
                     if(invItem) {
