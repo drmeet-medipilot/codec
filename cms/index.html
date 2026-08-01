@@ -104,7 +104,6 @@
         </div>
     </div>
 
-    <!-- UPDATED MOBILE HEADER: Added sticky behavior and a direct logout button so you don't need to open the menu -->
     <header class="bg-gradient-to-r from-blue-800 to-slate-900 text-white px-4 h-16 flex justify-between items-center md:hidden no-print shadow-md sticky top-0 z-[60]">
         <div class="flex items-center space-x-2">
             <img src="cms/88553.jpg" alt="Logo" class="h-8 w-8 object-cover bg-white rounded-full shadow-sm border border-blue-700/50">
@@ -120,7 +119,6 @@
         </div>
     </header>
 
-    <!-- UPDATED SIDEBAR: Added top-16 and h-[calc(100dvh-4rem)] on mobile to strictly prevent scrolling to access logout -->
     <nav id="sidebar" class="hidden md:flex flex-col w-full md:w-64 bg-white border-r border-slate-200 no-print shadow-sm z-50 fixed top-16 left-0 h-[calc(100dvh-4rem)] md:sticky md:top-0 md:h-screen">
         <div class="p-5 border-b border-slate-100 hidden md:flex items-center space-x-3 bg-gradient-to-br from-blue-800 via-blue-900 to-slate-900 text-white shadow-inner">
             <div class="bg-white rounded-full p-0.5 shadow-md flex-shrink-0">
@@ -1293,7 +1291,7 @@
             }
         }
         
-        // LOGOUT LOGIC (Safely clears device memory to prevent account contamination)
+        // LOGOUT LOGIC
         async function processLogout() {
             if (currentUser) {
                 localStorage.removeItem(`medipilot_vault_${currentUser.id}`);
@@ -1319,11 +1317,10 @@
                     credits: [],
                     suppliers: [],
                     clinicProfile: { name: '', address: '', mobile: '', regno: '', doctor: '', degree: '', esignBase64: '', estampBase64: '', esignPin: '' },
-                    metadata: { lastUpdated: new Date().getTime(), softwareVersion: "2026.7.4 (Cloud Vault V2)" }
+                    metadata: { lastUpdated: new Date().getTime(), softwareVersion: "2026.7.4 (Cloud Vault V2.1)" }
                 };
             }
 
-            // Fixed: Failsafe ensures no ghost data loads before user logs in
             static read() {
                 if (!this.cache) {
                     if (!currentUser) return this.initializeEmptySchema(); 
@@ -1348,9 +1345,11 @@
                 return this.cache;
             }
 
-            // Fixed: Safely bounds written data directly to the logged-in user
             static write(payload) {
-                if (!currentUser) return; // Hard failsafe
+                if (!currentUser) {
+                    console.warn("Write blocked: No active user session.");
+                    return; 
+                }
                 
                 if(!payload.metadata) payload.metadata = {};
                 payload.metadata.lastUpdated = new Date().getTime(); 
@@ -1361,7 +1360,10 @@
                     const storageKey = `medipilot_vault_${currentUser.id}`;
                     localStorage.setItem(storageKey, JSON.stringify(payload));
                 } catch(e) {
-                    console.warn("Local storage save failed:", e);
+                    console.error("Local storage save failed:", e);
+                    if (e.name === 'QuotaExceededError') {
+                        alert("Storage limits exceeded! Please reduce the size of your E-Sign/E-Stamp images or clear some data.");
+                    }
                 }
 
                 UI.triggerGlobalAuditRefresh();
@@ -1431,6 +1433,41 @@
             static pendingStockDeductions = [];
             static otcCart = []; 
 
+            // Utility to automatically compress uploaded images to prevent LocalStorage failures
+            static compressImage(file, callback) {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = event => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        const MAX_WIDTH = 800;
+                        const MAX_HEIGHT = 800;
+                        let width = img.width;
+                        let height = img.height;
+                        
+                        if (width > height) {
+                            if (width > MAX_WIDTH) {
+                                height *= MAX_WIDTH / width;
+                                width = MAX_WIDTH;
+                            }
+                        } else {
+                            if (height > MAX_HEIGHT) {
+                                width *= MAX_HEIGHT / height;
+                                height = MAX_HEIGHT;
+                            }
+                        }
+                        canvas.width = width;
+                        canvas.height = height;
+                        ctx.drawImage(img, 0, 0, width, height);
+                        // Save image as lightweight JPEG
+                        callback(canvas.toDataURL('image/jpeg', 0.8));
+                    };
+                };
+            }
+
             static parseIndianDate(dateStr) {
                 if(!dateStr) return new Date(0);
                 const parts = dateStr.split(/[-/]/);
@@ -1458,7 +1495,6 @@
                 return entries;
             }
 
-            // --- DATA WIPE FIX ---
             static async factoryResetData() {
                 if(!currentUser) return;
                 
@@ -1659,19 +1695,27 @@
                 }
             }
 
+            // Fixed implementation for saving clinic settings securely without crashing.
             static saveClinicProfile() {
                 const db = SystemStorage.read();
-                db.clinicProfile = {
-                    name: document.getElementById('clinic-name')?.value.trim() || '',
-                    address: document.getElementById('clinic-address')?.value.trim() || '',
-                    mobile: document.getElementById('clinic-mobile')?.value.trim() || '',
-                    regno: document.getElementById('clinic-regno')?.value.trim() || '',
-                    doctor: document.getElementById('clinic-doctor')?.value.trim() || '',
-                    degree: document.getElementById('clinic-degree')?.value.trim() || '',
-                    esignBase64: document.getElementById('clinic-esign-base64')?.value || '',
-                    estampBase64: document.getElementById('clinic-estamp-base64')?.value || '',
-                    esignPin: document.getElementById('clinic-esign-pin')?.value || ''
+                
+                const safeVal = (id) => {
+                    const el = document.getElementById(id);
+                    return el && el.value ? el.value.trim() : '';
                 };
+
+                db.clinicProfile = {
+                    name: safeVal('clinic-name'),
+                    address: safeVal('clinic-address'),
+                    mobile: safeVal('clinic-mobile'),
+                    regno: safeVal('clinic-regno'),
+                    doctor: safeVal('clinic-doctor'),
+                    degree: safeVal('clinic-degree'),
+                    esignBase64: safeVal('clinic-esign-base64'),
+                    estampBase64: safeVal('clinic-estamp-base64'),
+                    esignPin: safeVal('clinic-esign-pin')
+                };
+                
                 SystemStorage.write(db);
                 alert('Clinic profile & E-Security details securely saved to the Cloud Vault.');
             }
@@ -1937,38 +1981,34 @@
                 document.getElementById('dash-date').innerText = new Date().toLocaleDateString('en-IN', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
                 document.getElementById('patient-search').addEventListener('input', (e) => UI.renderPatientsGrid(e.target.value));
 
-                // E-Sign Upload Handler
+                // Updated E-Sign Upload Handler with compression
                 const esignFile = document.getElementById('clinic-esign-file');
                 if(esignFile) {
                     esignFile.addEventListener('change', function(e) {
                         const file = e.target.files[0];
                         if(file) {
-                            const reader = new FileReader();
-                            reader.onload = function(evt) {
-                                document.getElementById('clinic-esign-base64').value = evt.target.result;
+                            UI.compressImage(file, function(compressedBase64) {
+                                document.getElementById('clinic-esign-base64').value = compressedBase64;
                                 const preview = document.getElementById('esign-preview');
-                                preview.src = evt.target.result;
+                                preview.src = compressedBase64;
                                 preview.classList.remove('hidden');
-                            };
-                            reader.readAsDataURL(file);
+                            });
                         }
                     });
                 }
 
-                // E-Stamp Upload Handler
+                // Updated E-Stamp Upload Handler with compression
                 const estampFile = document.getElementById('clinic-estamp-file');
                 if(estampFile) {
                     estampFile.addEventListener('change', function(e) {
                         const file = e.target.files[0];
                         if(file) {
-                            const reader = new FileReader();
-                            reader.onload = function(evt) {
-                                document.getElementById('clinic-estamp-base64').value = evt.target.result;
+                            UI.compressImage(file, function(compressedBase64) {
+                                document.getElementById('clinic-estamp-base64').value = compressedBase64;
                                 const preview = document.getElementById('estamp-preview');
-                                preview.src = evt.target.result;
+                                preview.src = compressedBase64;
                                 preview.classList.remove('hidden');
-                            };
-                            reader.readAsDataURL(file);
+                            });
                         }
                     });
                 }
@@ -2571,7 +2611,6 @@
                 window.print();
             }
 
-            // Fixed: Now accurately captures and exports the Base Unit configurations required for correct financial math.
             static exportInventoryCSV() {
                 const db = SystemStorage.read();
                 let csvContent = "data:text/csv;charset=utf-8,";
@@ -2591,7 +2630,6 @@
                 link.remove();
             }
             
-            // Fixed: Now capable of reading the new Unit Base configs from the new CSV schema, while safely maintaining backward compatibility with older CSV imports.
             static importInventoryCSV(event) {
                 const file = event.target.files[0];
                 if (!file) return;
