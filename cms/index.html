@@ -3664,8 +3664,12 @@
                 this.pendingStockDeductions.forEach(deduction => {
                     const invItem = db.inventory.find(i => i.name === deduction.name);
                     if(invItem) {
-                        invItem.qty = Math.max(0, invItem.qty - deduction.qty);
-                        totalPtrCost += (deduction.qty / (invItem.unitQty || 1)) * invItem.purchase; 
+                        let p = parseFloat(invItem.purchase); if(isNaN(p)) p = 0;
+                        let u = parseFloat(invItem.unitQty); if(isNaN(u) || u <= 0) u = 1;
+                        let q = parseFloat(deduction.qty); if(isNaN(q)) q = 0;
+                        
+                        invItem.qty = Math.max(0, invItem.qty - q);
+                        totalPtrCost += (q / u) * p; 
                     }
                 });
 
