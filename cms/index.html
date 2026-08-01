@@ -474,6 +474,27 @@
                 </div>
 
             </div>
+            
+            <!-- ADDED OTC SUMMARY SECTION -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm mt-6">
+                <h3 class="font-bold text-base text-slate-800 border-b border-slate-100 pb-2 flex items-center"><i class="fa-solid fa-list text-blue-600 mr-2"></i>Recent OTC Sales Summary</h3>
+                <div class="overflow-x-auto mt-4">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-400 uppercase font-extrabold text-[10px] tracking-wider border-b border-slate-200">
+                                <th class="p-3">Date</th>
+                                <th class="p-3">Reference / Patient</th>
+                                <th class="p-3">Payment Mode</th>
+                                <th class="p-3 text-right">Amount (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="otc-summary-body">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
         </section>
 
         <section id="mod-inventory" class="erp-section hidden space-y-6">
@@ -2102,6 +2123,7 @@
                 this.renderFinanceLedgerGrid(db);
                 this.syncBillingDropdowns(db);
                 this.syncOTCDropdowns(db);
+                this.renderOTCSummary();
                 
                 this.renderAnalyticsMatrixCharts(totalRevenue, totalExpenses);
                 this.renderDashboardRecentPatients(db, filteredVisits);
@@ -2117,6 +2139,37 @@
                 if (patientDatalist) {
                     patientDatalist.innerHTML = db.patients.map(p => `<option value="${p.name}"></option>`).join('');
                 }
+            }
+
+            static renderOTCSummary() {
+                const db = SystemStorage.read();
+                const tbody = document.getElementById('otc-summary-body');
+                if(!tbody) return;
+
+                const otcSales = (db.finance || []).filter(f => f.category && f.category.includes("OTC Pharmacy"));
+                const sortedSales = [...otcSales].reverse(); // Ascending visual order (newest at the top, older at the bottom)
+
+                if (sortedSales.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400 text-xs italic font-medium">No recent OTC sales recorded.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = sortedSales.map(sale => {
+                    const match = sale.category.match(/\[(.*?)\]/);
+                    const mode = match ? match[1] : 'Unknown';
+                    
+                    const patParts = sale.category.split('] - ');
+                    const patient = patParts.length > 1 ? patParts[1] : 'Walk-in';
+
+                    return `
+                    <tr class="border-b border-slate-100 hover:bg-slate-50 font-medium text-xs">
+                        <td class="p-3 text-slate-500">${sale.date}</td>
+                        <td class="p-3 font-bold text-slate-700">${sale.ref} <span class="text-[10px] font-normal text-slate-400 ml-1">(${patient})</span></td>
+                        <td class="p-3 text-slate-600 font-bold">${mode}</td>
+                        <td class="p-3 text-right font-black text-emerald-600">₹${Number(sale.amount).toFixed(2)}</td>
+                    </tr>
+                    `;
+                }).join('');
             }
 
             static renderCreditsList() {
@@ -2319,6 +2372,7 @@
                 document.getElementById('otc-receive-amount').value = "";
                 document.getElementById('otc-patient-name').value = "";
                 this.renderOTCCart();
+                this.renderOTCSummary();
                 
                 alert(`Success! OTC sale recorded (Ref: ${refCode}). Total: ₹${manualAmount.toFixed(2)} updated in Ledger.`);
                 this.routeToTab('dashboard');
