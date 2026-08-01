@@ -486,7 +486,6 @@
                                 <th class="p-3">Reference / Patient</th>
                                 <th class="p-3">Payment Mode</th>
                                 <th class="p-3 text-right">Amount (₹)</th>
-                                <th class="p-3 text-center">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="otc-summary-body">
@@ -2151,7 +2150,7 @@
                 const sortedSales = [...otcSales].reverse(); // Ascending visual order (newest at the top, older at the bottom)
 
                 if (sortedSales.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400 text-xs italic font-medium">No recent OTC sales recorded.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400 text-xs italic font-medium">No recent OTC sales recorded.</td></tr>`;
                     return;
                 }
 
@@ -2168,10 +2167,6 @@
                         <td class="p-3 font-bold text-slate-700">${sale.ref} <span class="text-[10px] font-normal text-slate-400 ml-1">(${patient})</span></td>
                         <td class="p-3 text-slate-600 font-bold">${mode}</td>
                         <td class="p-3 text-right font-black text-emerald-600">₹${Number(sale.amount).toFixed(2)}</td>
-                        <td class="p-3 text-center space-x-1 whitespace-nowrap">
-                            <button onclick="UI.editOTCSale('${sale.ref}')" title="Edit OTC Sale" class="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold text-[10px] rounded-xl transition-all cursor-pointer"><i class="fa-solid fa-pen-to-square"></i></button>
-                            <button onclick="UI.deleteOTCSale('${sale.ref}')" title="Delete OTC Sale" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-[10px] rounded-xl transition-all cursor-pointer"><i class="fa-solid fa-trash-can"></i></button>
-                        </td>
                     </tr>
                     `;
                 }).join('');
@@ -2368,8 +2363,7 @@
                     category: `OTC Pharmacy [${mode}]${patTag}`,
                     ref: refCode,
                     amount: manualAmount,
-                    date: new Date().toLocaleDateString('en-IN'),
-                    items: JSON.parse(JSON.stringify(this.otcCart)) // Storing cart items to allow restocking upon delete/edit
+                    date: new Date().toLocaleDateString('en-IN')
                 });
                 
                 SystemStorage.write(db);
@@ -2382,81 +2376,6 @@
                 
                 alert(`Success! OTC sale recorded (Ref: ${refCode}). Total: ₹${manualAmount.toFixed(2)} updated in Ledger.`);
                 this.routeToTab('dashboard');
-            }
-
-            static deleteOTCSale(ref) {
-                if(!confirm("Are you sure you want to delete this OTC sale? The sold medicines will be restocked into inventory and the transaction will be removed from the ledger.")) return;
-                
-                const db = SystemStorage.read();
-                const saleIndex = db.finance.findIndex(f => f.ref === ref);
-                if(saleIndex === -1) return;
-
-                const sale = db.finance[saleIndex];
-                
-                // Restock items if they were tracked (new transactions)
-                if (sale.items && Array.isArray(sale.items)) {
-                    sale.items.forEach(cartItem => {
-                        const invItem = db.inventory.find(i => i.id === cartItem.id);
-                        if (invItem) {
-                            invItem.qty += cartItem.qty;
-                        }
-                    });
-                }
-
-                // Remove from ledger
-                db.finance.splice(saleIndex, 1);
-                SystemStorage.write(db);
-                
-                this.renderOTCSummary();
-                this.triggerGlobalAuditRefresh(); // Update Dashboard stats
-                alert(`Sale ${ref} has been deleted successfully and inventory has been restocked.`);
-            }
-
-            static editOTCSale(ref) {
-                const db = SystemStorage.read();
-                const saleIndex = db.finance.findIndex(f => f.ref === ref);
-                if(saleIndex === -1) return;
-                
-                if(this.otcCart.length > 0) {
-                    if(!confirm("Editing this sale will clear your currently active cart. Do you want to proceed?")) return;
-                }
-
-                const sale = db.finance[saleIndex];
-                
-                // Restock items to allow re-checking out
-                if (sale.items && Array.isArray(sale.items)) {
-                    sale.items.forEach(cartItem => {
-                        const invItem = db.inventory.find(i => i.id === cartItem.id);
-                        if (invItem) {
-                            invItem.qty += cartItem.qty;
-                        }
-                    });
-                    this.otcCart = JSON.parse(JSON.stringify(sale.items));
-                } else {
-                    this.otcCart = [];
-                    alert("Note: This older transaction does not have item records attached. You can edit the amount/details, but items cannot be automatically loaded or restocked.");
-                }
-
-                // Remove old transaction from ledger
-                db.finance.splice(saleIndex, 1);
-                SystemStorage.write(db);
-
-                // Populate fields
-                const modeMatch = sale.category.match(/\[(.*?)\]/);
-                const mode = modeMatch ? modeMatch[1] : 'Cash';
-                const patParts = sale.category.split('] - ');
-                const patient = patParts.length > 1 ? patParts[1] : '';
-
-                document.getElementById('otc-payment-mode').value = mode;
-                document.getElementById('otc-receive-amount').value = sale.amount;
-                document.getElementById('otc-patient-name').value = patient === 'Walk-in' ? '' : patient;
-
-                this.renderOTCCart();
-                this.renderOTCSummary();
-                this.triggerGlobalAuditRefresh(); // Update Dashboard stats
-                
-                document.getElementById('mod-otc').scrollIntoView({ behavior: 'smooth' });
-                alert(`Sale ${ref} loaded into the cart. The old record has been reversed. Modify your cart/amount and click "Complete OTC Transaction Settlement" to save the changes.`);
             }
 
             static renderPatientsGrid(filterTerm = "") {
@@ -3861,8 +3780,7 @@
                 alert("Clinical prescription block locked and recorded safely.");
             }
 
-            static renderAnalyticsMatrixCharts(revenue, expenses)
-        static renderAnalyticsMatrixCharts(revenue, expenses) {
+            static renderAnalyticsMatrixCharts(revenue, expenses) {
                 const ctx = document.getElementById('chart-revenue');
                 if(!ctx) return;
 
