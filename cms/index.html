@@ -3582,4 +3582,230 @@
                     case 'Syrup': prefix = 'Sy. '; break;
                     case 'Ointment': prefix = 'Oint. '; break;
                     case 'Drop': prefix = 'Drop. '; break;
-                    case 'Lotion': prefix = 'Lotion. ';I seem to be encountering an error. Can I try something else for you?
+                    case 'Lotion': prefix = 'Lotion. '; break;
+                    case 'Sachet': prefix = 'Sachet. '; break;
+                    case 'Vial': prefix = 'Vial. '; break;
+                    case 'Ampule': prefix = 'Amp. '; break;
+                    case 'SN': prefix = 'SN. '; break;
+                    case 'Nab': prefix = 'Nab. '; break;
+                    default: prefix = medType ? medType + '. ' : ''; break;
+                }
+                const medNameWithPrefix = prefix + medSelect.value;
+                
+                let lineContent = "";
+                let calculatedUnits = 10;
+                let durationStr = durInput.value.trim();
+                
+                if (durationStr && /^\d+$/.test(durationStr)) {
+                    durationStr += " days";
+                }
+                const finalDuration = durationStr || 'As directed';
+
+                const durMatch = finalDuration.match(/\d+/);
+                const days = durMatch ? (parseInt(durMatch[0]) || 1) : 1;
+                
+                let dailyCount = 2;
+                if(doseSelect.value === '1-1-1') dailyCount = 3;
+                if(['1-0-0','0-1-0','0-0-1'].includes(doseSelect.value)) dailyCount = 1;
+
+                const directQtyTypes = ['Syrup', 'Ointment', 'Drop', 'Lotion', 'Sachet', 'Nab', 'Other'];
+
+                if(isVial) {
+                    const mlDose = parseFloat(mlInput.value) || 0;
+                    if(mlDose <= 0) {
+                        alert("Please enter a valid Dose (ML) for this Vial prescription.");
+                        return;
+                    }
+                    lineContent = `${medNameWithPrefix} -- ${mlDose} ML per dose -- ${doseSelect.value} -- ${mealSelect.value} -- ${finalDuration}`;
+                    const totalMLNeeded = mlDose * dailyCount * days;
+                    calculatedUnits = totalMLNeeded; 
+                } else if (directQtyTypes.includes(medOption.dataset.type)) {
+                    const directQty = parseFloat(directQtyInput.value) || 0;
+                    if(directQty <= 0) {
+                        alert("Please enter a valid Qty Given for this medicine type.");
+                        return;
+                    }
+                    lineContent = `${medNameWithPrefix} -- ${doseSelect.value} -- ${mealSelect.value} -- ${finalDuration} -- [Qty Dispensed: ${directQty}]`;
+                    calculatedUnits = directQty;
+                } else {
+                    lineContent = `${medNameWithPrefix} -- ${doseSelect.value} -- ${mealSelect.value} -- ${finalDuration}`;
+                    calculatedUnits = days * dailyCount;
+                }
+
+                const currentText = rxArea.value.trim();
+                const nextNum = currentText ? currentText.split('\n').length + 1 : 1;
+                const finalLine = `${nextNum}. ${lineContent}`;
+
+                rxArea.value = currentText ? currentText + "\n" + finalLine : finalLine;
+                
+                this.pendingStockDeductions.push({ name: medSelect.value, qty: calculatedUnits });
+
+                medSelect.selectedIndex = 0;
+                durInput.value = "";
+                mlInput.value = "";
+                directQtyInput.value = "";
+                this.handlePrescriptionMedicineChange(); 
+            }
+
+            static handleVisitSubmit(e) {
+                e.preventDefault();
+                const db = SystemStorage.read();
+                const pId = document.getElementById('v-patient-id').value;
+                const vId = document.getElementById('v-visit-id').value; 
+
+                let visitDate = new Date().toLocaleDateString('en-IN');
+                if (vId) {
+                    const existingVisit = db.visits.find(v => v.id === vId);
+                    if (existingVisit) visitDate = existingVisit.date;
+                }
+
+                let totalPtrCost = 0; // Cost calculator for Margin Profiling
+
+                this.pendingStockDeductions.forEach(deduction => {
+                    const invItem = db.inventory.find(i => i.name === deduction.name);
+                    if(invItem) {
+                        invItem.qty = Math.max(0, invItem.qty - deduction.qty);
+                        totalPtrCost += (deduction.qty / (invItem.unitQty || 1)) * invItem.purchase; 
+                    }
+                });
+
+                const visitPayload = {
+                    id: vId || `VST-${Math.floor(10000 + Math.random() * 90000)}`,
+                    patientId: pId,
+                    date: visitDate, 
+                    complaint: document.getElementById('v-complaint').value.trim(),
+                    diagnosis: document.getElementById('v-diagnosis').value.trim(),
+                    vitals: {
+                        bp: document.getElementById('v-bp').value.trim(),
+                        pulse: document.getElementById('v-pulse').value.trim(),
+                        spo2: document.getElementById('v-spo2').value.trim(),
+                        rbs: document.getElementById('v-rbs-check').checked ? document.getElementById('v-rbs').value.trim() : ""
+                    },
+                    investigations: document.getElementById('v-investigation-plan').value.trim(),
+                    treatmentType: document.getElementById('v-treatment-type').value,
+                    treatmentPlan: document.getElementById('v-treatment-plan').value.trim(),
+                    prescription: document.getElementById('v-prescription').value.trim(),
+                    ptrCost: totalPtrCost // Save cost for profit margin evaluation when generating bill
+                };
+
+                if (vId) {
+                    const idx = db.visits.findIndex(v => v.id === vId);
+                    if (idx !== -1) {
+                        db.visits[idx] = visitPayload;
+                    } else {
+                        db.visits.push(visitPayload);
+                    }
+                } else {
+                    db.visits.push(visitPayload);
+                }
+
+                SystemStorage.write(db);
+
+                this.closeModal('modal-visit');
+                alert("Clinical prescription block locked and recorded safely.");
+            }
+
+            static editLatestPrescription(patientId) {
+                const db = SystemStorage.read();
+                const visits = db.visits.filter(v => v.patientId === patientId);
+                if(!visits.length) {
+                    alert("No localized clinical files are linked to this record yet.");
+                    return;
+                }
+                const latest = visits[visits.length - 1];
+                
+                this.initiateVisitModal(patientId);
+                document.getElementById('v-visit-id').value = latest.id; 
+                
+                document.getElementById('v-complaint').value = latest.complaint || '';
+                document.getElementById('v-diagnosis').value = latest.diagnosis || '';
+                document.getElementById('v-bp').value = latest.vitals?.bp || '';
+                document.getElementById('v-pulse').value = latest.vitals?.pulse || '';
+                document.getElementById('v-spo2').value = latest.vitals?.spo2 || '';
+                
+                if(latest.vitals?.rbs) {
+                    document.getElementById('v-rbs-check').checked = true;
+                    this.toggleRBS();
+                    document.getElementById('v-rbs').value = latest.vitals.rbs;
+                }
+
+                document.getElementById('v-investigation-plan').value = latest.investigations || '';
+                if(latest.investigations) {
+                    document.getElementById('v-inv-check').checked = true;
+                    this.toggleInvestigation();
+                }
+
+                document.getElementById('v-treatment-type').value = latest.treatmentType || 'None';
+                this.toggleTreatment();
+                document.getElementById('v-treatment-plan').value = latest.treatmentPlan || '';
+                document.getElementById('v-prescription').value = latest.prescription || '';
+            }
+
+            static renderAnalyticsMatrixCharts(revenue, expenses) {
+                const ctx = document.getElementById('chart-revenue');
+                if(!ctx) return;
+
+                if (this.activeCharts['revenue']) {
+                    this.activeCharts['revenue'].destroy();
+                }
+
+                this.activeCharts['revenue'] = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Inbound Operational Fees', 'Overhead Expenses Drain'],
+                        datasets: [{
+                            data: [revenue, expenses],
+                            backgroundColor: ['rgba(29, 78, 216, 0.85)', 'rgba(244, 63, 94, 0.85)'],
+                            borderColor: ['rgb(29, 78, 216)', 'rgb(244, 63, 94)'],
+                            borderWidth: 1.5,
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } }
+                    }
+                });
+            }
+
+            static renderDashboardRecentPatients(db, filteredVisits) {
+                const container = document.getElementById('dash-recent-patients');
+                if(!container) return;
+                container.innerHTML = "";
+
+                const sortedVisits = [...filteredVisits].sort((a,b) => this.parseIndianDate(b.date) - this.parseIndianDate(a.date)).slice(0, 5);
+
+                if(sortedVisits.length === 0) {
+                    container.innerHTML = `<div class="text-xs text-slate-400 italic py-4 font-medium text-center">No client logs mapped inside this chronological frame.</div>`;
+                    return;
+                }
+
+                sortedVisits.forEach(v => {
+                    const patient = db.patients.find(p => p.id === v.patientId) || { name: "Unknown Case" };
+                    const item = document.createElement('div');
+                    item.className = "flex justify-between items-center p-3 bg-slate-50 border border-slate-100 rounded-xl hover:bg-slate-100/50 transition-all text-xs";
+                    item.innerHTML = `
+                        <div class="text-left">
+                            <div class="font-bold text-slate-800 text-sm">${patient.name}</div>
+                            <div class="text-slate-400 mt-0.5 font-semibold">Diagnosis: ${v.diagnosis}</div>
+                        </div>
+                        <div class="text-right font-medium">
+                            <span class="text-blue-700 font-bold block">${v.date}</span>
+                            <button onclick="UI.printPatientPrescription('${v.patientId}')" class="text-[10px] text-slate-500 hover:text-blue-700 underline font-bold transition-colors cursor-pointer mt-0.5">Print Sheet</button>
+                        </div>
+                    `;
+                    container.appendChild(item);
+                });
+            }
+        }
+
+        // Initialize Runtime Sequence on View Ready State
+        window.addEventListener('DOMContentLoaded', () => {
+            checkActiveSession();
+            UI.initializeApplicationRuntime();
+        });
+    </script>
+</body>
+</html>
