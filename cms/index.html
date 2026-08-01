@@ -149,6 +149,9 @@
             <button data-target="finance" class="nav-link w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-600 rounded-xl hover:bg-slate-50 transition-all cursor-pointer">
                 <i class="fa-solid fa-wallet w-5 text-center text-base"></i> <span>Accounts & Ledger</span>
             </button>
+            <button data-target="profit" class="nav-link w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-600 rounded-xl hover:bg-slate-50 transition-all cursor-pointer">
+                <i class="fa-solid fa-chart-line w-5 text-center text-base"></i> <span>Profit Margin</span>
+            </button>
             <button data-target="settings" class="nav-link w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-600 rounded-xl hover:bg-slate-50 transition-all cursor-pointer">
                 <i class="fa-solid fa-gear w-5 text-center text-base"></i> <span>Clinic Settings</span>
             </button>
@@ -254,6 +257,61 @@
                     <h3 class="font-bold text-sm text-slate-700 mb-4 border-b border-slate-100 pb-2 flex items-center"><i class="fa-solid fa-clock-rotate-left text-blue-600 mr-2"></i>Recent Patient Consultations</h3>
                     <div id="dash-recent-patients" class="space-y-4 overflow-y-auto w-full max-h-[300px] pr-1">
                         </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- New Profit Margin Section -->
+        <section id="mod-profit" class="erp-section hidden space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-5 gap-4">
+                <div>
+                    <h2 class="text-3xl font-black animated-heading pb-1">Profit Margin Analysis</h2>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between transition-all hover:shadow-md">
+                    <div>
+                        <p class="text-[11px] font-extrabold tracking-wider uppercase text-slate-400">Total Revenue</p>
+                        <h3 id="profit-total-revenue" class="text-2xl font-black text-slate-900 mt-1">₹0.00</h3>
+                    </div>
+                    <div class="h-12 w-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-xl shadow-inner"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between transition-all hover:shadow-md">
+                    <div>
+                        <p class="text-[11px] font-extrabold tracking-wider uppercase text-slate-400">Total Cost (PTR)</p>
+                        <h3 id="profit-total-cost" class="text-2xl font-black text-rose-600 mt-1">₹0.00</h3>
+                    </div>
+                    <div class="h-12 w-12 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center text-xl shadow-inner"><i class="fa-solid fa-chart-pie"></i></div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between transition-all hover:shadow-md">
+                    <div>
+                        <p class="text-[11px] font-extrabold tracking-wider uppercase text-slate-400">Net Profit Margin</p>
+                        <h3 id="profit-net-margin" class="text-2xl font-black text-emerald-600 mt-1">₹0.00</h3>
+                        <p id="profit-margin-percent" class="text-[10px] font-bold text-emerald-500 mt-0.5">0.00%</p>
+                    </div>
+                    <div class="h-12 w-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-xl shadow-inner"><i class="fa-solid fa-arrow-trend-up"></i></div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="p-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
+                    <h3 class="font-bold text-sm text-slate-700">Transaction Breakdown</h3>
+                </div>
+                <div class="overflow-x-auto max-h-[500px] overflow-y-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-white text-slate-500 uppercase font-bold text-[11px] tracking-wider border-b border-slate-200 sticky top-0 shadow-sm">
+                                <th class="p-4">Date & Ref</th>
+                                <th class="p-4">Transaction Type</th>
+                                <th class="p-4 text-right">Revenue (MRP)</th>
+                                <th class="p-4 text-right">Cost (PTR)</th>
+                                <th class="p-4 text-right">Profit Generated</th>
+                            </tr>
+                        </thead>
+                        <tbody id="profit-table-body">
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </section>
@@ -2071,11 +2129,103 @@
                 this.renderPatientsGrid();
                 this.renderInventoryGrid(db, this.currentInventoryFilter);
                 this.renderFinanceLedgerGrid(db);
+                this.renderProfitMargin(); // New call to refresh profit margin table
                 this.syncBillingDropdowns(db);
                 this.syncOTCDropdowns(db);
                 
                 this.renderAnalyticsMatrixCharts(totalRevenue, totalExpenses);
                 this.renderDashboardRecentPatients(db, filteredVisits);
+            }
+
+            // --- Profit Margin Rendering Engine ---
+            static renderProfitMargin() {
+                const db = SystemStorage.read();
+                const timeframe = document.getElementById('dashboard-timeframe')?.value || 'TODAY';
+                const tbody = document.getElementById('profit-table-body');
+                if(!tbody) return;
+                tbody.innerHTML = '';
+
+                let totalRev = 0;
+                let totalCost = 0;
+                let transactions = [];
+
+                // Standard Inflows (OTC & Cash/UPI Patient Bills)
+                const inflows = db.finance.filter(f => 
+                    this.isDateInTimeframe(f.date, timeframe) && 
+                    f.type === 'INFLOW' && 
+                    (f.category.includes('OTC') || f.category.includes('Billing'))
+                );
+
+                inflows.forEach(f => {
+                    transactions.push({
+                        date: f.date,
+                        ref: f.ref,
+                        type: f.category.includes('OTC') ? 'OTC Pharmacy Sale' : 'Patient Invoice',
+                        revenue: f.amount || 0,
+                        cost: f.ptrCost || 0
+                    });
+                });
+
+                // Credits (Deferred Patient Bills)
+                if(db.credits) {
+                    const credits = db.credits.filter(c => this.isDateInTimeframe(c.date, timeframe));
+                    credits.forEach(c => {
+                        transactions.push({
+                            date: c.date,
+                            ref: c.ref,
+                            type: 'Patient Invoice (Deferred/Credit)',
+                            revenue: c.totalAmount || 0,
+                            cost: c.ptrCost || 0
+                        });
+                    });
+                }
+
+                // Sort descending by date roughly
+                transactions.sort((a,b) => this.parseIndianDate(b.date) - this.parseIndianDate(a.date));
+
+                if(transactions.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400 italic font-medium">No sales or invoicing transactions documented inside this timeframe.</td></tr>`;
+                } else {
+                    transactions.forEach(t => {
+                        totalRev += t.revenue;
+                        totalCost += t.cost;
+                        let profit = t.revenue - t.cost;
+                        
+                        const tr = document.createElement('tr');
+                        tr.className = "border-b border-slate-100 hover:bg-slate-50/50 text-slate-600 font-medium text-xs transition-colors";
+                        tr.innerHTML = `
+                            <td class="p-4">
+                                <div class="font-bold text-slate-800">${t.date}</div>
+                                <div class="text-[10px] text-slate-400 font-mono mt-0.5">${t.ref}</div>
+                            </td>
+                            <td class="p-4 font-bold text-slate-700">${t.type}</td>
+                            <td class="p-4 text-right text-emerald-600 font-bold">₹${t.revenue.toFixed(2)}</td>
+                            <td class="p-4 text-right text-rose-600 font-bold">₹${t.cost.toFixed(2)}</td>
+                            <td class="p-4 text-right font-black ${profit >= 0 ? 'text-blue-600' : 'text-rose-600'}">₹${profit.toFixed(2)}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+
+                let netProfit = totalRev - totalCost;
+                let marginPercent = totalRev > 0 ? ((netProfit / totalRev) * 100).toFixed(2) : '0.00';
+
+                document.getElementById('profit-total-revenue').innerText = `₹${totalRev.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+                document.getElementById('profit-total-cost').innerText = `₹${totalCost.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+                document.getElementById('profit-net-margin').innerText = `₹${netProfit.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+                document.getElementById('profit-margin-percent').innerText = `${marginPercent}% Gross Margin`;
+                
+                // Adjust contextual color dynamics
+                const marginEl = document.getElementById('profit-net-margin');
+                const percentEl = document.getElementById('profit-margin-percent');
+                
+                if(netProfit < 0) {
+                    marginEl.classList.remove('text-emerald-600'); marginEl.classList.add('text-rose-600');
+                    percentEl.classList.remove('text-emerald-500'); percentEl.classList.add('text-rose-500');
+                } else {
+                    marginEl.classList.remove('text-rose-600'); marginEl.classList.add('text-emerald-600');
+                    percentEl.classList.remove('text-rose-500'); percentEl.classList.add('text-emerald-500');
+                }
             }
 
             static syncOTCDropdowns(db) {
@@ -2134,6 +2284,8 @@
                     category: "Credit Payment Settlement",
                     ref: credit.ref,
                     amount: amount,
+                    // Note: ptrCost is calculated and associated upfront inside commitInvoiceTransaction. 
+                    ptrCost: 0, 
                     date: new Date().toLocaleDateString('en-IN')
                 });
                 
@@ -2256,11 +2408,14 @@
                 
                 const db = SystemStorage.read();
                 const mode = document.getElementById('otc-payment-mode').value;
+                let totalPtrCost = 0; // PTR margin calculator
                 
                 this.otcCart.forEach(cartItem => {
                     const invItem = db.inventory.find(i => i.id === cartItem.id);
                     if (invItem) {
                         invItem.qty = Math.max(0, invItem.qty - cartItem.qty);
+                        // Calculate cost of specific OTC item sold
+                        totalPtrCost += (cartItem.qty / (invItem.unitQty || 1)) * invItem.purchase; 
                     }
                 });
                 
@@ -2270,6 +2425,7 @@
                     category: `OTC Pharmacy Sales [${mode}]`,
                     ref: refCode,
                     amount: manualAmount,
+                    ptrCost: totalPtrCost, // Embed cost to calculate real margin
                     date: new Date().toLocaleDateString('en-IN')
                 });
                 
@@ -2280,7 +2436,7 @@
                 this.renderOTCCart();
                 
                 alert(`Success! OTC sale recorded (Ref: ${refCode}). Total: ₹${manualAmount.toFixed(2)} updated in Ledger.`);
-                this.routeToTab('dashboard');
+                this.routeToTab('profit');
             }
 
             static renderPatientsGrid(filterTerm = "") {
@@ -3106,6 +3262,13 @@
                 const db = SystemStorage.read();
                 const targetPatient = db.patients.find(p => p.id === patientSelect.value);
 
+                // Find associated PTR cost from latest visit
+                let latestVisit = db.visits.filter(v => v.patientId === targetPatient.id).pop();
+                let visitPtrCost = latestVisit ? (latestVisit.ptrCost || 0) : 0;
+
+                // Set PTR on visit to 0 after billing to prevent duplicate margin counting for identical bills
+                if (latestVisit) latestVisit.ptrCost = 0; 
+
                 if(modeSelect.value === 'Credit') {
                     if(!db.credits) db.credits = [];
                     db.credits.push({
@@ -3115,6 +3278,7 @@
                         ref: invCode,
                         totalAmount: amt,
                         paidAmount: 0,
+                        ptrCost: visitPtrCost, // Embed cost to calculate real margin
                         date: new Date().toLocaleDateString('en-IN')
                     });
                 } else {
@@ -3123,6 +3287,7 @@
                         category: `General Clinic Services / Billing [${modeSelect.value}]`,
                         ref: invCode,
                         amount: amt,
+                        ptrCost: visitPtrCost, // Embed cost to calculate real margin
                         date: new Date().toLocaleDateString('en-IN')
                     });
                 }
@@ -3134,7 +3299,7 @@
                 this.renderUPIQR();
                 
                 alert(`Invoice record committed successfully (Transaction ID: ${invCode}). balances modified.`);
-                this.routeToTab('dashboard');
+                this.routeToTab('profit');
             }
 
             static handlePatientSubmit(e) {
@@ -3417,226 +3582,4 @@
                     case 'Syrup': prefix = 'Sy. '; break;
                     case 'Ointment': prefix = 'Oint. '; break;
                     case 'Drop': prefix = 'Drop. '; break;
-                    case 'Lotion': prefix = 'Lotion. '; break;
-                    case 'Sachet': prefix = 'Sachet. '; break;
-                    case 'Vial': prefix = 'Vial. '; break;
-                    case 'Ampule': prefix = 'Amp. '; break;
-                    case 'SN': prefix = 'SN. '; break;
-                    case 'Nab': prefix = 'Nab. '; break;
-                    default: prefix = medType ? medType + '. ' : ''; break;
-                }
-                const medNameWithPrefix = prefix + medSelect.value;
-                
-                let lineContent = "";
-                let calculatedUnits = 10;
-                let durationStr = durInput.value.trim();
-                
-                if (durationStr && /^\d+$/.test(durationStr)) {
-                    durationStr += " days";
-                }
-                const finalDuration = durationStr || 'As directed';
-
-                const durMatch = finalDuration.match(/\d+/);
-                const days = durMatch ? (parseInt(durMatch[0]) || 1) : 1;
-                
-                let dailyCount = 2;
-                if(doseSelect.value === '1-1-1') dailyCount = 3;
-                if(['1-0-0','0-1-0','0-0-1'].includes(doseSelect.value)) dailyCount = 1;
-
-                const directQtyTypes = ['Syrup', 'Ointment', 'Drop', 'Lotion', 'Sachet', 'Nab', 'Other'];
-
-                if(isVial) {
-                    const mlDose = parseFloat(mlInput.value) || 0;
-                    if(mlDose <= 0) {
-                        alert("Please enter a valid Dose (ML) for this Vial prescription.");
-                        return;
-                    }
-                    lineContent = `${medNameWithPrefix} -- ${mlDose} ML per dose -- ${doseSelect.value} -- ${mealSelect.value} -- ${finalDuration}`;
-                    const totalMLNeeded = mlDose * dailyCount * days;
-                    calculatedUnits = totalMLNeeded; 
-                } else if (directQtyTypes.includes(medOption.dataset.type)) {
-                    const directQty = parseFloat(directQtyInput.value) || 0;
-                    if(directQty <= 0) {
-                        alert("Please enter a valid Qty Given for this medicine type.");
-                        return;
-                    }
-                    lineContent = `${medNameWithPrefix} -- ${doseSelect.value} -- ${mealSelect.value} -- ${finalDuration} -- [Qty Dispensed: ${directQty}]`;
-                    calculatedUnits = directQty;
-                } else {
-                    lineContent = `${medNameWithPrefix} -- ${doseSelect.value} -- ${mealSelect.value} -- ${finalDuration}`;
-                    calculatedUnits = days * dailyCount;
-                }
-
-                const currentText = rxArea.value.trim();
-                const nextNum = currentText ? currentText.split('\n').length + 1 : 1;
-                const finalLine = `${nextNum}. ${lineContent}`;
-
-                rxArea.value = currentText ? currentText + "\n" + finalLine : finalLine;
-                
-                this.pendingStockDeductions.push({ name: medSelect.value, qty: calculatedUnits });
-
-                medSelect.selectedIndex = 0;
-                durInput.value = "";
-                mlInput.value = "";
-                directQtyInput.value = "";
-                this.handlePrescriptionMedicineChange(); 
-            }
-
-            static handleVisitSubmit(e) {
-                e.preventDefault();
-                const db = SystemStorage.read();
-                const pId = document.getElementById('v-patient-id').value;
-                const vId = document.getElementById('v-visit-id').value; 
-
-                let visitDate = new Date().toLocaleDateString('en-IN');
-                if (vId) {
-                    const existingVisit = db.visits.find(v => v.id === vId);
-                    if (existingVisit) visitDate = existingVisit.date;
-                }
-
-                const visitPayload = {
-                    id: vId || `VST-${Math.floor(10000 + Math.random() * 90000)}`,
-                    patientId: pId,
-                    date: visitDate, 
-                    complaint: document.getElementById('v-complaint').value.trim(),
-                    diagnosis: document.getElementById('v-diagnosis').value.trim(),
-                    vitals: {
-                        bp: document.getElementById('v-bp').value.trim(),
-                        pulse: document.getElementById('v-pulse').value.trim(),
-                        spo2: document.getElementById('v-spo2').value.trim(),
-                        rbs: document.getElementById('v-rbs-check').checked ? document.getElementById('v-rbs').value.trim() : ""
-                    },
-                    investigations: document.getElementById('v-investigation-plan').value.trim(),
-                    treatmentType: document.getElementById('v-treatment-type').value,
-                    treatmentPlan: document.getElementById('v-treatment-plan').value.trim(),
-                    prescription: document.getElementById('v-prescription').value.trim()
-                };
-
-                this.pendingStockDeductions.forEach(deduction => {
-                    const invItem = db.inventory.find(i => i.name === deduction.name);
-                    if(invItem) {
-                        invItem.qty = Math.max(0, invItem.qty - deduction.qty);
-                    }
-                });
-
-                if (vId) {
-                    const idx = db.visits.findIndex(v => v.id === vId);
-                    if (idx !== -1) {
-                        db.visits[idx] = visitPayload;
-                    } else {
-                        db.visits.push(visitPayload);
-                    }
-                } else {
-                    db.visits.push(visitPayload);
-                }
-
-                SystemStorage.write(db);
-
-                this.closeModal('modal-visit');
-                alert("Clinical prescription block locked and recorded safely.");
-            }
-
-            static editLatestPrescription(patientId) {
-                const db = SystemStorage.read();
-                const visits = db.visits.filter(v => v.patientId === patientId);
-                if(!visits.length) {
-                    alert("No localized clinical files are linked to this record yet.");
-                    return;
-                }
-                const latest = visits[visits.length - 1];
-                
-                this.initiateVisitModal(patientId);
-                document.getElementById('v-visit-id').value = latest.id; 
-                
-                document.getElementById('v-complaint').value = latest.complaint || '';
-                document.getElementById('v-diagnosis').value = latest.diagnosis || '';
-                document.getElementById('v-bp').value = latest.vitals?.bp || '';
-                document.getElementById('v-pulse').value = latest.vitals?.pulse || '';
-                document.getElementById('v-spo2').value = latest.vitals?.spo2 || '';
-                
-                if(latest.vitals?.rbs) {
-                    document.getElementById('v-rbs-check').checked = true;
-                    this.toggleRBS();
-                    document.getElementById('v-rbs').value = latest.vitals.rbs;
-                }
-
-                document.getElementById('v-investigation-plan').value = latest.investigations || '';
-                if(latest.investigations) {
-                    document.getElementById('v-inv-check').checked = true;
-                    this.toggleInvestigation();
-                }
-
-                document.getElementById('v-treatment-type').value = latest.treatmentType || 'None';
-                this.toggleTreatment();
-                document.getElementById('v-treatment-plan').value = latest.treatmentPlan || '';
-                document.getElementById('v-prescription').value = latest.prescription || '';
-            }
-
-            static renderAnalyticsMatrixCharts(revenue, expenses) {
-                const ctx = document.getElementById('chart-revenue');
-                if(!ctx) return;
-
-                if (this.activeCharts['revenue']) {
-                    this.activeCharts['revenue'].destroy();
-                }
-
-                this.activeCharts['revenue'] = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Inbound Operational Fees', 'Overhead Expenses Drain'],
-                        datasets: [{
-                            data: [revenue, expenses],
-                            backgroundColor: ['rgba(29, 78, 216, 0.85)', 'rgba(244, 63, 94, 0.85)'],
-                            borderColor: ['rgb(29, 78, 216)', 'rgb(244, 63, 94)'],
-                            borderWidth: 1.5,
-                            borderRadius: 8
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } }
-                    }
-                });
-            }
-
-            static renderDashboardRecentPatients(db, filteredVisits) {
-                const container = document.getElementById('dash-recent-patients');
-                if(!container) return;
-                container.innerHTML = "";
-
-                const sortedVisits = [...filteredVisits].sort((a,b) => this.parseIndianDate(b.date) - this.parseIndianDate(a.date)).slice(0, 5);
-
-                if(sortedVisits.length === 0) {
-                    container.innerHTML = `<div class="text-xs text-slate-400 italic py-4 font-medium text-center">No client logs mapped inside this chronological frame.</div>`;
-                    return;
-                }
-
-                sortedVisits.forEach(v => {
-                    const patient = db.patients.find(p => p.id === v.patientId) || { name: "Unknown Case" };
-                    const item = document.createElement('div');
-                    item.className = "flex justify-between items-center p-3 bg-slate-50 border border-slate-100 rounded-xl hover:bg-slate-100/50 transition-all text-xs";
-                    item.innerHTML = `
-                        <div class="text-left">
-                            <div class="font-bold text-slate-800 text-sm">${patient.name}</div>
-                            <div class="text-slate-400 mt-0.5 font-semibold">Diagnosis: ${v.diagnosis}</div>
-                        </div>
-                        <div class="text-right font-medium">
-                            <span class="text-blue-700 font-bold block">${v.date}</span>
-                            <button onclick="UI.printPatientPrescription('${v.patientId}')" class="text-[10px] text-slate-500 hover:text-blue-700 underline font-bold transition-colors cursor-pointer mt-0.5">Print Sheet</button>
-                        </div>
-                    `;
-                    container.appendChild(item);
-                });
-            }
-        }
-
-        // Initialize Runtime Sequence on View Ready State
-        window.addEventListener('DOMContentLoaded', () => {
-            checkActiveSession();
-            UI.initializeApplicationRuntime();
-        });
-    </script>
-</body>
-</html>
+                    case 'Lotion': prefix = 'Lotion. ';I seem to be encountering an error. Can I try something else for you?
