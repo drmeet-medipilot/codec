@@ -499,7 +499,47 @@
         };
 
         // Export/Import triggers
-        document.getElementById('btnExportPdf').addEventListener('click', () => { /* PDF logic */ alert('Ensure PDF library loaded.'); });
+        document.getElementById('btnExportPdf').addEventListener('click', () => {
+    // 1. Check if there is data to export
+    if (!patientsData || patientsData.length === 0) {
+        alert("No patient data available to export.");
+        return;
+    }
+
+    // 2. Initialize jsPDF (Use landscape mode for tables with many columns)
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('landscape');
+
+    // 3. Add a Title
+    doc.text("Clinic Patient Register", 14, 15);
+
+    // 4. Prepare data for AutoTable
+    const tableColumn = ["Sr.No", "Patient Name", "Age", "Sex", "Address", "Diagnosis", "Prescription", "Remark"];
+    const tableRows = patientsData.map(p => [
+        p.srNo, 
+        p.name, 
+        p.age, 
+        p.sex, 
+        p.address, 
+        p.diagnosis, 
+        p.prescription, 
+        p.remark || '-'
+    ]);
+
+    // 5. Generate the Table
+    doc.autoTable({
+        head: [tableColumn],
+        body: tableRows,
+        startY: 20,
+        theme: 'grid',
+        styles: { fontSize: 9 },
+        headStyles: { fillColor: [6, 182, 212] } // Matches your --primary cyan color
+    });
+
+    // 6. Save the PDF
+    const today = new Date().toISOString().slice(0, 10);
+    doc.save(`Clinic_Patients_${today}.pdf`);
+});
         document.getElementById('btnExportCsv').addEventListener('click', () => {
     // 1. Check if there is data to export
     if (!patientsData || patientsData.length === 0) {
