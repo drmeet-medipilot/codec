@@ -266,8 +266,8 @@
         // ==========================================
         // 🚨 1. SUPABASE CREDENTIALS
         // ==========================================
-        const SUPABASE_URL = 'https://dsclchkghfzueypbmpuz.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_jdJ1rE_pMiRjfOpjGx808w_Ivl_81ng';
+        const SUPABASE_URL = 'https://mhquthxfsjnakymtaizp.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_S_GEAd5Y35gqI0Dgz0XNEQ_VNKimiUY';
         
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
