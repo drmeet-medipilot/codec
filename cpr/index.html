@@ -104,6 +104,7 @@
         input, select, textarea {
             background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.15); color: var(--text-main);
             padding: 14px; border-radius: 10px; font-size: 1rem; transition: all 0.3s ease; outline: none; width: 100%;
+            color-scheme: dark; /* Helps date picker calendar look dark mode */
         }
         textarea { resize: vertical; font-family: inherit; }
         input:focus:not([readonly]), select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 15px rgba(6, 182, 212, 0.3); background: rgba(0, 0, 0, 0.6); }
@@ -206,6 +207,11 @@
                             <label for="srNo">Sr. No. (Auto)</label>
                             <input type="text" id="srNo" readonly required>
                         </div>
+                        <!-- NEW DATE AUTO-SELECT FIELD -->
+                        <div class="input-group">
+                            <label for="visitDate">Date (Auto)</label>
+                            <input type="date" id="visitDate" required>
+                        </div>
                         <div class="input-group">
                             <label for="patientName">Patient Name</label>
                             <input type="text" id="patientName" required>
@@ -249,8 +255,15 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>Sr.No</th><th>Patient Name</th><th>Age/Sex</th><th>Address</th>
-                                <th>Diagnosis</th><th>Prescription</th><th>Remark</th><th>Actions</th>
+                                <th>Sr.No</th>
+                                <th>Date</th> <!-- NEW COLUMN HEADER -->
+                                <th>Patient Name</th>
+                                <th>Age/Sex</th>
+                                <th>Address</th>
+                                <th>Diagnosis</th>
+                                <th>Prescription</th>
+                                <th>Remark</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="patientTableBody"></tbody>
@@ -360,6 +373,7 @@
         const form = document.getElementById('patientForm');
         const tableBody = document.getElementById('patientTableBody');
         const srNoInput = document.getElementById('srNo');
+        const visitDateInput = document.getElementById('visitDate'); // New Date Input
         const submitBtn = document.getElementById('submitBtn');
 
         // UPDATED: fetchPatients handles Supabase errors gracefully
@@ -394,18 +408,23 @@
                 if(seqs.length) nextSeq = Math.max(...seqs) + 1;
             }
             srNoInput.value = `${dateStr}${String(nextSeq).padStart(2,'0')}`;
+            
+            // Auto-select today's date in the new field
+            visitDateInput.value = today.toISOString().split('T')[0];
         }
 
         function renderTable() {
             tableBody.innerHTML = '';
             if (patientsData.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:30px;">No patients found.</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:30px;">No patients found.</td></tr>`;
                 return;
             }
             patientsData.forEach(p => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td data-label="Sr.No">${p.srNo}</td><td data-label="Name" class="td-name">${p.name}</td>
+                    <td data-label="Sr.No" class="td-srno">${p.srNo}</td>
+                    <td data-label="Date">${p.visitDate || '-'}</td> <!-- NEW COLUMN DATA -->
+                    <td data-label="Name" class="td-name">${p.name}</td>
                     <td data-label="Age/Sex">${p.age} / ${p.sex}</td><td data-label="Address">${p.address}</td>
                     <td data-label="Diagnosis">${p.diagnosis}</td><td data-label="Prescription">${p.prescription}</td>
                     <td data-label="Remark">${p.remark || '-'}</td>
@@ -426,6 +445,7 @@
 
             const record = {
                 srNo: srNoInput.value, 
+                visitDate: visitDateInput.value, // Included new date field in the payload
                 name: document.getElementById('patientName').value,
                 age: parseInt(document.getElementById('age').value), 
                 sex: document.getElementById('sex').value,
@@ -474,6 +494,7 @@
             
             // Populate the form with the patient's data
             srNoInput.value = p.srNo; 
+            visitDateInput.value = p.visitDate || new Date().toISOString().split('T')[0]; // Auto-populates stored date or falls back to today
             document.getElementById('patientName').value = p.name;
             document.getElementById('age').value = p.age; 
             document.getElementById('sex').value = p.sex;
@@ -489,6 +510,7 @@
             // Auto-scroll back up to the form
             window.scrollTo({top: 0, behavior: 'smooth'});
         };
+        
         window.delP = async (id) => {
             if(confirm("Delete this patient?")) {
                 document.getElementById('tableCard').classList.add('loading');
@@ -500,97 +522,91 @@
 
         // Export/Import triggers
         document.getElementById('btnExportPdf').addEventListener('click', () => {
-    // 1. Check if there is data to export
-    if (!patientsData || patientsData.length === 0) {
-        alert("No patient data available to export.");
-        return;
-    }
+            // 1. Check if there is data to export
+            if (!patientsData || patientsData.length === 0) {
+                alert("No patient data available to export.");
+                return;
+            }
 
-    // 2. Initialize jsPDF (Use landscape mode for tables with many columns)
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF('landscape');
+            // 2. Initialize jsPDF (Use landscape mode for tables with many columns)
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('landscape');
 
-    // 3. Add a Title
-    doc.text("Clinic Patient Register", 14, 15);
+            // 3. Add a Title
+            doc.text("Clinic Patient Register", 14, 15);
 
-    // 4. Prepare data for AutoTable
-    const tableColumn = ["Sr.No", "Patient Name", "Age", "Sex", "Address", "Diagnosis", "Prescription", "Remark"];
-    const tableRows = patientsData.map(p => [
-        p.srNo, 
-        p.name, 
-        p.age, 
-        p.sex, 
-        p.address, 
-        p.diagnosis, 
-        p.prescription, 
-        p.remark || '-'
-    ]);
+            // 4. Prepare data for AutoTable (Added Date column)
+            const tableColumn = ["Sr.No", "Date", "Patient Name", "Age", "Sex", "Address", "Diagnosis", "Prescription", "Remark"];
+            const tableRows = patientsData.map(p => [
+                p.srNo, 
+                p.visitDate || '-',
+                p.name, 
+                p.age, 
+                p.sex, 
+                p.address, 
+                p.diagnosis, 
+                p.prescription, 
+                p.remark || '-'
+            ]);
 
-    // 5. Generate the Table
-    doc.autoTable({
-        head: [tableColumn],
-        body: tableRows,
-        startY: 20,
-        theme: 'grid',
-        styles: { fontSize: 9 },
-        headStyles: { fillColor: [6, 182, 212] } // Matches your --primary cyan color
-    });
+            // 5. Generate the Table
+            doc.autoTable({
+                head: [tableColumn],
+                body: tableRows,
+                startY: 20,
+                theme: 'grid',
+                styles: { fontSize: 9 },
+                headStyles: { fillColor: [6, 182, 212] } // Matches your --primary cyan color
+            });
 
-    // 6. Save the PDF
-    const today = new Date().toISOString().slice(0, 10);
-    doc.save(`Clinic_Patients_${today}.pdf`);
-});
-        document.getElementById('btnExportCsv').addEventListener('click', () => {
-    // 1. Check if there is data to export
-    if (!patientsData || patientsData.length === 0) {
-        alert("No patient data available to export.");
-        return;
-    }
-
-    // 2. Format the data specifically for the CSV file
-    const exportData = patientsData.map(p => ({
-        "Sr. No": p.srNo,
-        "Patient Name": p.name,
-        "Age": p.age,
-        "Sex": p.sex,
-        "Address": p.address,
-        "Diagnosis": p.diagnosis,
-        "Prescription": p.prescription,
-        "Remark": p.remark || "-"
-    }));
-
-    // 3. Convert JSON to CSV string using PapaParse
-    const csv = Papa.unparse(exportData);
-
-    // 4. Create a Blob and trigger the download
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    
-    // Set file name with today's date
-    const today = new Date().toISOString().slice(0, 10);
-    
-    link.setAttribute("href", url);
-    link.setAttribute("download", `Clinic_Patients_${today}.csv`);
-    link.style.visibility = 'hidden';
-    
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-});
-        document.getElementById('btnImportCsv').addEventListener('click', () => document.getElementById('importFile').click());
-// Export/Import triggers
-        document.getElementById('btnExportPdf').addEventListener('click', () => {
-            // ... your PDF export code ...
+            // 6. Save the PDF
+            const today = new Date().toISOString().slice(0, 10);
+            doc.save(`Clinic_Patients_${today}.pdf`);
         });
         
         document.getElementById('btnExportCsv').addEventListener('click', () => {
-            // ... your CSV export code ...
+            // 1. Check if there is data to export
+            if (!patientsData || patientsData.length === 0) {
+                alert("No patient data available to export.");
+                return;
+            }
+
+            // 2. Format the data specifically for the CSV file (Added Date)
+            const exportData = patientsData.map(p => ({
+                "Sr. No": p.srNo,
+                "Date": p.visitDate || "-",
+                "Patient Name": p.name,
+                "Age": p.age,
+                "Sex": p.sex,
+                "Address": p.address,
+                "Diagnosis": p.diagnosis,
+                "Prescription": p.prescription,
+                "Remark": p.remark || "-"
+            }));
+
+            // 3. Convert JSON to CSV string using PapaParse
+            const csv = Papa.unparse(exportData);
+
+            // 4. Create a Blob and trigger the download
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            
+            // Set file name with today's date
+            const today = new Date().toISOString().slice(0, 10);
+            
+            link.setAttribute("href", url);
+            link.setAttribute("download", `Clinic_Patients_${today}.csv`);
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         });
         
         document.getElementById('btnImportCsv').addEventListener('click', () => document.getElementById('importFile').click());
 
-        // 👇 PASTE THE NEW IMPORT LOGIC HERE 👇
+        // 👇 IMPORT LOGIC 👇
         document.getElementById('importFile').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -608,9 +624,10 @@
                     
                     // Loop through parsed CSV rows and insert into Supabase
                     for (const row of data) {
-                        // Ensure these match your exported CSV headers
+                        // Ensure these match your exported CSV headers (Added Date matching logic)
                         const record = {
                             srNo: row["Sr. No"] || row["Sr.No"] || row["srNo"],
+                            visitDate: row["Date"] || row["visitDate"] || new Date().toISOString().split('T')[0],
                             name: row["Patient Name"] || row["name"],
                             age: parseInt(row["Age"] || row["age"]),
                             sex: row["Sex"] || row["sex"],
@@ -649,7 +666,6 @@
                 }
             });
         });
-        // 👆 END OF IMPORT LOGIC 👆
 
         // Run Initial Session Check
         checkSession();
