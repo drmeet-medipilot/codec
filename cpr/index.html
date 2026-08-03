@@ -579,6 +579,77 @@
     document.body.removeChild(link);
 });
         document.getElementById('btnImportCsv').addEventListener('click', () => document.getElementById('importFile').click());
+// Export/Import triggers
+        document.getElementById('btnExportPdf').addEventListener('click', () => {
+            // ... your PDF export code ...
+        });
+        
+        document.getElementById('btnExportCsv').addEventListener('click', () => {
+            // ... your CSV export code ...
+        });
+        
+        document.getElementById('btnImportCsv').addEventListener('click', () => document.getElementById('importFile').click());
+
+        // 👇 PASTE THE NEW IMPORT LOGIC HERE 👇
+        document.getElementById('importFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Show loading overlay
+            document.getElementById('tableCard').classList.add('loading');
+
+            // Use PapaParse to read the CSV file
+            Papa.parse(file, {
+                header: true, // Reads the first row as column names
+                skipEmptyLines: true,
+                complete: async function(results) {
+                    const data = results.data;
+                    let errorCount = 0;
+                    
+                    // Loop through parsed CSV rows and insert into Supabase
+                    for (const row of data) {
+                        // Ensure these match your exported CSV headers
+                        const record = {
+                            srNo: row["Sr. No"] || row["Sr.No"] || row["srNo"],
+                            name: row["Patient Name"] || row["name"],
+                            age: parseInt(row["Age"] || row["age"]),
+                            sex: row["Sex"] || row["sex"],
+                            address: row["Address"] || row["address"],
+                            diagnosis: row["Diagnosis"] || row["diagnosis"],
+                            prescription: row["Prescription"] || row["prescription"],
+                            remark: row["Remark"] || row["remark"] || null
+                        };
+
+                        const { error } = await _supabase.from('patients').insert([record]);
+                        
+                        if (error) {
+                            console.error("Failed to import row:", record, error);
+                            errorCount++;
+                        }
+                    }
+                    
+                    document.getElementById('tableCard').classList.remove('loading');
+                    
+                    if (errorCount > 0) {
+                        alert(`Import finished, but ${errorCount} records failed. Check browser console for details.`);
+                    } else {
+                        alert("All patient data imported successfully!");
+                    }
+                    
+                    // Reset the file input so the same file can be imported again if needed
+                    e.target.value = ''; 
+                    
+                    // Refresh the table to show the newly imported data
+                    fetchPatients();
+                },
+                error: function(err) {
+                    document.getElementById('tableCard').classList.remove('loading');
+                    alert("Error reading the CSV file.");
+                    console.error(err);
+                }
+            });
+        });
+        // 👆 END OF IMPORT LOGIC 👆
 
         // Run Initial Session Check
         checkSession();
