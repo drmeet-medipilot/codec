@@ -464,15 +464,31 @@
         });
 
         window.editP = (id) => {
-            const p = patientsData.find(x => x.id === id);
-            if(!p) return;
-            srNoInput.value = p.srNo; document.getElementById('patientName').value = p.name;
-            document.getElementById('age').value = p.age; document.getElementById('sex').value = p.sex;
-            document.getElementById('address').value = p.address; document.getElementById('diagnosis').value = p.diagnosis;
-            document.getElementById('prescription').value = p.prescription; document.getElementById('remark').value = p.remark;
-            currentEditDBId = id; submitBtn.textContent = "Update Data"; window.scrollTo({top:0, behavior:'smooth'});
+            // Convert both to strings so JavaScript matches them flawlessly
+            const p = patientsData.find(x => String(x.id) === String(id));
+            
+            if(!p) {
+                alert("Could not find patient data.");
+                return;
+            }
+            
+            // Populate the form with the patient's data
+            srNoInput.value = p.srNo; 
+            document.getElementById('patientName').value = p.name;
+            document.getElementById('age').value = p.age; 
+            document.getElementById('sex').value = p.sex;
+            document.getElementById('address').value = p.address; 
+            document.getElementById('diagnosis').value = p.diagnosis;
+            document.getElementById('prescription').value = p.prescription; 
+            document.getElementById('remark').value = p.remark || ''; // Prevents "null" from showing up
+            
+            // Tell the form we are updating an existing patient, not making a new one
+            currentEditDBId = p.id; 
+            submitBtn.textContent = "Update Data"; 
+            
+            // Auto-scroll back up to the form
+            window.scrollTo({top: 0, behavior: 'smooth'});
         };
-
         window.delP = async (id) => {
             if(confirm("Delete this patient?")) {
                 document.getElementById('tableCard').classList.add('loading');
