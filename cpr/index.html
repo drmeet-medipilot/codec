@@ -352,7 +352,7 @@
 
 
         // ==========================================
-        // 3. CORE APPLICATION LOGIC (Same as before)
+        // 3. CORE APPLICATION LOGIC (UPDATED WITH ERROR HANDLING)
         // ==========================================
         let patientsData = [];
         let currentEditDBId = null; 
@@ -362,6 +362,7 @@
         const srNoInput = document.getElementById('srNo');
         const submitBtn = document.getElementById('submitBtn');
 
+        // UPDATED: fetchPatients handles Supabase errors gracefully
         async function fetchPatients() {
             document.getElementById('tableCard').classList.add('loading');
             const { data, error } = await _supabase.from('patients').select('*').order('created_at', { ascending: false });
@@ -369,8 +370,14 @@
 
             if (error) {
                 console.error("Fetch error:", error);
-                return;
+                alert(`Cannot load patients: ${error.message}`);
+                
+                // CRITICAL FIX: Even if there is an error, generate a default serial number
+                patientsData = []; 
+                setNextSerialNumber(); 
+                return; 
             }
+            
             patientsData = data || [];
             renderTable();
             setNextSerialNumber();
@@ -411,24 +418,45 @@
             });
         }
 
+        // UPDATED: Submit handler catches errors instead of failing silently
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             document.getElementById('formCard').classList.add('loading');
             submitBtn.disabled = true;
 
             const record = {
-                srNo: srNoInput.value, name: document.getElementById('patientName').value,
-                age: parseInt(document.getElementById('age').value), sex: document.getElementById('sex').value,
-                address: document.getElementById('address').value, diagnosis: document.getElementById('diagnosis').value,
-                prescription: document.getElementById('prescription').value, remark: document.getElementById('remark').value
+                srNo: srNoInput.value, 
+                name: document.getElementById('patientName').value,
+                age: parseInt(document.getElementById('age').value), 
+                sex: document.getElementById('sex').value,
+                address: document.getElementById('address').value, 
+                diagnosis: document.getElementById('diagnosis').value,
+                prescription: document.getElementById('prescription').value, 
+                remark: document.getElementById('remark').value
             };
 
-            if (currentEditDBId) await _supabase.from('patients').update(record).eq('id', currentEditDBId);
-            else await _supabase.from('patients').insert([record]);
+            let dbError;
+
+            // Capture the error object from Supabase
+            if (currentEditDBId) {
+                const { error } = await _supabase.from('patients').update(record).eq('id', currentEditDBId);
+                dbError = error;
+            } else {
+                const { error } = await _supabase.from('patients').insert([record]);
+                dbError = error;
+            }
 
             document.getElementById('formCard').classList.remove('loading');
             submitBtn.disabled = false;
+
+            // Check if an error occurred during save
+            if (dbError) {
+                console.error("Error saving patient:", dbError);
+                alert(`Failed to save patient: ${dbError.message}`);
+                return; // Stop execution here so the form doesn't reset
+            }
             
+            // If no error, reset form and fetch patients
             currentEditDBId = null;
             submitBtn.textContent = "Save Patient Data";
             form.reset();
@@ -454,7 +482,7 @@
             }
         };
 
-        // Export/Import triggers (same logic as previous step)
+        // Export/Import triggers
         document.getElementById('btnExportPdf').addEventListener('click', () => { /* PDF logic */ alert('Ensure PDF library loaded.'); });
         document.getElementById('btnExportCsv').addEventListener('click', () => { /* CSV logic */ alert('Ensure CSV library loaded.'); });
         document.getElementById('btnImportCsv').addEventListener('click', () => document.getElementById('importFile').click());
