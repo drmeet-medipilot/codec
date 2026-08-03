@@ -92,7 +92,7 @@
         .btn-excel:hover { background: var(--excel-color); color: white; transform: translateY(-2px); }
         .btn-import { background: rgba(59, 130, 246, 0.2); border: 1px solid var(--import-color); color: var(--import-color); }
         .btn-import:hover { background: var(--import-color); color: white; transform: translateY(-2px); }
-        .btn-logout { background: rgba(245, 158, 11, 0.2); border: 1px solid var(--logout-color); color: var(--logout-color); }
+        .btn-logout { background: rgba(245, 158, 11, 0.2); border: 1px solid var(--logout-color); color: var(--logout-color); margin-left: auto; }
         .btn-logout:hover { background: var(--logout-color); color: white; transform: translateY(-2px); }
 
         /* --- Form Grid & Inputs --- */
@@ -141,6 +141,7 @@
 
         /* --- MOBILE --- */
         @media (max-width: 768px) {
+            .btn-logout { margin-left: 0; }
             table, thead, tbody, th, td, tr { display: block; width: 100%; }
             thead tr { display: none; }
             tbody tr { background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 20px; padding: 15px; }
@@ -265,8 +266,8 @@
         // ==========================================
         // 🚨 1. SUPABASE CREDENTIALS
         // ==========================================
-        const SUPABASE_URL = 'https://dsclchkghfzueypbmpuz.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_jdJ1rE_pMiRjfOpjGx808w_Ivl_81ng';
+        const SUPABASE_URL = 'https://YOUR-PROJECT-ID.supabase.co';
+        const SUPABASE_ANON_KEY = 'YOUR_ANON_PUBLIC_KEY';
         
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
