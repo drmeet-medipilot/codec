@@ -3280,7 +3280,15 @@
                     return;
                 }
 
-                sorted.forEach((f, index) => {
+                sorted.forEach((f) => {
+                    // Find the correct index from the original database array
+                    const originalIndex = db.finance.findIndex(item => 
+                        item.ref === f.ref && 
+                        item.amount === f.amount && 
+                        item.category === f.category && 
+                        item.date === f.date
+                    );
+
                     const tr = document.createElement('tr');
                     tr.className = "border-b border-slate-100 hover:bg-slate-50/50 text-slate-600 font-semibold font-mono";
                     tr.innerHTML = `
@@ -3288,7 +3296,7 @@
                         <td class="p-3 font-sans text-slate-700 text-xs font-bold">${f.category}</td>
                         <td class="p-3 text-slate-400 text-[11px]">${f.ref}</td>
                         <td class="p-3 text-right text-xs ${f.type === 'INFLOW' ? 'text-emerald-600 font-bold' : 'text-rose-600 font-bold'}">${f.type === 'INFLOW' ? '+' : '-'}₹${Number(f.amount).toFixed(2)}</td>
-                        <td class="p-3 text-right font-sans"><button onclick="UI.deleteFinanceLine(${index})" class="text-rose-400 hover:text-rose-600 transition-colors cursor-pointer text-xs"><i class="fa-solid fa-trash-can"></i></button></td>
+                        <td class="p-3 text-right font-sans"><button onclick="UI.deleteFinanceLine(${originalIndex})" class="text-rose-400 hover:text-rose-600 transition-colors cursor-pointer text-xs"><i class="fa-solid fa-trash-can"></i></button></td>
                     `;
                     container.appendChild(tr);
                 });
@@ -3297,11 +3305,13 @@
             static deleteFinanceLine(idx) {
                 if(confirm("Confirm reversal: Rollback this operational transaction sequence completely? Balance metrics recalculate immediately.")) {
                     const db = SystemStorage.read();
-                    db.finance.splice(idx, 1);
-                    SystemStorage.write(db);
+                    if (idx !== -1 && db.finance[idx]) {
+                        db.finance.splice(idx, 1);
+                        SystemStorage.write(db);
+                        this.triggerGlobalAuditRefresh(); // Instantly refreshes the interface
+                    }
                 }
             }
-
             static handleExpenseSubmit(e) {
                 e.preventDefault();
                 const db = SystemStorage.read();
