@@ -206,6 +206,17 @@
                             <label for="srNo">Sr. No. (Auto)</label>
                             <input type="text" id="srNo" readonly required>
                         </div>
+                        <!-- Existing Sr. No. Field -->
+<div class="input-group">
+    <label for="srNo">Sr. No. (Auto)</label>
+    <input type="text" id="srNo" readonly required>
+</div>
+
+<!-- NEW: Add this block right after Sr. No. -->
+<div class="input-group">
+    <label for="dateTime">Date & Time (Auto)</label>
+    <input type="text" id="dateTime" readonly required>
+</div>
                         <div class="input-group">
                             <label for="patientName">Patient Name</label>
                             <input type="text" id="patientName" required>
@@ -383,18 +394,21 @@
             setNextSerialNumber();
         }
 
-        function setNextSerialNumber() {
-            if (currentEditDBId) return;
-            const today = new Date();
-            const dateStr = `${today.getFullYear()}${String(today.getMonth()+1).padStart(2,'0')}${String(today.getDate()).padStart(2,'0')}`;
-            const todayPatients = patientsData.filter(p => p.srNo && p.srNo.startsWith(dateStr));
-            let nextSeq = 1;
-            if (todayPatients.length > 0) {
-                const seqs = todayPatients.map(p => parseInt(p.srNo.slice(-2))).filter(n => !isNaN(n));
-                if(seqs.length) nextSeq = Math.max(...seqs) + 1;
-            }
-            srNoInput.value = `${dateStr}${String(nextSeq).padStart(2,'0')}`;
-        }
+       function setNextSerialNumber() {
+    if (currentEditDBId) return;
+    const today = new Date(); // Gets current system date/time
+    const dateStr = `${today.getFullYear()}${String(today.getMonth()+1).padStart(2,'0')}${String(today.getDate()).padStart(2,'0')}`;
+    const todayPatients = patientsData.filter(p => p.srNo && p.srNo.startsWith(dateStr));
+    let nextSeq = 1;
+    if (todayPatients.length > 0) {
+        const seqs = todayPatients.map(p => parseInt(p.srNo.slice(-2))).filter(n => !isNaN(n));
+        if(seqs.length) nextSeq = Math.max(...seqs) + 1;
+    }
+    srNoInput.value = `${dateStr}${String(nextSeq).padStart(2,'0')}`;
+    
+    // NEW: Set the Date & Time input field automatically
+    document.getElementById('dateTime').value = today.toLocaleString('en-IN'); 
+}
 
         function renderTable() {
             tableBody.innerHTML = '';
@@ -424,16 +438,17 @@
             document.getElementById('formCard').classList.add('loading');
             submitBtn.disabled = true;
 
-            const record = {
-                srNo: srNoInput.value, 
-                name: document.getElementById('patientName').value,
-                age: parseInt(document.getElementById('age').value), 
-                sex: document.getElementById('sex').value,
-                address: document.getElementById('address').value, 
-                diagnosis: document.getElementById('diagnosis').value,
-                prescription: document.getElementById('prescription').value, 
-                remark: document.getElementById('remark').value
-            };
+           const record = {
+    srNo: srNoInput.value,
+    dateTime: document.getElementById('dateTime').value, // <-- NEW FIELD ADDED HERE
+    name: document.getElementById('patientName').value,
+    age: parseInt(document.getElementById('age').value), 
+    sex: document.getElementById('sex').value,
+    address: document.getElementById('address').value, 
+    diagnosis: document.getElementById('diagnosis').value,
+    prescription: document.getElementById('prescription').value, 
+    remark: document.getElementById('remark').value
+};
 
             let dbError;
 
@@ -474,6 +489,11 @@
             
             // Populate the form with the patient's data
             srNoInput.value = p.srNo; 
+            // Inside window.editP function...
+srNoInput.value = p.srNo; 
+document.getElementById('dateTime').value = p.dateTime || ''; // <-- NEW FIELD ADDED HERE
+document.getElementById('patientName').value = p.name;
+// ... rest of the existing edit code
             document.getElementById('patientName').value = p.name;
             document.getElementById('age').value = p.age; 
             document.getElementById('sex').value = p.sex;
