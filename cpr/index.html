@@ -500,7 +500,44 @@
 
         // Export/Import triggers
         document.getElementById('btnExportPdf').addEventListener('click', () => { /* PDF logic */ alert('Ensure PDF library loaded.'); });
-        document.getElementById('btnExportCsv').addEventListener('click', () => { /* CSV logic */ alert('Ensure CSV library loaded.'); });
+        document.getElementById('btnExportCsv').addEventListener('click', () => {
+    // 1. Check if there is data to export
+    if (!patientsData || patientsData.length === 0) {
+        alert("No patient data available to export.");
+        return;
+    }
+
+    // 2. Format the data specifically for the CSV file
+    const exportData = patientsData.map(p => ({
+        "Sr. No": p.srNo,
+        "Patient Name": p.name,
+        "Age": p.age,
+        "Sex": p.sex,
+        "Address": p.address,
+        "Diagnosis": p.diagnosis,
+        "Prescription": p.prescription,
+        "Remark": p.remark || "-"
+    }));
+
+    // 3. Convert JSON to CSV string using PapaParse
+    const csv = Papa.unparse(exportData);
+
+    // 4. Create a Blob and trigger the download
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    
+    // Set file name with today's date
+    const today = new Date().toISOString().slice(0, 10);
+    
+    link.setAttribute("href", url);
+    link.setAttribute("download", `Clinic_Patients_${today}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+});
         document.getElementById('btnImportCsv').addEventListener('click', () => document.getElementById('importFile').click());
 
         // Run Initial Session Check
