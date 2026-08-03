@@ -206,7 +206,12 @@
                             <label for="srNo">Sr. No. (Auto)</label>
                             <input type="text" id="srNo" readonly required>
                         </div>
-                        <!-- Existing Sr. No. Field -->
+
+                        <!-- NEW: Add this block right after Sr. No. -->
+                        <div class="input-group">
+                            <label for="dateTime">Date & Time (Auto)</label>
+                            <input type="text" id="dateTime" readonly required>
+                        </div>
 <div class="input-group">
     <label for="srNo">Sr. No. (Auto)</label>
     <input type="text" id="srNo" readonly required>
@@ -479,7 +484,6 @@
         });
 
         window.editP = (id) => {
-            // Convert both to strings so JavaScript matches them flawlessly
             const p = patientsData.find(x => String(x.id) === String(id));
             
             if(!p) {
@@ -489,14 +493,11 @@
             
             // Populate the form with the patient's data
             srNoInput.value = p.srNo; 
-            // Inside window.editP function...
-srNoInput.value = p.srNo; 
-document.getElementById('dateTime').value = p.dateTime || ''; // <-- NEW FIELD ADDED HERE
-document.getElementById('patientName').value = p.name;
-// ... rest of the existing edit code
+            document.getElementById('dateTime').value = p.dateTime || ''; 
             document.getElementById('patientName').value = p.name;
             document.getElementById('age').value = p.age; 
             document.getElementById('sex').value = p.sex;
+            // ... rest of the existing edit code
             document.getElementById('address').value = p.address; 
             document.getElementById('diagnosis').value = p.diagnosis;
             document.getElementById('prescription').value = p.prescription; 
@@ -599,7 +600,7 @@ document.getElementById('patientName').value = p.name;
     document.body.removeChild(link);
 });
         document.getElementById('btnImportCsv').addEventListener('click', () => document.getElementById('importFile').click());
-// Export/Import triggers
+        // Export/Import triggers
         document.getElementById('btnExportPdf').addEventListener('click', () => {
             // ... your PDF export code ...
         });
