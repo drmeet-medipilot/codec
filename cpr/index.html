@@ -50,23 +50,18 @@
 
         /* --- Header --- */
         h1 {
-            text-align: center; font-size: 2.8rem; margin-bottom: 10px;
+            text-align: center; font-size: 2.8rem; margin-bottom: 5px;
             background: linear-gradient(to right, var(--primary), var(--secondary), var(--accent));
             -webkit-background-clip: text; color: transparent;
             letter-spacing: 1px; text-shadow: 0 0 30px rgba(139, 92, 246, 0.3);
         }
 
-        /* --- Added Header Text Option --- */
-        .header-text-option {
-            display: block; margin: 0 auto 30px auto; max-width: 600px;
-            text-align: center; background: rgba(0, 0, 0, 0.2);
-            border: 1px dashed rgba(255, 255, 255, 0.2); color: var(--text-muted);
-            padding: 12px; border-radius: 8px; font-size: 1.1rem; width: 100%;
-            transition: all 0.3s ease; outline: none;
-        }
-        .header-text-option:focus {
-            border-color: var(--primary); background: rgba(0, 0, 0, 0.4);
-            color: var(--text-main); box-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
+        .copyright-text {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 30px;
+            letter-spacing: 0.5px;
         }
 
         /* --- Cards (Glassmorphism) --- */
@@ -170,8 +165,8 @@
     <div class="container">
         <h1>CPR - Clinic Patient Register</h1>
         
-        <!-- NEW TEXT OPTION ADDED HERE -->
-        <input type="text" class="header-text-option" placeholder="Add custom text or clinic details here...">
+        <!-- Added Copyright Line -->
+        <p class="copyright-text">Copyright - 2026 - Dr.Meet P. Patel "All Rights Reserved"</p>
 
         <!-- ===================================== -->
         <!-- 1. LOGIN / AUTHENTICATION UI -->
