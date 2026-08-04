@@ -104,7 +104,7 @@
         input, select, textarea {
             background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.15); color: var(--text-main);
             padding: 14px; border-radius: 10px; font-size: 1rem; transition: all 0.3s ease; outline: none; width: 100%;
-            color-scheme: dark; /* Helps date picker calendar look dark mode */
+            color-scheme: dark;
         }
         textarea { resize: vertical; font-family: inherit; }
         input:focus:not([readonly]), select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 15px rgba(6, 182, 212, 0.3); background: rgba(0, 0, 0, 0.6); }
@@ -193,8 +193,6 @@
                 <button id="btnExportCsv" class="btn-tool btn-excel">📊 Export CSV</button>
                 <button id="btnImportCsv" class="btn-tool btn-import">📥 Import Data</button>
                 <input type="file" id="importFile" accept=".csv" class="hidden">
-                
-                <!-- NEW LOGOUT BUTTON -->
                 <button id="btnLogout" class="btn-tool btn-logout">🚪 Logout</button>
             </div>
 
@@ -207,7 +205,6 @@
                             <label for="srNo">Sr. No. (Auto)</label>
                             <input type="text" id="srNo" readonly required>
                         </div>
-                        <!-- NEW DATE AUTO-SELECT FIELD -->
                         <div class="input-group">
                             <label for="visitDate">Date (Auto)</label>
                             <input type="date" id="visitDate" required>
@@ -256,7 +253,7 @@
                         <thead>
                             <tr>
                                 <th>Sr.No</th>
-                                <th>Date</th> <!-- NEW COLUMN HEADER -->
+                                <th>Date</th> 
                                 <th>Patient Name</th>
                                 <th>Age/Sex</th>
                                 <th>Address</th>
@@ -290,27 +287,37 @@
         const appSection = document.getElementById('appSection');
         const authMessage = document.getElementById('authMessage');
         const authContainer = document.getElementById('authSection');
+        
+        // --- NEW: Keep track of the currently logged-in user ---
+        let currentUser = null;
 
         // Check if user is already logged in on page load
         async function checkSession() {
             const { data: { session } } = await _supabase.auth.getSession();
             if (session) {
+                currentUser = session.user; // Save the user info
                 showApp();
             } else {
+                currentUser = null;
                 showLogin();
             }
         }
 
         // Listen for Login/Logout events automatically
         _supabase.auth.onAuthStateChange((event, session) => {
-            if (session) showApp();
-            else showLogin();
+            if (session) {
+                currentUser = session.user; // Save the user info
+                showApp();
+            } else {
+                currentUser = null;
+                showLogin();
+            }
         });
 
         function showApp() {
             authSection.classList.add('hidden');
             appSection.classList.remove('hidden');
-            fetchPatients(); // Only load data once logged in
+            fetchPatients(); 
         }
 
         function showLogin() {
@@ -365,7 +372,7 @@
 
 
         // ==========================================
-        // 3. CORE APPLICATION LOGIC (UPDATED WITH ERROR HANDLING)
+        // 3. CORE APPLICATION LOGIC
         // ==========================================
         let patientsData = [];
         let currentEditDBId = null; 
@@ -373,20 +380,27 @@
         const form = document.getElementById('patientForm');
         const tableBody = document.getElementById('patientTableBody');
         const srNoInput = document.getElementById('srNo');
-        const visitDateInput = document.getElementById('visitDate'); // New Date Input
+        const visitDateInput = document.getElementById('visitDate'); 
         const submitBtn = document.getElementById('submitBtn');
 
-        // UPDATED: fetchPatients handles Supabase errors gracefully
+        // UPDATED: Now filters data by the logged-in user's ID
         async function fetchPatients() {
+            if (!currentUser) return; // Failsafe
+
             document.getElementById('tableCard').classList.add('loading');
-            const { data, error } = await _supabase.from('patients').select('*').order('created_at', { ascending: false });
+            
+            // --- NEW: Add .eq('user_id', currentUser.id) so you only see YOUR data ---
+            const { data, error } = await _supabase.from('patients')
+                .select('*')
+                .eq('user_id', currentUser.id)
+                .order('created_at', { ascending: false });
+                
             document.getElementById('tableCard').classList.remove('loading');
 
             if (error) {
                 console.error("Fetch error:", error);
                 alert(`Cannot load patients: ${error.message}`);
                 
-                // CRITICAL FIX: Even if there is an error, generate a default serial number
                 patientsData = []; 
                 setNextSerialNumber(); 
                 return; 
@@ -409,7 +423,6 @@
             }
             srNoInput.value = `${dateStr}${String(nextSeq).padStart(2,'0')}`;
             
-            // Auto-select today's date in the new field
             visitDateInput.value = today.toISOString().split('T')[0];
         }
 
@@ -423,7 +436,7 @@
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td data-label="Sr.No" class="td-srno">${p.srNo}</td>
-                    <td data-label="Date">${p.visitDate || '-'}</td> <!-- NEW COLUMN DATA -->
+                    <td data-label="Date">${p.visitDate || '-'}</td> 
                     <td data-label="Name" class="td-name">${p.name}</td>
                     <td data-label="Age/Sex">${p.age} / ${p.sex}</td><td data-label="Address">${p.address}</td>
                     <td data-label="Diagnosis">${p.diagnosis}</td><td data-label="Prescription">${p.prescription}</td>
@@ -437,15 +450,17 @@
             });
         }
 
-        // UPDATED: Submit handler catches errors instead of failing silently
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
+            if (!currentUser) return; // Failsafe
+
             document.getElementById('formCard').classList.add('loading');
             submitBtn.disabled = true;
 
             const record = {
+                user_id: currentUser.id, // --- NEW: Attach the record to the current user ---
                 srNo: srNoInput.value, 
-                visitDate: visitDateInput.value, // Included new date field in the payload
+                visitDate: visitDateInput.value, 
                 name: document.getElementById('patientName').value,
                 age: parseInt(document.getElementById('age').value), 
                 sex: document.getElementById('sex').value,
@@ -457,7 +472,6 @@
 
             let dbError;
 
-            // Capture the error object from Supabase
             if (currentEditDBId) {
                 const { error } = await _supabase.from('patients').update(record).eq('id', currentEditDBId);
                 dbError = error;
@@ -469,14 +483,12 @@
             document.getElementById('formCard').classList.remove('loading');
             submitBtn.disabled = false;
 
-            // Check if an error occurred during save
             if (dbError) {
                 console.error("Error saving patient:", dbError);
                 alert(`Failed to save patient: ${dbError.message}`);
-                return; // Stop execution here so the form doesn't reset
+                return; 
             }
             
-            // If no error, reset form and fetch patients
             currentEditDBId = null;
             submitBtn.textContent = "Save Patient Data";
             form.reset();
@@ -484,7 +496,6 @@
         });
 
         window.editP = (id) => {
-            // Convert both to strings so JavaScript matches them flawlessly
             const p = patientsData.find(x => String(x.id) === String(id));
             
             if(!p) {
@@ -492,22 +503,19 @@
                 return;
             }
             
-            // Populate the form with the patient's data
             srNoInput.value = p.srNo; 
-            visitDateInput.value = p.visitDate || new Date().toISOString().split('T')[0]; // Auto-populates stored date or falls back to today
+            visitDateInput.value = p.visitDate || new Date().toISOString().split('T')[0]; 
             document.getElementById('patientName').value = p.name;
             document.getElementById('age').value = p.age; 
             document.getElementById('sex').value = p.sex;
             document.getElementById('address').value = p.address; 
             document.getElementById('diagnosis').value = p.diagnosis;
             document.getElementById('prescription').value = p.prescription; 
-            document.getElementById('remark').value = p.remark || ''; // Prevents "null" from showing up
+            document.getElementById('remark').value = p.remark || ''; 
             
-            // Tell the form we are updating an existing patient, not making a new one
             currentEditDBId = p.id; 
             submitBtn.textContent = "Update Data"; 
             
-            // Auto-scroll back up to the form
             window.scrollTo({top: 0, behavior: 'smooth'});
         };
         
@@ -522,20 +530,16 @@
 
         // Export/Import triggers
         document.getElementById('btnExportPdf').addEventListener('click', () => {
-            // 1. Check if there is data to export
             if (!patientsData || patientsData.length === 0) {
                 alert("No patient data available to export.");
                 return;
             }
 
-            // 2. Initialize jsPDF (Use landscape mode for tables with many columns)
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('landscape');
 
-            // 3. Add a Title
             doc.text("Clinic Patient Register", 14, 15);
 
-            // 4. Prepare data for AutoTable (Added Date column)
             const tableColumn = ["Sr.No", "Date", "Patient Name", "Age", "Sex", "Address", "Diagnosis", "Prescription", "Remark"];
             const tableRows = patientsData.map(p => [
                 p.srNo, 
@@ -549,29 +553,25 @@
                 p.remark || '-'
             ]);
 
-            // 5. Generate the Table
             doc.autoTable({
                 head: [tableColumn],
                 body: tableRows,
                 startY: 20,
                 theme: 'grid',
                 styles: { fontSize: 9 },
-                headStyles: { fillColor: [6, 182, 212] } // Matches your --primary cyan color
+                headStyles: { fillColor: [6, 182, 212] } 
             });
 
-            // 6. Save the PDF
             const today = new Date().toISOString().slice(0, 10);
             doc.save(`Clinic_Patients_${today}.pdf`);
         });
         
         document.getElementById('btnExportCsv').addEventListener('click', () => {
-            // 1. Check if there is data to export
             if (!patientsData || patientsData.length === 0) {
                 alert("No patient data available to export.");
                 return;
             }
 
-            // 2. Format the data specifically for the CSV file (Added Date)
             const exportData = patientsData.map(p => ({
                 "Sr. No": p.srNo,
                 "Date": p.visitDate || "-",
@@ -584,15 +584,12 @@
                 "Remark": p.remark || "-"
             }));
 
-            // 3. Convert JSON to CSV string using PapaParse
             const csv = Papa.unparse(exportData);
 
-            // 4. Create a Blob and trigger the download
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
             const url = URL.createObjectURL(blob);
             
-            // Set file name with today's date
             const today = new Date().toISOString().slice(0, 10);
             
             link.setAttribute("href", url);
@@ -606,26 +603,22 @@
         
         document.getElementById('btnImportCsv').addEventListener('click', () => document.getElementById('importFile').click());
 
-        // 👇 IMPORT LOGIC 👇
         document.getElementById('importFile').addEventListener('change', function(e) {
             const file = e.target.files[0];
-            if (!file) return;
+            if (!file || !currentUser) return; // Failsafe
 
-            // Show loading overlay
             document.getElementById('tableCard').classList.add('loading');
 
-            // Use PapaParse to read the CSV file
             Papa.parse(file, {
-                header: true, // Reads the first row as column names
+                header: true,
                 skipEmptyLines: true,
                 complete: async function(results) {
                     const data = results.data;
                     let errorCount = 0;
                     
-                    // Loop through parsed CSV rows and insert into Supabase
                     for (const row of data) {
-                        // Ensure these match your exported CSV headers (Added Date matching logic)
                         const record = {
+                            user_id: currentUser.id, // --- NEW: Attach imported records to current user ---
                             srNo: row["Sr. No"] || row["Sr.No"] || row["srNo"],
                             visitDate: row["Date"] || row["visitDate"] || new Date().toISOString().split('T')[0],
                             name: row["Patient Name"] || row["name"],
@@ -653,10 +646,7 @@
                         alert("All patient data imported successfully!");
                     }
                     
-                    // Reset the file input so the same file can be imported again if needed
                     e.target.value = ''; 
-                    
-                    // Refresh the table to show the newly imported data
                     fetchPatients();
                 },
                 error: function(err) {
