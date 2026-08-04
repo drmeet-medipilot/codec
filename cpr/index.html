@@ -288,7 +288,6 @@
         const authMessage = document.getElementById('authMessage');
         const authContainer = document.getElementById('authSection');
         
-        // --- NEW: Keep track of the currently logged-in user ---
         let currentUser = null;
 
         // Check if user is already logged in on page load
@@ -383,17 +382,17 @@
         const visitDateInput = document.getElementById('visitDate'); 
         const submitBtn = document.getElementById('submitBtn');
 
-        // UPDATED: Now filters data by the logged-in user's ID
+        // UPDATED: Now sorts data by 'name' in descending order
         async function fetchPatients() {
             if (!currentUser) return; // Failsafe
 
             document.getElementById('tableCard').classList.add('loading');
             
-            // --- NEW: Add .eq('user_id', currentUser.id) so you only see YOUR data ---
+            // --- NEW: Added .order('name', { ascending: false }) ---
             const { data, error } = await _supabase.from('patients')
                 .select('*')
                 .eq('user_id', currentUser.id)
-                .order('created_at', { ascending: false });
+                .order('name', { ascending: false });
                 
             document.getElementById('tableCard').classList.remove('loading');
 
@@ -458,7 +457,7 @@
             submitBtn.disabled = true;
 
             const record = {
-                user_id: currentUser.id, // --- NEW: Attach the record to the current user ---
+                user_id: currentUser.id, 
                 srNo: srNoInput.value, 
                 visitDate: visitDateInput.value, 
                 name: document.getElementById('patientName').value,
@@ -605,7 +604,7 @@
 
         document.getElementById('importFile').addEventListener('change', function(e) {
             const file = e.target.files[0];
-            if (!file || !currentUser) return; // Failsafe
+            if (!file || !currentUser) return; 
 
             document.getElementById('tableCard').classList.add('loading');
 
@@ -618,7 +617,7 @@
                     
                     for (const row of data) {
                         const record = {
-                            user_id: currentUser.id, // --- NEW: Attach imported records to current user ---
+                            user_id: currentUser.id, 
                             srNo: row["Sr. No"] || row["Sr.No"] || row["srNo"],
                             visitDate: row["Date"] || row["visitDate"] || new Date().toISOString().split('T')[0],
                             name: row["Patient Name"] || row["name"],
