@@ -382,13 +382,12 @@
         const visitDateInput = document.getElementById('visitDate'); 
         const submitBtn = document.getElementById('submitBtn');
 
-        // UPDATED: Now sorts data by 'visitDate' in descending order (newest dates first), and falls back to created_at
+        // Fetch Data logic
         async function fetchPatients() {
             if (!currentUser) return; // Failsafe
 
             document.getElementById('tableCard').classList.add('loading');
             
-            // --- NEW: Added .order('visitDate', { ascending: false }) ---
             const { data, error } = await _supabase.from('patients')
                 .select('*')
                 .eq('user_id', currentUser.id)
@@ -603,6 +602,9 @@
         
         document.getElementById('btnImportCsv').addEventListener('click', () => document.getElementById('importFile').click());
 
+        // ==========================================
+        // FIX: IMPROVED CSV IMPORT LOGIC 
+        // ==========================================
         document.getElementById('importFile').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file || !currentUser) return; 
@@ -611,29 +613,42 @@
 
             Papa.parse(file, {
                 header: true,
-                skipEmptyLines: true,
+                skipEmptyLines: 'greedy', // Better at ignoring empty Excel rows
+                transformHeader: function(header) {
+                    return header.trim(); // Fixes headers with accidental spaces (e.g. "Age ")
+                },
                 complete: async function(results) {
                     const data = results.data;
                     let errorCount = 0;
                     
                     for (const row of data) {
+                        // Skip fully blank rows that somehow passed the parser
+                        if (!row["Patient Name"] && !row["name"] && !row["Sr. No"] && !row["srNo"]) continue;
+
+                        // FIX: Safely parse Age to prevent "NaN" database errors
+                        let parsedAge = parseInt(row["Age"] || row["age"]);
+                        if (isNaN(parsedAge)) {
+                            parsedAge = 0; // Fallback for empty/invalid age
+                        }
+
+                        // FIX: Added fallbacks ("Unknown", "-", "Other") so blank fields don't cause DB errors
                         const record = {
                             user_id: currentUser.id, 
-                            srNo: row["Sr. No"] || row["Sr.No"] || row["srNo"],
+                            srNo: String(row["Sr. No"] || row["Sr.No"] || row["srNo"] || "Auto"),
                             visitDate: row["Date"] || row["visitDate"] || new Date().toISOString().split('T')[0],
-                            name: row["Patient Name"] || row["name"],
-                            age: parseInt(row["Age"] || row["age"]),
-                            sex: row["Sex"] || row["sex"],
-                            address: row["Address"] || row["address"],
-                            diagnosis: row["Diagnosis"] || row["diagnosis"],
-                            prescription: row["Prescription"] || row["prescription"],
+                            name: row["Patient Name"] || row["name"] || "Unknown",
+                            age: parsedAge,
+                            sex: row["Sex"] || row["sex"] || "Other",
+                            address: row["Address"] || row["address"] || "-",
+                            diagnosis: row["Diagnosis"] || row["diagnosis"] || "-",
+                            prescription: row["Prescription"] || row["prescription"] || "-",
                             remark: row["Remark"] || row["remark"] || null
                         };
 
                         const { error } = await _supabase.from('patients').insert([record]);
                         
                         if (error) {
-                            console.error("Failed to import row:", record, error);
+                            console.error("Failed to import row:", record, "DB Error:", error.message);
                             errorCount++;
                         }
                     }
@@ -641,7 +656,7 @@
                     document.getElementById('tableCard').classList.remove('loading');
                     
                     if (errorCount > 0) {
-                        alert(`Import finished, but ${errorCount} records failed. Check browser console for details.`);
+                        alert(`Import finished, but ${errorCount} records failed. (They might still be poorly formatted). Check browser console for exact details.`);
                     } else {
                         alert("All patient data imported successfully!");
                     }
