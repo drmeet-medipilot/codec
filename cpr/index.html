@@ -102,6 +102,8 @@
         .btn-import:hover { background: var(--import-color); color: white; transform: translateY(-2px); }
         .btn-logout { background: rgba(245, 158, 11, 0.2); border: 1px solid var(--logout-color); color: var(--logout-color); }
         .btn-logout:hover { background: var(--logout-color); color: white; transform: translateY(-2px); }
+        .btn-wipe { background: rgba(244, 63, 94, 0.2); border: 1px solid var(--accent); color: var(--accent); }
+        .btn-wipe:hover { background: var(--accent); color: white; transform: translateY(-2px); }
 
         /* --- Form Grid & Inputs --- */
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
@@ -205,6 +207,7 @@
                 <button id="btnImportCsv" class="btn-tool btn-import">📥 Import Data</button>
                 <input type="file" id="importFile" accept=".csv" class="hidden">
                 <button id="btnLogout" class="btn-tool btn-logout">🚪 Logout</button>
+                <button id="btnWipeData" class="btn-tool btn-wipe">🗑️ Wipe Data</button>
             </div>
 
             <div class="card" id="formCard">
@@ -378,6 +381,52 @@
         // Handle Logout
         document.getElementById('btnLogout').addEventListener('click', async () => {
             await _supabase.auth.signOut();
+        });
+
+        // ==========================================
+        // WIPE ALL DATA LOGIC
+        // ==========================================
+        const WIPE_PASSCODE = "123456"; // <-- Change this to your desired passcode
+
+        document.getElementById('btnWipeData').addEventListener('click', async () => {
+            if (!currentUser) return;
+
+            // Prompt user for the passcode
+            const userInput = prompt("⚠️ WARNING: This will permanently delete ALL patient data.\n\nEnter passcode to confirm:");
+            
+            if (userInput === null) return; // User clicked Cancel
+
+            if (userInput === WIPE_PASSCODE) {
+                // Double confirmation just to be safe
+                if(confirm("Passcode accepted. Are you absolutely sure you want to WIPE ALL DATA? This cannot be undone.")) {
+                    
+                    document.getElementById('tableCard').classList.add('loading');
+                    
+                    // Delete all records belonging to the current user
+                    const { error } = await _supabase
+                        .from('patients')
+                        .delete()
+                        .eq('user_id', currentUser.id);
+
+                    document.getElementById('tableCard').classList.remove('loading');
+
+                    if (error) {
+                        console.error("Wipe Error:", error);
+                        alert(`Failed to wipe data: ${error.message}`);
+                    } else {
+                        alert("All patient data has been successfully wiped.");
+                        // Reset forms and variables
+                        if(currentEditDBId) { 
+                            form.reset(); 
+                            currentEditDBId = null; 
+                            submitBtn.textContent = "Save Patient Data"; 
+                        }
+                        fetchPatients(); // Refresh the table UI
+                    }
+                }
+            } else {
+                alert("❌ Incorrect passcode. Data wipe cancelled.");
+            }
         });
 
 
