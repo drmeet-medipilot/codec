@@ -382,17 +382,18 @@
         const visitDateInput = document.getElementById('visitDate'); 
         const submitBtn = document.getElementById('submitBtn');
 
-        // UPDATED: Now sorts data by 'name' in descending order
+        // UPDATED: Now sorts data by 'visitDate' in descending order (newest dates first), and falls back to created_at
         async function fetchPatients() {
             if (!currentUser) return; // Failsafe
 
             document.getElementById('tableCard').classList.add('loading');
             
-            // --- NEW: Added .order('name', { ascending: false }) ---
+            // --- NEW: Added .order('visitDate', { ascending: false }) ---
             const { data, error } = await _supabase.from('patients')
                 .select('*')
                 .eq('user_id', currentUser.id)
-                .order('name', { ascending: false });
+                .order('visitDate', { ascending: false, nullsFirst: false })
+                .order('created_at', { ascending: false });
                 
             document.getElementById('tableCard').classList.remove('loading');
 
