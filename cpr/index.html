@@ -603,7 +603,7 @@
         document.getElementById('btnImportCsv').addEventListener('click', () => document.getElementById('importFile').click());
 
         // ==========================================
-        // FIX: IMPROVED CSV IMPORT LOGIC 
+        // FIX: BATCH IMPORT LOGIC (MUCH FASTER & SAFER)
         // ==========================================
         document.getElementById('importFile').addEventListener('change', function(e) {
             const file = e.target.files[0];
@@ -613,25 +613,21 @@
 
             Papa.parse(file, {
                 header: true,
-                skipEmptyLines: 'greedy', // Better at ignoring empty Excel rows
+                skipEmptyLines: 'greedy', 
                 transformHeader: function(header) {
-                    return header.trim(); // Fixes headers with accidental spaces (e.g. "Age ")
+                    return header.trim(); 
                 },
                 complete: async function(results) {
                     const data = results.data;
-                    let errorCount = 0;
+                    const recordsToInsert = []; // We will gather all records in this array
                     
                     for (const row of data) {
-                        // Skip fully blank rows that somehow passed the parser
+                        // Skip fully blank rows 
                         if (!row["Patient Name"] && !row["name"] && !row["Sr. No"] && !row["srNo"]) continue;
 
-                        // FIX: Safely parse Age to prevent "NaN" database errors
                         let parsedAge = parseInt(row["Age"] || row["age"]);
-                        if (isNaN(parsedAge)) {
-                            parsedAge = 0; // Fallback for empty/invalid age
-                        }
+                        if (isNaN(parsedAge)) parsedAge = 0;
 
-                        // FIX: Added fallbacks ("Unknown", "-", "Other") so blank fields don't cause DB errors
                         const record = {
                             user_id: currentUser.id, 
                             srNo: String(row["Sr. No"] || row["Sr.No"] || row["srNo"] || "Auto"),
@@ -645,24 +641,28 @@
                             remark: row["Remark"] || row["remark"] || null
                         };
 
-                        const { error } = await _supabase.from('patients').insert([record]);
-                        
-                        if (error) {
-                            console.error("Failed to import row:", record, "DB Error:", error.message);
-                            errorCount++;
-                        }
+                        recordsToInsert.push(record); // Add to the batch
                     }
                     
-                    document.getElementById('tableCard').classList.remove('loading');
-                    
-                    if (errorCount > 0) {
-                        alert(`Import finished, but ${errorCount} records failed. (They might still be poorly formatted). Check browser console for exact details.`);
+                    if (recordsToInsert.length > 0) {
+                        // 🔥 THE FIX: Insert ALL records at once in a single database request
+                        const { error } = await _supabase.from('patients').insert(recordsToInsert);
+                        
+                        document.getElementById('tableCard').classList.remove('loading');
+                        
+                        if (error) {
+                            console.error("Batch Insert Error:", error);
+                            alert(`Failed to import data: ${error.message}. Please check your browser's Developer Console for exact details.`);
+                        } else {
+                            alert(`Successfully imported ${recordsToInsert.length} patient records!`);
+                        }
                     } else {
-                        alert("All patient data imported successfully!");
+                        document.getElementById('tableCard').classList.remove('loading');
+                        alert("No valid data found in the CSV file.");
                     }
                     
                     e.target.value = ''; 
-                    fetchPatients();
+                    fetchPatients(); // Reload the table
                 },
                 error: function(err) {
                     document.getElementById('tableCard').classList.remove('loading');
