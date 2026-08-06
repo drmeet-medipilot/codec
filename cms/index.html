@@ -165,37 +165,34 @@
     </nav>
 
     <main class="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-8 w-full">
-
-        <!-- GLOBAL TIMEFRAME HEADER (Applies to all Menus) -->
-        <div class="flex flex-col sm:flex-row items-center justify-between bg-white p-4 rounded-2xl border border-slate-200 shadow-sm mb-6 no-print">
-            <div class="flex items-center text-sm font-black tracking-tight text-slate-700">
-                <i class="fa-solid fa-calendar-day text-blue-600 mr-2 text-lg"></i> Global Operations Filter
-            </div>
-            <div class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto mt-3 sm:mt-0">
-                <select id="dashboard-timeframe" onchange="UI.handleTimeframeChange()" class="w-full sm:w-auto text-xs font-bold bg-slate-50 px-3 py-2.5 border border-slate-200 rounded-xl text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer shadow-inner">
-                    <option value="TODAY" selected>Today</option>
-                    <option value="YESTERDAY">Yesterday</option>
-                    <option value="THIS_WEEK">This Week</option>
-                    <option value="THIS_MONTH">This Month</option>
-                    <option value="THIS_YEAR">This Year</option>
-                    <option value="ALL_TIME">All Time</option>
-                    <option value="CUSTOM">Custom Range</option>
-                </select>
-                <div id="custom-date-range" class="hidden flex items-center gap-2 bg-slate-50 px-3 py-1.5 border border-slate-200 rounded-xl shadow-inner">
-                    <input type="date" id="dash-start-date" onchange="UI.triggerGlobalAuditRefresh()" class="text-xs text-slate-600 bg-transparent focus:outline-none cursor-pointer font-medium">
-                    <span class="text-[10px] font-black text-slate-400">TO</span>
-                    <input type="date" id="dash-end-date" onchange="UI.triggerGlobalAuditRefresh()" class="text-xs text-slate-600 bg-transparent focus:outline-none cursor-pointer font-medium">
-                </div>
-                <div class="text-xs font-bold bg-white px-4 py-2.5 border border-slate-200 rounded-xl text-slate-600 shadow-xs hidden sm:flex items-center">
-                    <i class="fa-regular fa-calendar-days mr-2 text-blue-600"></i><span id="dash-date">--/--/----</span>
-                </div>
-            </div>
-        </div>
         
         <section id="mod-dashboard" class="erp-section space-y-6">
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between border-b border-slate-200 pb-5 gap-4">
                 <div>
                     <h2 id="dashboard-greeting" class="text-3xl font-black tracking-tight animated-heading pb-1">Clinic Management System</h2>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row items-center gap-3 self-start lg:self-end">
+                    <!-- SHARED TIMEFRAME SELECTOR -->
+                    <select onchange="UI.handleTimeframeChange(this.value)" class="timeframe-select text-xs font-bold bg-white px-3 py-2.5 border border-slate-200 rounded-xl text-blue-800 shadow-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition cursor-pointer">
+                        <option value="TODAY" selected>Today</option>
+                        <option value="YESTERDAY">Yesterday</option>
+                        <option value="THIS_WEEK">This Week</option>
+                        <option value="THIS_MONTH">This Month</option>
+                        <option value="THIS_YEAR">This Year</option>
+                        <option value="ALL_TIME">All Time</option>
+                        <option value="CUSTOM">Custom Range</option>
+                    </select>
+                    
+                    <div class="custom-date-range hidden flex items-center gap-2 bg-white px-3 py-1.5 border border-slate-200 rounded-xl shadow-xs">
+                        <input type="date" onchange="UI.syncCustomDatesAndRefresh(this)" class="custom-start-date text-xs text-slate-600 focus:outline-none cursor-pointer font-medium">
+                        <span class="text-[10px] font-black text-slate-400">TO</span>
+                        <input type="date" onchange="UI.syncCustomDatesAndRefresh(this)" class="custom-end-date text-xs text-slate-600 focus:outline-none cursor-pointer font-medium">
+                    </div>
+
+                    <div class="text-xs font-bold bg-white px-4 py-2.5 border border-slate-200 rounded-xl text-slate-600 shadow-xs hidden sm:block">
+                        <i class="fa-regular fa-calendar-days mr-2 text-blue-600"></i><span id="dash-date">--/--/----</span>
+                    </div>
                 </div>
             </div>
 
@@ -268,22 +265,40 @@
                     <h2 class="text-3xl font-black animated-heading pb-1">Patient Registry</h2>
                 </div>
                 
-                <div class="flex gap-2 items-center self-start flex-nowrap w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0 hide-scroll">
-                    <!-- ADDED: Old Patient Re-visit Button -->
-                    <button onclick="UI.openRevisitModal()" class="px-3 sm:px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-indigo-700/20 active:scale-[0.98] cursor-pointer flex items-center shrink-0">
-                        <i class="fa-solid fa-clock-rotate-left sm:mr-2"></i><span class="hidden sm:inline">Old Patient Re-visit</span>
-                    </button>
+                <div class="flex flex-col sm:flex-row gap-3 items-center self-start flex-nowrap w-full sm:w-auto">
+                    <!-- SHARED TIMEFRAME SELECTOR -->
+                    <div class="flex items-center gap-3 w-full sm:w-auto">
+                        <select onchange="UI.handleTimeframeChange(this.value)" class="timeframe-select text-xs font-bold bg-white px-3 py-2.5 border border-slate-200 rounded-xl text-blue-800 shadow-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition cursor-pointer">
+                            <option value="TODAY" selected>Today</option>
+                            <option value="YESTERDAY">Yesterday</option>
+                            <option value="THIS_WEEK">This Week</option>
+                            <option value="THIS_MONTH">This Month</option>
+                            <option value="THIS_YEAR">This Year</option>
+                            <option value="ALL_TIME">All Time</option>
+                            <option value="CUSTOM">Custom Range</option>
+                        </select>
+                        <div class="custom-date-range hidden flex items-center gap-2 bg-white px-3 py-1.5 border border-slate-200 rounded-xl shadow-xs">
+                            <input type="date" onchange="UI.syncCustomDatesAndRefresh(this)" class="custom-start-date text-xs text-slate-600 focus:outline-none cursor-pointer font-medium">
+                            <span class="text-[10px] font-black text-slate-400">TO</span>
+                            <input type="date" onchange="UI.syncCustomDatesAndRefresh(this)" class="custom-end-date text-xs text-slate-600 focus:outline-none cursor-pointer font-medium">
+                        </div>
+                    </div>
 
-                    <label for="import-patient-csv" class="px-3 sm:px-4 py-2.5 bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-teal-700/20 active:scale-[0.98] cursor-pointer flex items-center shrink-0">
-                        <i class="fa-solid fa-file-import sm:mr-2"></i><span class="hidden sm:inline">Import</span>
-                        <input type="file" id="import-patient-csv" accept=".csv" class="hidden" onchange="UI.importPatientsCSV(event)">
-                    </label>
-                    <button onclick="UI.exportPatientsCSV()" class="px-3 sm:px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-emerald-700/20 active:scale-[0.98] cursor-pointer flex items-center shrink-0">
-                        <i class="fa-solid fa-file-csv sm:mr-2"></i><span class="hidden sm:inline">Export</span>
-                    </button>
-                    <button onclick="UI.openPatientModal()" class="px-3 sm:px-4 py-2.5 bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-800 hover:to-blue-900 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-blue-700/20 active:scale-[0.98] self-start cursor-pointer flex items-center shrink-0 whitespace-nowrap">
-                        <i class="fa-solid fa-user-plus sm:mr-2"></i><span class="hidden sm:inline">Register New</span>
-                    </button>
+                    <div class="flex gap-2 items-center overflow-x-auto pb-1 sm:pb-0 hide-scroll w-full sm:w-auto">
+                        <button onclick="UI.openRevisitModal()" class="px-3 sm:px-4 py-2.5 bg-gradient-to-r from-violet-600 to-violet-700 hover:from-violet-700 hover:to-violet-800 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-violet-700/20 active:scale-[0.98] cursor-pointer flex items-center shrink-0">
+                            <i class="fa-solid fa-clock-rotate-left sm:mr-2"></i><span class="hidden sm:inline">Old Patient Re-visit</span>
+                        </button>
+                        <label for="import-patient-csv" class="px-3 sm:px-4 py-2.5 bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-teal-700/20 active:scale-[0.98] cursor-pointer flex items-center shrink-0">
+                            <i class="fa-solid fa-file-import sm:mr-2"></i><span class="hidden sm:inline">Import Patients</span>
+                            <input type="file" id="import-patient-csv" accept=".csv" class="hidden" onchange="UI.importPatientsCSV(event)">
+                        </label>
+                        <button onclick="UI.exportPatientsCSV()" class="px-3 sm:px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-emerald-700/20 active:scale-[0.98] cursor-pointer flex items-center shrink-0">
+                            <i class="fa-solid fa-file-csv sm:mr-2"></i><span class="hidden sm:inline">Export Patients</span>
+                        </button>
+                        <button onclick="UI.openPatientModal()" class="px-3 sm:px-4 py-2.5 bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-800 hover:to-blue-900 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-blue-700/20 active:scale-[0.98] self-start cursor-pointer flex items-center shrink-0 whitespace-nowrap">
+                            <i class="fa-solid fa-user-plus sm:mr-2"></i><span class="hidden sm:inline">Register New Patient</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -315,8 +330,28 @@
         </section>
 
         <section id="mod-billing" class="erp-section hidden space-y-6">
-            <div class="border-b border-slate-200 pb-5">
-                <h2 class="text-3xl font-black animated-heading pb-1">Clinic Billing</h2>
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-5 gap-4">
+                <div>
+                    <h2 class="text-3xl font-black animated-heading pb-1">Clinic Billing</h2>
+                </div>
+                
+                <!-- SHARED TIMEFRAME SELECTOR -->
+                <div class="flex items-center gap-3 self-start sm:self-end">
+                    <select onchange="UI.handleTimeframeChange(this.value)" class="timeframe-select text-xs font-bold bg-white px-3 py-2.5 border border-slate-200 rounded-xl text-blue-800 shadow-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition cursor-pointer">
+                        <option value="TODAY" selected>Today</option>
+                        <option value="YESTERDAY">Yesterday</option>
+                        <option value="THIS_WEEK">This Week</option>
+                        <option value="THIS_MONTH">This Month</option>
+                        <option value="THIS_YEAR">This Year</option>
+                        <option value="ALL_TIME">All Time</option>
+                        <option value="CUSTOM">Custom Range</option>
+                    </select>
+                    <div class="custom-date-range hidden flex items-center gap-2 bg-white px-3 py-1.5 border border-slate-200 rounded-xl shadow-xs">
+                        <input type="date" onchange="UI.syncCustomDatesAndRefresh(this)" class="custom-start-date text-xs text-slate-600 focus:outline-none cursor-pointer font-medium">
+                        <span class="text-[10px] font-black text-slate-400">TO</span>
+                        <input type="date" onchange="UI.syncCustomDatesAndRefresh(this)" class="custom-end-date text-xs text-slate-600 focus:outline-none cursor-pointer font-medium">
+                    </div>
+                </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
@@ -394,11 +429,53 @@
                 </div>
 
             </div>
+
+            <!-- ADDED BILLING SUMMARY SECTION -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm mt-6">
+                <h3 class="font-bold text-base text-slate-800 border-b border-slate-100 pb-2 flex items-center"><i class="fa-solid fa-list text-blue-600 mr-2"></i>Recent Billing Summary</h3>
+                <div class="overflow-x-auto mt-4">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-400 uppercase font-extrabold text-[10px] tracking-wider border-b border-slate-200">
+                                <th class="p-3">Date</th>
+                                <th class="p-3">Invoice / Patient</th>
+                                <th class="p-3">Payment Mode</th>
+                                <th class="p-3 text-right">Amount (₹)</th>
+                                <th class="p-3 text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="billing-summary-body">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         </section>
 
         <section id="mod-otc" class="erp-section hidden space-y-6">
-            <div class="border-b border-slate-200 pb-5">
-                <h2 class="text-3xl font-black animated-heading pb-1">OTC Sale</h2>
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-5 gap-4">
+                <div>
+                    <h2 class="text-3xl font-black animated-heading pb-1">OTC Sale</h2>
+                </div>
+
+                <!-- SHARED TIMEFRAME SELECTOR -->
+                <div class="flex items-center gap-3 self-start sm:self-end">
+                    <select onchange="UI.handleTimeframeChange(this.value)" class="timeframe-select text-xs font-bold bg-white px-3 py-2.5 border border-slate-200 rounded-xl text-blue-800 shadow-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition cursor-pointer">
+                        <option value="TODAY" selected>Today</option>
+                        <option value="YESTERDAY">Yesterday</option>
+                        <option value="THIS_WEEK">This Week</option>
+                        <option value="THIS_MONTH">This Month</option>
+                        <option value="THIS_YEAR">This Year</option>
+                        <option value="ALL_TIME">All Time</option>
+                        <option value="CUSTOM">Custom Range</option>
+                    </select>
+                    <div class="custom-date-range hidden flex items-center gap-2 bg-white px-3 py-1.5 border border-slate-200 rounded-xl shadow-xs">
+                        <input type="date" onchange="UI.syncCustomDatesAndRefresh(this)" class="custom-start-date text-xs text-slate-600 focus:outline-none cursor-pointer font-medium">
+                        <span class="text-[10px] font-black text-slate-400">TO</span>
+                        <input type="date" onchange="UI.syncCustomDatesAndRefresh(this)" class="custom-end-date text-xs text-slate-600 focus:outline-none cursor-pointer font-medium">
+                    </div>
+                </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
@@ -445,7 +522,7 @@
                     </div>
 
                     <div class="w-full space-y-2">
-                        <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Patient Name (Optional, Required for Credit)</label>
+                        <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Patient Name (Optional)</label>
                         <input id="otc-patient-name" list="otc-patient-list" type="text" placeholder="Enter patient name..." class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 font-medium">
                         <datalist id="otc-patient-list"></datalist>
                     </div>
@@ -455,7 +532,7 @@
                         <select id="otc-payment-mode" onchange="UI.renderOTCUPIQR()" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none font-medium">
                             <option value="Cash">Cash</option>
                             <option value="UPI">UPI</option>
-                            <option value="Credit">Credit / Account Receivable</option> <!-- ADDED CREDIT OPTION -->
+                            <option value="Credit">Credit</option>
                         </select>
                     </div>
 
@@ -512,6 +589,8 @@
                 <div>
                     <h2 class="text-3xl font-black animated-heading pb-1">Stock Management</h2>
                 </div>
+                
+                <!-- NOTE: Explicitly REMOVED Timeframe filter from here per request -->
                 
                 <div class="flex gap-2 items-center self-start flex-nowrap w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0 hide-scroll">
                     <button onclick="UI.printInventoryStock()" class="px-3 sm:px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-indigo-700/20 active:scale-[0.98] cursor-pointer flex items-center shrink-0">
@@ -612,13 +691,34 @@
                 <div>
                     <h2 class="text-3xl font-black animated-heading pb-1">Accounts & Ledger</h2>
                 </div>
-                <div class="flex gap-2.5 self-start flex-wrap">
-                    <button onclick="UI.openCreditsModal()" class="px-4 py-2.5 bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-800 hover:to-blue-900 text-white rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer flex items-center active:scale-[0.97]">
-                        <i class="fa-solid fa-hand-holding-dollar mr-2"></i>Credit
-                    </button>
-                    <button onclick="UI.openModal('modal-expense')" class="px-4 py-2.5 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 text-white rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer flex items-center active:scale-[0.97]">
-                        <i class="fa-solid fa-receipt mr-2"></i>Log Overhead Expense
-                    </button>
+                
+                <div class="flex flex-col sm:flex-row gap-3 items-center self-start flex-nowrap w-full sm:w-auto">
+                    <!-- SHARED TIMEFRAME SELECTOR -->
+                    <div class="flex items-center gap-3 w-full sm:w-auto">
+                        <select onchange="UI.handleTimeframeChange(this.value)" class="timeframe-select text-xs font-bold bg-white px-3 py-2.5 border border-slate-200 rounded-xl text-blue-800 shadow-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition cursor-pointer">
+                            <option value="TODAY" selected>Today</option>
+                            <option value="YESTERDAY">Yesterday</option>
+                            <option value="THIS_WEEK">This Week</option>
+                            <option value="THIS_MONTH">This Month</option>
+                            <option value="THIS_YEAR">This Year</option>
+                            <option value="ALL_TIME">All Time</option>
+                            <option value="CUSTOM">Custom Range</option>
+                        </select>
+                        <div class="custom-date-range hidden flex items-center gap-2 bg-white px-3 py-1.5 border border-slate-200 rounded-xl shadow-xs">
+                            <input type="date" onchange="UI.syncCustomDatesAndRefresh(this)" class="custom-start-date text-xs text-slate-600 focus:outline-none cursor-pointer font-medium">
+                            <span class="text-[10px] font-black text-slate-400">TO</span>
+                            <input type="date" onchange="UI.syncCustomDatesAndRefresh(this)" class="custom-end-date text-xs text-slate-600 focus:outline-none cursor-pointer font-medium">
+                        </div>
+                    </div>
+
+                    <div class="flex gap-2.5 self-start flex-wrap">
+                        <button onclick="UI.openCreditsModal()" class="px-4 py-2.5 bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-800 hover:to-blue-900 text-white rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer flex items-center active:scale-[0.97]">
+                            <i class="fa-solid fa-hand-holding-dollar mr-2"></i>Credit
+                        </button>
+                        <button onclick="UI.openModal('modal-expense')" class="px-4 py-2.5 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 text-white rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer flex items-center active:scale-[0.97]">
+                            <i class="fa-solid fa-receipt mr-2"></i>Log Overhead Expense
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -664,6 +764,7 @@
         <section id="mod-settings" class="erp-section hidden space-y-6">
             <div class="border-b border-slate-200 pb-5">
                 <h2 class="text-3xl font-black animated-heading pb-1">Clinic Settings</h2>
+                <!-- NOTE: Explicitly REMOVED Timeframe filter from here per request -->
             </div>
 
             <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm max-w-3xl">
@@ -734,26 +835,6 @@
 
     </main>
 
-    <!-- REVISIT MODAL -->
-    <div id="modal-revisit" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh] animate-zoom-in">
-            <div class="bg-gradient-to-r from-blue-800 to-blue-950 p-4 text-white flex justify-between items-center">
-                <h3 class="font-bold text-sm uppercase tracking-wide"><i class="fa-solid fa-clock-rotate-left mr-2 text-emerald-400"></i>Old Patient Re-visit Search</h3>
-                <button onclick="UI.closeModal('modal-revisit')" class="text-white/80 hover:text-white text-xl cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="p-4 bg-slate-50 border-b border-slate-200 shadow-sm z-10">
-                <div class="relative w-full">
-                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-slate-400 text-sm"></i>
-                    <input type="text" id="revisit-search" oninput="UI.renderRevisitGrid(this.value)" placeholder="Search past records by name, ID, or mobile number..." class="w-full pl-11 p-3 border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 font-medium text-sm text-slate-800">
-                </div>
-            </div>
-            <div class="p-4 flex-1 overflow-y-auto bg-slate-50/50">
-                <div id="revisit-list" class="space-y-3"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- PATIENT REGISTRATION MODAL -->
     <div id="modal-patient" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh] transform transition-all border border-slate-200 animate-zoom-in">
             <div class="bg-gradient-to-r from-blue-800 to-blue-950 p-4 text-white flex justify-between items-center">
@@ -809,7 +890,27 @@
         </div>
     </div>
 
-    <!-- VISIT MODAL -->
+    <!-- NEW MODAL: RE-VISIT PATIENT SELECTION -->
+    <div id="modal-revisit" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print">
+        <div class="w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden animate-zoom-in">
+            <div class="bg-gradient-to-r from-violet-700 to-violet-900 text-white px-5 py-4 flex items-center justify-between">
+                <div>
+                    <h3 class="font-bold text-sm uppercase tracking-wide"><i class="fa-solid fa-clock-rotate-left mr-2 text-violet-200"></i>Select Old Patient for Re-visit</h3>
+                </div>
+                <button onclick="UI.closeModal('modal-revisit')" class="text-white/80 hover:text-white text-xl cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-5">
+                <div class="relative w-full mb-4">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-slate-400 text-sm"></i>
+                    <input id="revisit-search" type="text" oninput="UI.renderRevisitGrid(this.value)" placeholder="Search by name, mobile, or ID to add to today's queue..." class="w-full pl-11 pr-4 py-3 border border-slate-200 rounded-xl text-sm bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all font-medium">
+                </div>
+                <div class="max-h-[50vh] overflow-y-auto bg-slate-50 rounded-xl border border-slate-100 p-2 space-y-2" id="revisit-list">
+                    <!-- Dynamic Revisit List -->
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="modal-visit" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print">
         <div class="w-full max-w-3xl bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border border-slate-200 animate-zoom-in">
             <div class="bg-gradient-to-r from-blue-800 to-blue-950 p-4 text-white flex justify-between items-center">
@@ -1092,7 +1193,6 @@
         </div>
     </div>
 
-    <!-- CONSULTATIONS MODAL -->
     <div id="modal-consultations" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print">
         <div class="w-full max-w-4xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden animate-zoom-in">
             <div class="bg-gradient-to-r from-blue-800 to-blue-950 text-white px-5 py-4 flex items-center justify-between">
@@ -1108,7 +1208,6 @@
         </div>
     </div>
 
-    <!-- OTHER MODALS (Medicine, Vendors, Expense, Credits) -->
     <div id="modal-medicine" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden flex flex-col max-h-[90vh] border border-slate-200 animate-zoom-in">
             <div class="bg-gradient-to-r from-blue-800 to-blue-950 p-4 text-white flex justify-between items-center">
@@ -1312,6 +1411,7 @@
 
     <div id="print-area" class="hidden font-mono text-sm bg-white text-slate-900 w-full max-w-full">
         </div>
+
     <script>
         // =========================================================================
         // 1. SUPABASE CLOUD ENGINE
@@ -1494,8 +1594,7 @@
                 }
             }
         }
-        
-        /**
+/**
          * INTERFACE AND VIEW STATE LOGIC CONTROLLER MATRIX
          */
         class UI {
@@ -1507,6 +1606,11 @@
             static otcCart = []; 
             static editingOTCDate = null;
             static editingOTCRef = null;
+
+            // Global State for Shared Timeframe
+            static currentTimeframe = 'TODAY';
+            static customStart = '';
+            static customEnd = '';
 
             // Utility to automatically compress uploaded images to prevent LocalStorage failures
             static compressImage(file, callback) {
@@ -1618,18 +1722,34 @@
                 }
             }
 
-            static handleTimeframeChange() {
-                const timeframe = document.getElementById('dashboard-timeframe').value;
-                const customDiv = document.getElementById('custom-date-range');
-                if (timeframe === 'CUSTOM') {
-                    customDiv.classList.remove('hidden');
+            // Sync shared timeframe across all sections
+            static handleTimeframeChange(value) {
+                this.currentTimeframe = value;
+                document.querySelectorAll('.timeframe-select').forEach(el => el.value = value);
+                
+                if (value === 'CUSTOM') {
+                    document.querySelectorAll('.custom-date-range').forEach(el => el.classList.remove('hidden'));
                 } else {
-                    customDiv.classList.add('hidden');
+                    document.querySelectorAll('.custom-date-range').forEach(el => el.classList.add('hidden'));
                 }
                 this.triggerGlobalAuditRefresh();
             }
 
-            static isDateInTimeframe(dateStr, timeframe) {
+            // Sync custom dates across all sections
+            static syncCustomDatesAndRefresh(element) {
+                if (element.classList.contains('custom-start-date')) {
+                    this.customStart = element.value;
+                    document.querySelectorAll('.custom-start-date').forEach(el => el.value = this.customStart);
+                } else {
+                    this.customEnd = element.value;
+                    document.querySelectorAll('.custom-end-date').forEach(el => el.value = this.customEnd);
+                }
+                this.triggerGlobalAuditRefresh();
+            }
+
+            // Check if date falls within the GLOBAL shared timeframe
+            static isDateInTimeframe(dateStr) {
+                const timeframe = this.currentTimeframe;
                 if (timeframe === 'ALL_TIME') return true;
                 
                 const targetDate = this.parseIndianDate(dateStr);
@@ -1655,8 +1775,8 @@
                     return targetDate.getFullYear() === today.getFullYear();
                 }
                 if (timeframe === 'CUSTOM') {
-                    const startStr = document.getElementById('dash-start-date').value;
-                    const endStr = document.getElementById('dash-end-date').value;
+                    const startStr = this.customStart;
+                    const endStr = this.customEnd;
                     if(!startStr || !endStr) return true; 
                     
                     const startDt = new Date(startStr);
@@ -1689,7 +1809,7 @@
                 }
                 
                 const optionsHtml = '<option value="" data-type="" data-unitqty="">Select medicine from stock</option>' + 
-                    filtered.map(item => `<option value="${item.name}" data-type="${item.type || ''}" data-unitqty="${item.unitQty || 1}">${item.name}</option>`).join('');
+                    filtered.map(item => `<option value="${item.name}" data-type="${item.type || ''}" data-unitqty="${item.unitQty \vert{}\vert{} 1}">${item.name}</option>`).join('');
                 
                 select.innerHTML = optionsHtml;
                 
@@ -1857,12 +1977,12 @@
                             <div style="padding:18px 22px;border-bottom:3px solid #1d4ed8;text-align:center;background:#eff6ff;">
                                 <div style="font-size:28px;font-weight:800;letter-spacing:.3px;color:#1d4ed8;text-transform:uppercase;">${clinic.name || 'Clinic Name'}</div>
                                 <div style="font-size:13px;color:#334155;margin-top:6px;">${clinic.address || 'Clinic Address'}</div>
-                                <div style="font-size:13px;color:#334155;margin-top:4px;">Consultant: ${docName} | Reg. No.: ${clinic.regno || 'Not set'} | Contact: ${clinic.mobile || 'Not set'}</div>
+                                <div style="font-size:13px;color:#334155;margin-top:4px;">Consultant: ${docName} | Reg. No.: ${clinic.regno \vert{}\vert{} 'Not set'} \vert{} Contact:${clinic.mobile || 'Not set'}</div>
                             </div>
                             <div style="padding:18px 22px 10px;">
                                 <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:10px 18px;font-size:13px;border-bottom:1px solid #cbd5e1;padding-bottom:12px;">
                                     <div><span style="font-weight:700;">Patient Name:</span> ${patient.name || 'Not recorded'}</div>
-                                    <div><span style="font-weight:700;">Age/Sex:</span> ${patient.ageVal || ''} ${patient.ageUnit || ''}</div>
+                                    <div><span style="font-weight:700;">Age/Sex:</span> ${patient.ageVal \vert{}\vert{} ''}${patient.ageUnit || ''}</div>
                                     <div><span style="font-weight:700;">Date:</span> ${visitDate}</div>
                                     <div><span style="font-weight:700;">Address:</span> ${patient.address || 'Not recorded'}</div>
                                     <div><span style="font-weight:700;">Contact:</span> ${patient.mobile || 'Not recorded'}</div>
@@ -1878,8 +1998,7 @@
                                         <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:#1d4ed8;text-transform:uppercase;margin-bottom:5px;">Diagnosis</div>
                                         <div style="min-height:48px;border:1px solid #cbd5e1;border-radius:10px;padding:10px 12px;font-size:14px;line-height:1.6;background:#f8fafc;">${diagnosis}</div>
                                     </div>
-                                    ${invHtml}
-                                    ${treatmentHtml}
+                                    ${invHtml}${treatmentHtml}
                                     <div>
                                         <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:#1d4ed8;text-transform:uppercase;margin-bottom:5px;">Prescription</div>
                                         <div style="min-height:220px;border:1.5px solid #94a3b8;border-radius:10px;padding:14px 14px 16px;font-size:15px;line-height:1.9;white-space:pre-wrap;background:#ffffff;">℞\n${rxText}</div>
@@ -1999,7 +2118,7 @@
                     jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
                 };
 
-                const msgText = `Hello ${patient.name},\nHere is your prescription from ${clinic.name || 'our clinic'}. Please find the attached PDF document.`;
+                const msgText = `Hello ${patient.name},\nHere is your prescription from${clinic.name || 'our clinic'}. Please find the attached PDF document.`;
                 let mobileNum = patient.mobile ? patient.mobile.replace(/\D/g, '') : '';
                 if(mobileNum.length === 10) mobileNum = '91' + mobileNum; 
 
@@ -2124,14 +2243,12 @@
                 
                 this.loadClinicProfile();
                 this.renderGreeting(); 
-
-                const timeframe = document.getElementById('dashboard-timeframe')?.value || 'TODAY';
                 
-                const filteredFinance = db.finance.filter(f => this.isDateInTimeframe(f.date, timeframe));
+                const filteredFinance = db.finance.filter(f => UI.isDateInTimeframe(f.date));
                 let totalRevenue = filteredFinance.filter(f => f.type === "INFLOW").reduce((a,c) => a+c.amount, 0);
                 let totalExpenses = filteredFinance.filter(f => f.type === "OUTFLOW").reduce((a,c) => a+c.amount, 0);
                 
-                const filteredVisits = db.visits.filter(v => this.isDateInTimeframe(v.date, timeframe));
+                const filteredVisits = db.visits.filter(v => UI.isDateInTimeframe(v.date));
                 const totalOPD = filteredVisits.length;
 
                 let stockAssetValue = db.inventory.reduce((a,c) => a + ((c.qty / (c.unitQty || 1)) * c.selling), 0);
@@ -2158,6 +2275,7 @@
                 this.syncBillingDropdowns(db);
                 this.syncOTCDropdowns(db);
                 this.renderOTCSummary();
+                this.renderBillingSummary();
                 this.renderCreditsList();
                 
                 this.renderAnalyticsMatrixCharts(totalRevenue, totalExpenses);
@@ -2168,7 +2286,7 @@
                 const select = document.getElementById('otc-medicine-select');
                 if (select) {
                     select.innerHTML = '<option value="" disabled selected>-- Select Medicine --</option>' + 
-                        db.inventory.filter(i => i.qty > 0).map(i => `<option value="${i.id}">${i.name} (Stock: ${parseFloat(Number(i.qty).toFixed(2))})</option>`).join('');
+                        db.inventory.filter(i => i.qty > 0).map(i => `<option value="${i.id}">${i.name} (Stock:${parseFloat(Number(i.qty).toFixed(2))})</option>`).join('');
                 }
                 const patientDatalist = document.getElementById('otc-patient-list');
                 if (patientDatalist) {
@@ -2179,13 +2297,12 @@
             static renderOTCSummary() {
                 const db = SystemStorage.read();
                 const tbody = document.getElementById('otc-summary-body');
-                const timeframe = document.getElementById('dashboard-timeframe')?.value || 'TODAY';
                 if(!tbody) return;
 
-                // Pull from finance and credits based on timeframe
-                const otcFinance = (db.finance || []).filter(f => f.category && f.category.includes("OTC Pharmacy") && this.isDateInTimeframe(f.date, timeframe));
+                // Pull from finance and credits based on global timeframe
+                const otcFinance = (db.finance || []).filter(f => f.category && f.category.includes("OTC Pharmacy") && UI.isDateInTimeframe(f.date));
                 
-                const otcCredits = (db.credits || []).filter(c => c.ref && c.ref.startsWith("OTC-") && this.isDateInTimeframe(c.date, timeframe)).map(c => ({
+                const otcCredits = (db.credits || []).filter(c => c.ref && c.ref.startsWith("OTC-") && UI.isDateInTimeframe(c.date)).map(c => ({
                     date: c.date,
                     ref: c.ref,
                     category: `OTC Pharmacy [Credit] - ${c.patientName}`,
@@ -2223,7 +2340,7 @@
                 }).join('');
             }
 
-            // ADDED: Function to edit OTC Sale and restock items (Preserves original date)
+            // Function to edit OTC Sale and restock items (Preserves original date)
             static editOTCSale(refCode) {
                 const db = SystemStorage.read();
                 let sale = null;
@@ -2293,7 +2410,7 @@
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
 
-            // ADDED: Function to delete OTC Sale and restock items
+            // Function to delete OTC Sale and restock items
             static deleteOTCSale(refCode) {
                 if (!confirm("Are you sure you want to delete this OTC Sale? Associated medicines will be restocked into inventory.")) return;
 
@@ -2338,12 +2455,82 @@
                 alert(`OTC Sale (${refCode}) has been deleted and the ledger updated.`);
             }
 
+            // ADDED: Billing Summary Rendering
+            static renderBillingSummary() {
+                const db = SystemStorage.read();
+                const tbody = document.getElementById('billing-summary-body');
+                if(!tbody) return;
+
+                // Pull from finance and credits based on timeframe and "Billing" category
+                const billFinance = (db.finance || []).filter(f => f.category && f.category.startsWith("Billing") && UI.isDateInTimeframe(f.date));
+                
+                const billCredits = (db.credits || []).filter(c => c.ref && c.ref.startsWith("INV-") && UI.isDateInTimeframe(c.date)).map(c => ({
+                    date: c.date,
+                    ref: c.ref,
+                    category: `Billing [Credit] - ${c.patientName}`,
+                    amount: c.totalAmount,
+                    isCredit: true
+                }));
+
+                const sortedBills = [...billFinance, ...billCredits].sort((a,b) => UI.parseIndianDate(a.date) - UI.parseIndianDate(b.date)).reverse();
+
+                if (sortedBills.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400 text-xs italic font-medium">No billing records found in this timeframe.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = sortedBills.map(bill => {
+                    const match = bill.category.match(/\[(.*?)\]/);
+                    const mode = match ? match[1] : 'Unknown';
+                    
+                    const patParts = bill.category.split('] - ');
+                    const patient = patParts.length > 1 ? patParts[1] : 'Unknown';
+
+                    return `
+                    <tr class="border-b border-slate-100 hover:bg-slate-50 font-medium text-xs">
+                        <td class="p-3 text-slate-500">${bill.date}</td>
+                        <td class="p-3 font-bold text-slate-700">${bill.ref} <span class="text-[10px] font-normal text-slate-400 ml-1">(${patient})</span></td>
+                        <td class="p-3 text-slate-600 font-bold">${mode}</td>
+                        <td class="p-3 text-right font-black text-emerald-600">₹${Number(bill.amount).toFixed(2)}</td>
+                        <td class="p-3 text-center space-x-1 whitespace-nowrap">
+                            <button onclick="UI.deleteBillingRecord('${bill.ref}')" title="Delete Bill" class="px-2 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-xs rounded transition-all cursor-pointer"><i class="fa-solid fa-trash-can"></i></button>
+                        </td>
+                    </tr>
+                    `;
+                }).join('');
+            }
+
+            static deleteBillingRecord(refCode) {
+                if (!confirm("Are you sure you want to delete this Billing Record? This will be permanently removed from the ledger.")) return;
+
+                const db = SystemStorage.read();
+                let isDeleted = false;
+
+                let index = db.finance.findIndex(f => f.ref === refCode && f.category.startsWith("Billing"));
+                if (index !== -1) {
+                    db.finance.splice(index, 1);
+                    isDeleted = true;
+                } else {
+                    index = db.credits.findIndex(c => c.ref === refCode && c.ref.startsWith("INV-"));
+                    if (index !== -1) {
+                        db.credits.splice(index, 1);
+                        isDeleted = true;
+                    }
+                }
+                
+                if (isDeleted) {
+                    SystemStorage.write(db);
+                    UI.renderBillingSummary();
+                    UI.triggerGlobalAuditRefresh();
+                    alert(`Billing Record (${refCode}) has been deleted.`);
+                }
+            }
+
             static renderCreditsList() {
                 const db = SystemStorage.read();
                 const container = document.getElementById('credits-list');
-                const timeframe = document.getElementById('dashboard-timeframe')?.value || 'TODAY';
                 
-                const activeCredits = (db.credits || []).filter(c => c.paidAmount < c.totalAmount && this.isDateInTimeframe(c.date, timeframe));
+                const activeCredits = (db.credits || []).filter(c => c.paidAmount < c.totalAmount && UI.isDateInTimeframe(c.date));
                 
                 if (activeCredits.length === 0) {
                     container.innerHTML = `<div class="bg-white border border-slate-200 rounded-xl p-5 text-sm text-slate-500 text-center font-medium">No active credit accounts found in this timeframe.</div>`;
@@ -2578,7 +2765,7 @@
                 this.routeToTab('dashboard');
             }
 
-            // ADDED: Revisit Modal Logic
+            // Revisit Modal Logic
             static openRevisitModal() {
                 document.getElementById('revisit-search').value = "";
                 this.renderRevisitGrid("");
@@ -2646,14 +2833,13 @@
                 alert(`${patient.name} has been added to Today's Registry Queue.`);
                 
                 // Force dashboard-timeframe to Today to see the added patient
-                document.getElementById('dashboard-timeframe').value = 'TODAY';
-                this.handleTimeframeChange();
+                UI.handleTimeframeChange('TODAY');
             }
 
             static renderPatientsGrid(filterTerm = "") {
                 const db = SystemStorage.read();
                 const container = document.getElementById('patients-table-body');
-                const timeframe = document.getElementById('dashboard-timeframe')?.value || 'TODAY';
+                const timeframe = UI.currentTimeframe;
                 
                 if(!container) return;
                 container.innerHTML = "";
@@ -2668,14 +2854,14 @@
                     // Filter patients based on timeframe (Visits or Creation date)
                     if (timeframe === 'ALL_TIME') return true;
                     
-                    const hasVisitInTimeframe = db.visits.some(v => v.patientId === p.id && this.isDateInTimeframe(v.date, timeframe));
-                    const createdInTimeframe = p.createdAt ? this.isDateInTimeframe(p.createdAt, timeframe) : false;
+                    const hasVisitInTimeframe = db.visits.some(v => v.patientId === p.id && UI.isDateInTimeframe(v.date));
+                    const createdInTimeframe = p.createdAt ? UI.isDateInTimeframe(p.createdAt) : false;
                     
                     return hasVisitInTimeframe || createdInTimeframe;
                 });
 
                 if(filtered.length === 0) {
-                    container.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400 italic font-medium">No patients found for the selected timeframe (${timeframe}). Try the 'Old Patient Re-visit' option.</td></tr>`;
+                    container.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400 italic font-medium">No patients found for the selected timeframe. Try the 'Old Patient Re-visit' option.</td></tr>`;
                     return;
                 }
 
@@ -2838,7 +3024,7 @@
                         </div>
                         <div class="flex justify-end gap-2 mt-4 pt-3 border-t border-slate-100">
                             <button onclick="UI.editSpecificPrescription('${visit.patientId}', '${visit.id}')" class="px-3 py-1.5 bg-amber-50 text-amber-700 hover:bg-amber-100 font-bold text-[10px] rounded-lg transition-all cursor-pointer"><i class="fa-solid fa-pen-to-square mr-1"></i> Edit</button>
-                            <button onclick="UI.printSpecificPrescription('${visit.patientId}', '${visit.id}')" class="px-3 py-1.5 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 font-bold text-[10px] rounded-lg transition-all cursor-pointer"><i class="fa-solid fa-print mr-1"></i> Print</button>
+                            <button onclick="UI.printSpecificPrescription('${visit.patientId}', '${visit.id}')" class="px-3 py-1.5 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 font-bold text-[10px] rounded-lg transition-all cursor-pointer"><="fa-solid fa-print mr-1"></i> Print</button>
                             <button onclick="UI.deleteSpecificPrescription('${visit.patientId}', '${visit.id}')" class="px-3 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 font-bold text-[10px] rounded-lg transition-all cursor-pointer"><i class="fa-solid fa-trash-can mr-1"></i> Delete</button>
                         </div>
                     </div>`
@@ -3464,8 +3650,7 @@
                 if(!container) return;
                 container.innerHTML = "";
 
-                const timeframe = document.getElementById('dashboard-timeframe')?.value || 'TODAY';
-                const filtered = db.finance.filter(f => this.isDateInTimeframe(f.date, timeframe));
+                const filtered = db.finance.filter(f => UI.isDateInTimeframe(f.date));
                 
                 let grossIn = filtered.filter(f => f.type === "INFLOW").reduce((a,c) => a+c.amount, 0);
                 let grossOut = filtered.filter(f => f.type === "OUTFLOW").reduce((a,c) => a+c.amount, 0);
