@@ -165,34 +165,35 @@
     </nav>
 
     <main class="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-8 w-full">
-
-        <!-- GLOBAL TIMEFRAME HEADER (Applies to all Menus) -->
-        <div class="flex flex-col sm:flex-row items-center justify-between bg-white p-4 rounded-2xl border border-slate-200 shadow-sm mb-6 no-print">
-            <div class="flex items-center text-sm font-black tracking-tight text-slate-700">
-                <i class="fa-solid fa-calendar-day text-blue-600 mr-2 text-lg"></i> Global Operations Filter
-            </div>
-            <div class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto mt-3 sm:mt-0">
-                <select id="dashboard-timeframe" onchange="UI.handleTimeframeChange()" class="w-full sm:w-auto text-xs font-bold bg-slate-50 px-3 py-2.5 border border-slate-200 rounded-xl text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer shadow-inner">
-                    <option value="TODAY" selected>Today</option>
-                    <option value="YESTERDAY">Yesterday</option>
-                    <option value="THIS_WEEK">This Week</option>
-                    <option value="THIS_MONTH">This Month</option>
-                    <option value="THIS_YEAR">This Year</option>
-                    <option value="ALL_TIME">All Time</option>
-                    <option value="CUSTOM">Custom Range</option>
-                </select>
-                <div id="custom-date-range" class="hidden flex items-center gap-2 bg-slate-50 px-3 py-1.5 border border-slate-200 rounded-xl shadow-inner">
-                    <input type="date" id="dash-start-date" onchange="UI.triggerGlobalAuditRefresh()" class="text-xs text-slate-600 bg-transparent focus:outline-none cursor-pointer font-medium">
-                    <span class="text-[10px] font-black text-slate-400">TO</span>
-                    <input type="date" id="dash-end-date" onchange="UI.triggerGlobalAuditRefresh()" class="text-xs text-slate-600 bg-transparent focus:outline-none cursor-pointer font-medium">
-                </div>
-                <div class="text-xs font-bold bg-white px-4 py-2.5 border border-slate-200 rounded-xl text-slate-600 shadow-xs hidden sm:flex items-center">
-                    <i class="fa-regular fa-calendar-days mr-2 text-blue-600"></i><span id="dash-date">--/--/----</span>
-                </div>
-            </div>
-        </div>
         
         <section id="mod-dashboard" class="erp-section space-y-6">
+
+            <!-- GLOBAL TIMEFRAME HEADER (Moved specifically to Dashboard) -->
+            <div class="flex flex-col sm:flex-row items-center justify-between bg-white p-4 rounded-2xl border border-slate-200 shadow-sm no-print">
+                <div class="flex items-center text-sm font-black tracking-tight text-slate-700">
+                    <i class="fa-solid fa-calendar-day text-blue-600 mr-2 text-lg"></i> Global Operations Filter
+                </div>
+                <div class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto mt-3 sm:mt-0">
+                    <select id="dashboard-timeframe" onchange="UI.handleTimeframeChange()" class="w-full sm:w-auto text-xs font-bold bg-slate-50 px-3 py-2.5 border border-slate-200 rounded-xl text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer shadow-inner">
+                        <option value="TODAY" selected>Today</option>
+                        <option value="YESTERDAY">Yesterday</option>
+                        <option value="THIS_WEEK">This Week</option>
+                        <option value="THIS_MONTH">This Month</option>
+                        <option value="THIS_YEAR">This Year</option>
+                        <option value="ALL_TIME">All Time</option>
+                        <option value="CUSTOM">Custom Range</option>
+                    </select>
+                    <div id="custom-date-range" class="hidden flex items-center gap-2 bg-slate-50 px-3 py-1.5 border border-slate-200 rounded-xl shadow-inner">
+                        <input type="date" id="dash-start-date" onchange="UI.triggerGlobalAuditRefresh()" class="text-xs text-slate-600 bg-transparent focus:outline-none cursor-pointer font-medium">
+                        <span class="text-[10px] font-black text-slate-400">TO</span>
+                        <input type="date" id="dash-end-date" onchange="UI.triggerGlobalAuditRefresh()" class="text-xs text-slate-600 bg-transparent focus:outline-none cursor-pointer font-medium">
+                    </div>
+                    <div class="text-xs font-bold bg-white px-4 py-2.5 border border-slate-200 rounded-xl text-slate-600 shadow-xs hidden sm:flex items-center">
+                        <i class="fa-regular fa-calendar-days mr-2 text-blue-600"></i><span id="dash-date">--/--/----</span>
+                    </div>
+                </div>
+            </div>
+
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between border-b border-slate-200 pb-5 gap-4">
                 <div>
                     <h2 id="dashboard-greeting" class="text-3xl font-black tracking-tight animated-heading pb-1">Clinic Management System</h2>
@@ -394,8 +395,31 @@
                 </div>
 
             </div>
-        </section>
 
+            <!-- NEW: BILLING SUMMARY TABLE AT THE BOTTOM -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm mt-6">
+                <h3 class="font-bold text-base text-slate-800 border-b border-slate-100 pb-2 flex items-center"><i class="fa-solid fa-list text-blue-600 mr-2"></i>Recent Generated Bills Summary</h3>
+                <div class="overflow-x-auto mt-4">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-400 uppercase font-extrabold text-[10px] tracking-wider border-b border-slate-200">
+                                <th class="p-3">Date</th>
+                                <th class="p-3">Invoice Ref</th>
+                                <th class="p-3">Patient Name</th>
+                                <th class="p-3">Mode</th>
+                                <th class="p-3 text-right">Amount (₹)</th>
+                                <th class="p-3 text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="billing-summary-body">
+                            <!-- Populated dynamically based on Global Timeframe Filter -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </section>
+        
         <section id="mod-otc" class="erp-section hidden space-y-6">
             <div class="border-b border-slate-200 pb-5">
                 <h2 class="text-3xl font-black animated-heading pb-1">OTC Sale</h2>
@@ -733,7 +757,6 @@
         </section>
 
     </main>
-
     <!-- REVISIT MODAL -->
     <div id="modal-revisit" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh] animate-zoom-in">
@@ -2158,10 +2181,77 @@
                 this.syncBillingDropdowns(db);
                 this.syncOTCDropdowns(db);
                 this.renderOTCSummary();
+                this.renderBillingSummary();
                 this.renderCreditsList();
                 
                 this.renderAnalyticsMatrixCharts(totalRevenue, totalExpenses);
                 this.renderDashboardRecentPatients(db, filteredVisits);
+            }
+
+            static renderBillingSummary() {
+                const db = SystemStorage.read();
+                const tbody = document.getElementById('billing-summary-body');
+                const timeframe = document.getElementById('dashboard-timeframe')?.value || 'TODAY';
+                if(!tbody) return;
+
+                const billingFinance = (db.finance || []).filter(f => f.category && f.category.startsWith("Billing [") && this.isDateInTimeframe(f.date, timeframe));
+                
+                const billingCredits = (db.credits || []).filter(c => c.ref && c.ref.startsWith("INV-") && this.isDateInTimeframe(c.date, timeframe)).map(c => ({
+                    date: c.date,
+                    ref: c.ref,
+                    category: `Billing [Credit] - ${c.patientName}`,
+                    amount: c.totalAmount,
+                    isCredit: true
+                }));
+
+                const sortedBills = [...billingFinance, ...billingCredits].sort((a,b) => UI.parseIndianDate(b.date) - UI.parseIndianDate(a.date));
+
+                if (sortedBills.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400 text-xs italic font-medium">No bills generated in this timeframe.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = sortedBills.map((bill, index) => {
+                    const match = bill.category.match(/\[(.*?)\]/);
+                    const mode = match ? match[1] : 'Unknown';
+                    
+                    const patParts = bill.category.split('] - ');
+                    const patientWithVisit = patParts.length > 1 ? patParts[1] : 'Unknown';
+                    const patientName = patientWithVisit.split(' [Visit:')[0]; 
+
+                    return `
+                    <tr class="border-b border-slate-100 hover:bg-slate-50 font-medium text-xs">
+                        <td class="p-3 text-slate-500">${bill.date}</td>
+                        <td class="p-3 font-bold text-slate-700">${bill.ref}</td>
+                        <td class="p-3 font-bold text-blue-600">${patientName}</td>
+                        <td class="p-3 text-slate-600 font-bold">${mode}</td>
+                        <td class="p-3 text-right font-black text-emerald-600">₹${Number(bill.amount).toFixed(2)}</td>
+                        <td class="p-3 text-center space-x-1 whitespace-nowrap">
+                            <button onclick="UI.deleteBill('${bill.ref}')" title="Delete Bill" class="px-2 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-xs rounded transition-all cursor-pointer"><i class="fa-solid fa-trash-can"></i></button>
+                        </td>
+                    </tr>
+                    `;
+                }).join('');
+            }
+            
+            static deleteBill(refCode) {
+                if(!confirm("Are you sure you want to delete this bill? It will be removed from your finance ledger.")) return;
+                const db = SystemStorage.read();
+                
+                const finIdx = db.finance.findIndex(f => f.ref === refCode);
+                if(finIdx !== -1) {
+                    db.finance.splice(finIdx, 1);
+                }
+                
+                const credIdx = db.credits.findIndex(c => c.ref === refCode);
+                if(credIdx !== -1) {
+                    db.credits.splice(credIdx, 1);
+                }
+                
+                SystemStorage.write(db);
+                this.renderBillingSummary();
+                this.triggerGlobalAuditRefresh();
+                alert("Bill deleted successfully.");
             }
 
             static syncOTCDropdowns(db) {
@@ -3523,8 +3613,20 @@
 
             static syncBillingDropdowns(db) {
                 const select = document.getElementById('bill-patient-id');
+                const timeframe = document.getElementById('dashboard-timeframe')?.value || 'TODAY';
+                
                 if (select) {
-                    select.innerHTML = '<option value="" disabled selected>-- Select a Patient --</option>' + db.patients.map(p => `<option value="${p.id}">${p.name} (${p.id})</option>`).join('');
+                    let patientsToShow = [];
+                    if (timeframe === 'ALL_TIME') {
+                        patientsToShow = db.patients;
+                    } else {
+                        const filteredVisits = db.visits.filter(v => this.isDateInTimeframe(v.date, timeframe));
+                        const activePatientIds = new Set(filteredVisits.map(v => v.patientId));
+                        patientsToShow = db.patients.filter(p => activePatientIds.has(p.id) || this.isDateInTimeframe(p.createdAt, timeframe));
+                    }
+
+                    select.innerHTML = '<option value="" disabled selected>-- Select a Patient --</option>' + 
+                        patientsToShow.map(p => `<option value="${p.id}">${p.name} (${p.id})</option>`).join('');
                 }
                 
                 const codeInput = document.getElementById('bill-invoice-num');
