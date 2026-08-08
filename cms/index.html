@@ -404,6 +404,7 @@
                         <thead>
                             <tr class="bg-slate-50 text-slate-400 uppercase font-extrabold text-[10px] tracking-wider border-b border-slate-200">
                                 <th class="p-3">Date</th>
+                                <th class="p-3">Time</th>
                                 <th class="p-3">Invoice Ref</th>
                                 <th class="p-3">Patient Name</th>
                                 <th class="p-3">Mode</th>
@@ -1114,7 +1115,6 @@
             </div>
         </div>
     </div>
-
     <!-- CONSULTATIONS MODAL -->
     <div id="modal-consultations" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print">
         <div class="w-full max-w-4xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden animate-zoom-in">
@@ -2198,16 +2198,23 @@
                 
                 const billingCredits = (db.credits || []).filter(c => c.ref && c.ref.startsWith("INV-") && this.isDateInTimeframe(c.date, timeframe)).map(c => ({
                     date: c.date,
+                    time: c.time,
+                    timestamp: c.timestamp,
                     ref: c.ref,
                     category: `Billing [Credit] - ${c.patientName}`,
                     amount: c.totalAmount,
                     isCredit: true
                 }));
 
-                const sortedBills = [...billingFinance, ...billingCredits].sort((a,b) => UI.parseIndianDate(b.date) - UI.parseIndianDate(a.date));
+                const sortedBills = [...billingFinance, ...billingCredits].sort((a,b) => {
+                    if (a.timestamp && b.timestamp) {
+                        return b.timestamp - a.timestamp;
+                    }
+                    return UI.parseIndianDate(b.date) - UI.parseIndianDate(a.date);
+                });
 
                 if (sortedBills.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400 text-xs italic font-medium">No bills generated in this timeframe.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400 text-xs italic font-medium">No bills generated in this timeframe.</td></tr>`;
                     return;
                 }
 
@@ -2222,6 +2229,7 @@
                     return `
                     <tr class="border-b border-slate-100 hover:bg-slate-50 font-medium text-xs">
                         <td class="p-3 text-slate-500">${bill.date}</td>
+                        <td class="p-3 text-slate-500 font-mono text-[11px]">${bill.time || '--:--'}</td>
                         <td class="p-3 font-bold text-slate-700">${bill.ref}</td>
                         <td class="p-3 font-bold text-blue-600">${patientName}</td>
                         <td class="p-3 text-slate-600 font-bold">${mode}</td>
@@ -2431,12 +2439,12 @@
             static renderCreditsList() {
                 const db = SystemStorage.read();
                 const container = document.getElementById('credits-list');
-                const timeframe = document.getElementById('dashboard-timeframe')?.value || 'TODAY';
                 
-                const activeCredits = (db.credits || []).filter(c => c.paidAmount < c.totalAmount && this.isDateInTimeframe(c.date, timeframe));
+                // REVISED: Bypassing timeframe filter to show ALL active credits
+                const activeCredits = (db.credits || []).filter(c => c.paidAmount < c.totalAmount);
                 
                 if (activeCredits.length === 0) {
-                    container.innerHTML = `<div class="bg-white border border-slate-200 rounded-xl p-5 text-sm text-slate-500 text-center font-medium">No active credit accounts found in this timeframe.</div>`;
+                    container.innerHTML = `<div class="bg-white border border-slate-200 rounded-xl p-5 text-sm text-slate-500 text-center font-medium">No active credit accounts found.</div>`;
                     return;
                 }
 
@@ -3710,6 +3718,12 @@
                 const visitTag = visitId ? ` [Visit: ${visitId}]` : '';
                 const catStr = `Billing [${modeSelect.value}] - ${targetPatient.name}${visitTag}`;
 
+                // ADDED: Capture accurate Time and Timestamp so the generated bills summary can sort descending
+                const now = new Date();
+                const currentDate = now.toLocaleDateString('en-IN');
+                const currentTime = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+                const currentTimestamp = now.getTime();
+
                 if(modeSelect.value === 'Credit') {
                     if(!db.credits) db.credits = [];
                     db.credits.push({
@@ -3719,7 +3733,9 @@
                         ref: invCode,
                         totalAmount: amt,
                         paidAmount: 0,
-                        date: new Date().toLocaleDateString('en-IN')
+                        date: currentDate,
+                        time: currentTime,
+                        timestamp: currentTimestamp
                     });
                 } else {
                     db.finance.push({
@@ -3727,7 +3743,9 @@
                         category: catStr,
                         ref: invCode,
                         amount: amt,
-                        date: new Date().toLocaleDateString('en-IN')
+                        date: currentDate,
+                        time: currentTime,
+                        timestamp: currentTimestamp
                     });
                 }
 
