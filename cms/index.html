@@ -17,7 +17,7 @@
             scroll-behavior: smooth;
         }
 
-        /* Print layout adjustments for perfect A4 Prescriptions (Fixed Pagination Truncation) */
+        /* Print layout adjustments for perfect A4 Prescriptions */
         @media print {
             @page { 
                 size: A4 portrait; 
@@ -32,7 +32,6 @@
                 display: block !important;
                 overflow: visible !important;
             }
-            /* Hide all main UI elements completely from the document flow */
             body > *:not(#print-area):not(script) {
                 display: none !important;
             }
@@ -60,7 +59,6 @@
             font-weight: 700;
         }
         
-        /* Hide scrollbar for button row on mobile */
         .hide-scroll::-webkit-scrollbar {
             display: none;
         }
@@ -69,7 +67,6 @@
             scrollbar-width: none;
         }
 
-        /* Professional Animated Heading */
         @keyframes subtleZoom {
             0% { opacity: 0; transform: scale(0.96) translateY(5px); }
             100% { opacity: 1; transform: scale(1) translateY(0); }
@@ -149,6 +146,10 @@
             <button data-target="finance" class="nav-link w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-600 rounded-xl hover:bg-slate-50 transition-all cursor-pointer">
                 <i class="fa-solid fa-wallet w-5 text-center text-base"></i> <span>Accounts & Ledger</span>
             </button>
+            <!-- NEW PROFIT MARGIN MENU -->
+            <button data-target="profit" class="nav-link w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-600 rounded-xl hover:bg-slate-50 transition-all cursor-pointer">
+                <i class="fa-solid fa-chart-line w-5 text-center text-base"></i> <span>Profit Margin</span>
+            </button>
             <button data-target="settings" class="nav-link w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-600 rounded-xl hover:bg-slate-50 transition-all cursor-pointer">
                 <i class="fa-solid fa-gear w-5 text-center text-base"></i> <span>Clinic Settings</span>
             </button>
@@ -168,7 +169,6 @@
         
         <section id="mod-dashboard" class="erp-section space-y-6">
 
-            <!-- GLOBAL TIMEFRAME HEADER -->
             <div class="flex flex-col sm:flex-row items-center justify-between bg-white p-4 rounded-2xl border border-slate-200 shadow-sm no-print">
                 <div class="flex items-center text-sm font-black tracking-tight text-slate-700">
                     <i class="fa-solid fa-calendar-day text-blue-600 mr-2 text-lg"></i> Global Operations Filter
@@ -188,7 +188,6 @@
                         <span class="text-[10px] font-black text-slate-400">TO</span>
                         <input type="date" id="dash-end-date" onchange="UI.triggerGlobalAuditRefresh()" class="text-xs text-slate-600 bg-transparent focus:outline-none cursor-pointer font-medium">
                     </div>
-                    <!-- CLOCK & DATE UI ADDED HERE -->
                     <div class="text-xs font-bold bg-white px-4 py-2.5 border border-slate-200 rounded-xl text-slate-600 shadow-xs hidden sm:flex items-center">
                         <i class="fa-regular fa-calendar-days mr-2 text-blue-600"></i><span id="dash-date">--/--/----</span>
                         <span class="mx-2 text-slate-300">|</span>
@@ -432,7 +431,6 @@
                     <h3 class="font-bold text-base text-slate-800 border-b border-slate-100 pb-2 flex items-center"><i class="fa-solid fa-cart-shopping text-blue-600 mr-2"></i>Active Dispensing Cart</h3>
                     
                     <div class="flex items-end gap-3 flex-wrap">
-                        <!-- OTC FILTER ADDED HERE -->
                         <div class="w-32">
                             <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Type Filter</label>
                             <select id="otc-medicine-type-filter" onchange="UI.filterOTCMedicineOptions()" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium cursor-pointer">
@@ -704,6 +702,61 @@
             </div>
         </section>
 
+        <!-- NEW PROFIT MARGIN SECTION -->
+        <section id="mod-profit" class="erp-section hidden space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-5 gap-4">
+                <div>
+                    <h2 class="text-3xl font-black animated-heading pb-1">Profit Margin Analysis</h2>
+                </div>
+                <div class="flex gap-2.5 self-start flex-wrap">
+                    <button onclick="UI.exportProfitMarginPDF()" class="px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer flex items-center active:scale-[0.97]">
+                        <i class="fa-solid fa-file-pdf mr-2"></i>Export Margin PDF
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between transition-all hover:shadow-md">
+                    <div>
+                        <p class="text-[11px] font-extrabold tracking-wider uppercase text-slate-400">Total Revenue</p>
+                        <h3 id="pm-total-revenue" class="text-2xl font-black text-blue-600 mt-1">₹0.00</h3>
+                    </div>
+                    <div class="h-12 w-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-xl shadow-inner"><i class="fa-solid fa-arrow-trend-up"></i></div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between transition-all hover:shadow-md">
+                    <div>
+                        <p class="text-[11px] font-extrabold tracking-wider uppercase text-slate-400">Total Cost (PTR)</p>
+                        <h3 id="pm-total-cost" class="text-2xl font-black text-rose-600 mt-1">₹0.00</h3>
+                    </div>
+                    <div class="h-12 w-12 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center text-xl shadow-inner"><i class="fa-solid fa-boxes-stacked"></i></div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between transition-all hover:shadow-md border-emerald-100 bg-emerald-50/10">
+                    <div>
+                        <p class="text-[11px] font-extrabold tracking-wider uppercase text-slate-400">Net Profit</p>
+                        <h3 id="pm-net-profit" class="text-2xl font-black text-emerald-600 mt-1">₹0.00</h3>
+                    </div>
+                    <div class="h-12 w-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center text-xl shadow-inner"><i class="fa-solid fa-wallet"></i></div>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm overflow-x-auto mt-6">
+                <h3 class="font-bold text-sm text-slate-700 mb-4 flex items-center"><i class="fa-solid fa-list-check text-slate-400 mr-2"></i>Patient-wise Margin Breakdown</h3>
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-slate-50 text-slate-500 uppercase font-bold text-[10px] tracking-wider border-b border-slate-200">
+                            <th class="p-3">Date & Time</th>
+                            <th class="p-3">Reference / Patient</th>
+                            <th class="p-3 text-right">Total Amount (₹)</th>
+                            <th class="p-3 text-right">Cost/PTR (₹)</th>
+                            <th class="p-3 text-right">Net Profit (₹)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="profit-margin-body">
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
         <section id="mod-settings" class="erp-section hidden space-y-6">
             <div class="border-b border-slate-200 pb-5">
                 <h2 class="text-3xl font-black animated-heading pb-1">Clinic Settings</h2>
@@ -898,7 +951,6 @@
                         </div>
                     </div>
 
-                    <!-- INVESTIGATIONS ADDITION MODULE -->
                     <div class="border border-slate-200 p-4 rounded-xl bg-slate-50/50 space-y-3 shadow-inner mt-4">
                         <div class="flex justify-between items-center">
                             <label class="flex items-center space-x-2 text-xs font-black text-slate-600 uppercase tracking-wider cursor-pointer select-none">
@@ -918,7 +970,6 @@
                                 </div>
                             </div>
 
-                            <!-- Pathology Section -->
                             <div id="inv-path-section" class="hidden grid grid-cols-1 md:grid-cols-4 gap-3">
                                 <div class="md:col-span-1">
                                     <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Select Report</label>
@@ -954,7 +1005,6 @@
                                 </div>
                             </div>
 
-                            <!-- Radiology Section -->
                             <div id="inv-rad-section" class="hidden grid grid-cols-1 md:grid-cols-4 gap-3">
                                 <div class="md:col-span-1">
                                     <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Select Report</label>
@@ -990,7 +1040,6 @@
                             <textarea id="v-investigation-plan" rows="2" placeholder="Added investigations will appear here..." class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none text-xs font-semibold font-mono text-slate-700 mt-2"></textarea>
                         </div>
                     </div>
-                    <!-- /INVESTIGATIONS END -->
 
                     <div class="border border-slate-200 p-4 rounded-xl bg-slate-50/50 space-y-3 shadow-inner">
                         <div class="flex justify-between items-center">
@@ -1133,6 +1182,7 @@
             </div>
         </div>
     </div>
+
     <!-- CONSULTATIONS MODAL -->
     <div id="modal-consultations" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print">
         <div class="w-full max-w-4xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden animate-zoom-in">
@@ -1149,7 +1199,7 @@
         </div>
     </div>
 
-    <!-- OTHER MODALS (Medicine, Vendors, Expense, Credits) -->
+    <!-- OTHER MODALS -->
     <div id="modal-medicine" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden flex flex-col max-h-[90vh] border border-slate-200 animate-zoom-in">
             <div class="bg-gradient-to-r from-blue-800 to-blue-950 p-4 text-white flex justify-between items-center">
@@ -1535,7 +1585,6 @@
                 }
             }
         }
-        
         /**
          * INTERFACE AND VIEW STATE LOGIC CONTROLLER MATRIX
          */
@@ -2128,7 +2177,6 @@
                 document.getElementById('dash-date').innerText = new Date().toLocaleDateString('en-IN', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
                 document.getElementById('patient-search').addEventListener('input', (e) => UI.renderPatientsGrid(e.target.value));
 
-                // Updated E-Sign Upload Handler with compression
                 const esignFile = document.getElementById('clinic-esign-file');
                 if(esignFile) {
                     esignFile.addEventListener('change', function(e) {
@@ -2144,7 +2192,6 @@
                     });
                 }
 
-                // Updated E-Stamp Upload Handler with compression
                 const estampFile = document.getElementById('clinic-estamp-file');
                 if(estampFile) {
                     estampFile.addEventListener('change', function(e) {
@@ -2180,6 +2227,239 @@
 
             static triggerInventoryFilter() {
                 this.renderInventoryGrid(SystemStorage.read(), this.currentInventoryFilter);
+            }
+
+            // --- NEW: Profit Margin Calculator Method ---
+            static getTransactionCost(txn, db) {
+                let cost = 0;
+                if (txn.cartItems && txn.cartItems.length > 0) {
+                    txn.cartItems.forEach(item => {
+                        const inv = db.inventory.find(i => i.id === item.id);
+                        if (inv) {
+                            cost += (inv.purchase / (inv.unitQty || 1)) * item.qty;
+                        }
+                    });
+                } else if (txn.category && txn.category.includes('Billing [') && txn.category.includes('[Visit:')) {
+                    const match = txn.category.match(/\[Visit:\s*(VST-[^\]]+)\]/);
+                    if (match && match[1]) {
+                        const visit = db.visits.find(v => v.id === match[1]);
+                        if (visit && visit.deductions) {
+                            visit.deductions.forEach(deduction => {
+                                const inv = db.inventory.find(i => i.name === deduction.name);
+                                if (inv) {
+                                    cost += (inv.purchase / (inv.unitQty || 1)) * deduction.qty;
+                                }
+                            });
+                        }
+                    }
+                }
+                return cost;
+            }
+
+            // --- NEW: Render Profit Margin Method ---
+            static renderProfitMargin(db, timeframe) {
+                const tbody = document.getElementById('profit-margin-body');
+                if(!tbody) return;
+
+                const incomeFinance = (db.finance || []).filter(f => f.type === "INFLOW" && this.isDateInTimeframe(f.date, timeframe));
+                const activeCredits = (db.credits || []).filter(c => this.isDateInTimeframe(c.date, timeframe)).map(c => ({
+                    date: c.date,
+                    time: c.time,
+                    timestamp: c.timestamp,
+                    ref: c.ref,
+                    category: c.cartItems ? `OTC Pharmacy [Credit] - ${c.patientName}` : `Billing [Credit] - ${c.patientName}`,
+                    amount: c.totalAmount,
+                    cartItems: c.cartItems,
+                    isCredit: true
+                }));
+
+                const allInflows = [...incomeFinance, ...activeCredits].sort((a,b) => {
+                    if (a.timestamp && b.timestamp) {
+                        return b.timestamp - a.timestamp;
+                    }
+                    return UI.parseIndianDate(b.date) - UI.parseIndianDate(a.date);
+                });
+
+                let grandTotalRev = 0;
+                let grandTotalCost = 0;
+                let grandTotalProfit = 0;
+                
+                let htmlRows = "";
+
+                if (allInflows.length === 0) {
+                    htmlRows = `<tr><td colspan="5" class="p-4 text-center text-slate-400 text-xs italic font-medium">No sales or billings found in this timeframe.</td></tr>`;
+                } else {
+                    allInflows.forEach(txn => {
+                        const rev = Number(txn.amount) || 0;
+                        const cost = UI.getTransactionCost(txn, db);
+                        const profit = rev - cost;
+
+                        grandTotalRev += rev;
+                        grandTotalCost += cost;
+                        grandTotalProfit += profit;
+
+                        const patParts = txn.category.split('] - ');
+                        let patName = patParts.length > 1 ? patParts[1] : 'Walk-in / General';
+                        patName = patName.split(' [Visit:')[0]; 
+
+                        htmlRows += `
+                        <tr class="border-b border-slate-100 hover:bg-slate-50 font-medium text-xs">
+                            <td class="p-3 text-slate-500 whitespace-nowrap">${txn.date} <span class="text-[10px] font-mono ml-1 font-bold">${txn.time || ''}</span></td>
+                            <td class="p-3 font-bold text-slate-700">${txn.ref} <span class="text-[10px] font-normal text-slate-400 ml-1">(${patName})</span></td>
+                            <td class="p-3 text-right font-black text-blue-600">₹${rev.toFixed(2)}</td>
+                            <td class="p-3 text-right font-black text-rose-600">₹${cost.toFixed(2)}</td>
+                            <td class="p-3 text-right font-black text-emerald-600">₹${profit.toFixed(2)}</td>
+                        </tr>
+                        `;
+                    });
+                }
+
+                tbody.innerHTML = htmlRows;
+                
+                document.getElementById('pm-total-revenue').innerText = `₹${grandTotalRev.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+                document.getElementById('pm-total-cost').innerText = `₹${grandTotalCost.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+                document.getElementById('pm-net-profit').innerText = `₹${grandTotalProfit.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+            }
+
+            // --- NEW: Export Profit Margin PDF Method ---
+            static exportProfitMarginPDF() {
+                const db = SystemStorage.read();
+                const clinic = db.clinicProfile || {};
+                const timeframe = document.getElementById('dashboard-timeframe')?.value || 'TODAY';
+                
+                const incomeFinance = (db.finance || []).filter(f => f.type === "INFLOW" && this.isDateInTimeframe(f.date, timeframe));
+                const activeCredits = (db.credits || []).filter(c => this.isDateInTimeframe(c.date, timeframe)).map(c => ({
+                    date: c.date,
+                    time: c.time,
+                    timestamp: c.timestamp,
+                    ref: c.ref,
+                    category: c.cartItems ? `OTC Pharmacy [Credit] - ${c.patientName}` : `Billing [Credit] - ${c.patientName}`,
+                    amount: c.totalAmount,
+                    cartItems: c.cartItems
+                }));
+
+                const allInflows = [...incomeFinance, ...activeCredits].sort((a,b) => {
+                    return UI.parseIndianDate(a.date) - UI.parseIndianDate(b.date);
+                });
+
+                let grandTotalRev = 0;
+                let grandTotalCost = 0;
+                let grandTotalProfit = 0;
+                
+                let dayMap = {};
+
+                allInflows.forEach(txn => {
+                    if (!dayMap[txn.date]) {
+                        dayMap[txn.date] = { rev: 0, cost: 0, profit: 0, rows: [] };
+                    }
+                    const rev = Number(txn.amount) || 0;
+                    const cost = UI.getTransactionCost(txn, db);
+                    const profit = rev - cost;
+
+                    grandTotalRev += rev;
+                    grandTotalCost += cost;
+                    grandTotalProfit += profit;
+
+                    dayMap[txn.date].rev += rev;
+                    dayMap[txn.date].cost += cost;
+                    dayMap[txn.date].profit += profit;
+
+                    const patParts = txn.category.split('] - ');
+                    let patName = patParts.length > 1 ? patParts[1] : 'Walk-in / General';
+                    patName = patName.split(' [Visit:')[0]; 
+
+                    dayMap[txn.date].rows.push({
+                        time: txn.time || '',
+                        ref: txn.ref,
+                        patient: patName,
+                        rev: rev,
+                        cost: cost,
+                        profit: profit
+                    });
+                });
+
+                const printDate = new Date().toLocaleDateString('en-IN') + ' ' + new Date().toLocaleTimeString('en-IN');
+
+                let html = `
+                    <div style="font-family:'Arial',sans-serif;background:#ffffff;color:#0f172a;width:100%;box-sizing:border-box;padding:20px;">
+                        <div style="text-align:center; margin-bottom: 20px; border-bottom: 2px solid #1d4ed8; padding-bottom: 10px;">
+                            <h2 style="margin:0; font-size: 24px; color: #1d4ed8; text-transform: uppercase; font-weight:800;">${clinic.name || 'Clinic Margin Report'}</h2>
+                            <p style="margin:5px 0 0; font-size: 13px; color: #475569;">${clinic.address || ''}</p>
+                            <p style="margin:8px 0 0; font-size: 15px; font-weight: bold; color:#0f172a;">Profit Margin Analysis (${timeframe.replace('_', ' ')})</p>
+                            <p style="margin:4px 0 0; font-size: 11px; color: #64748b;">Generated on: ${printDate}</p>
+                        </div>
+                        <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">
+                            <thead>
+                                <tr style="background-color: #f8fafc; border-bottom: 2px solid #cbd5e1;">
+                                    <th style="padding: 10px 8px; border: 1px solid #e2e8f0; color:#334155;">Time</th>
+                                    <th style="padding: 10px 8px; border: 1px solid #e2e8f0; color:#334155;">Patient / Reference</th>
+                                    <th style="padding: 10px 8px; border: 1px solid #e2e8f0; color:#334155; text-align:right;">Amount (₹)</th>
+                                    <th style="padding: 10px 8px; border: 1px solid #e2e8f0; color:#334155; text-align:right;">PTR (₹)</th>
+                                    <th style="padding: 10px 8px; border: 1px solid #e2e8f0; color:#334155; text-align:right;">Net Profit (₹)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+
+                if (Object.keys(dayMap).length === 0) {
+                    html += `<tr><td colspan="5" style="padding: 12px; text-align: center; border: 1px solid #e2e8f0; color:#64748b; font-style: italic;">No transactions in selected timeframe.</td></tr>`;
+                } else {
+                    for (const [date, data] of Object.entries(dayMap)) {
+                        html += `
+                            <tr style="background-color: #eff6ff; border-top: 2px solid #93c5fd; border-bottom: 1px solid #93c5fd;">
+                                <td colspan="5" style="padding: 8px; font-weight: 800; color:#1e40af;">📅 Date: ${date}</td>
+                            </tr>
+                        `;
+                        data.rows.forEach(r => {
+                            html += `
+                                <tr style="border-bottom: 1px solid #e2e8f0;">
+                                    <td style="padding: 6px 8px; border-left: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; color:#475569;">${r.time}</td>
+                                    <td style="padding: 6px 8px; border-right: 1px solid #e2e8f0; font-weight: 600; color:#0f172a;">${r.patient} <br><span style="font-size:9px; color:#64748b;">${r.ref}</span></td>
+                                    <td style="padding: 6px 8px; border-right: 1px solid #e2e8f0; text-align:right; font-weight:bold; color:#2563eb;">${r.rev.toFixed(2)}</td>
+                                    <td style="padding: 6px 8px; border-right: 1px solid #e2e8f0; text-align:right; font-weight:bold; color:#e11d48;">${r.cost.toFixed(2)}</td>
+                                    <td style="padding: 6px 8px; border-right: 1px solid #e2e8f0; text-align:right; font-weight:bold; color:#059669;">${r.profit.toFixed(2)}</td>
+                                </tr>
+                            `;
+                        });
+                        html += `
+                            <tr style="background-color: #f8fafc; border-bottom: 2px solid #cbd5e1;">
+                                <td colspan="2" style="padding: 8px; text-align:right; font-weight: 800; color:#334155;">Daily Autosum:</td>
+                                <td style="padding: 8px; border: 1px solid #e2e8f0; text-align:right; font-weight:bold; color:#2563eb;">₹${data.rev.toFixed(2)}</td>
+                                <td style="padding: 8px; border: 1px solid #e2e8f0; text-align:right; font-weight:bold; color:#e11d48;">₹${data.cost.toFixed(2)}</td>
+                                <td style="padding: 8px; border: 1px solid #e2e8f0; text-align:right; font-weight:bold; color:#059669;">₹${data.profit.toFixed(2)}</td>
+                            </tr>
+                        `;
+                    }
+                }
+
+                html += `
+                            </tbody>
+                        </table>
+                        <div style="margin-top: 25px; padding:15px; border: 2px solid #1d4ed8; border-radius: 8px; background: #eff6ff; display:flex; justify-content:space-between; font-size:14px; font-weight:800;">
+                            <div>GRAND TOTAL REVENUE: <span style="color:#2563eb;">₹${grandTotalRev.toLocaleString('en-IN', {minimumFractionDigits: 2})}</span></div>
+                            <div>TOTAL INVESTMENT: <span style="color:#e11d48;">₹${grandTotalCost.toLocaleString('en-IN', {minimumFractionDigits: 2})}</span></div>
+                            <div>TOTAL NET PROFIT: <span style="color:#059669;">₹${grandTotalProfit.toLocaleString('en-IN', {minimumFractionDigits: 2})}</span></div>
+                        </div>
+                        <div style="margin-top: 30px; font-size: 11px; color: #94a3b8; text-align: center;">
+                            System Auto-Computed Margin Analysis - MediPilot
+                        </div>
+                    </div>
+                `;
+
+                const wrapper = document.createElement('div');
+                wrapper.innerHTML = html;
+                const node = wrapper.firstElementChild;
+                document.body.appendChild(node);
+                
+                const opt = {
+                    margin: 0.3,
+                    filename: `Profit_Margin_${timeframe}_${new Date().toISOString().split('T')[0]}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true },
+                    jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+                };
+
+                html2pdf().set(opt).from(node).save().then(() => node.remove()).catch(() => node.remove());
             }
 
             static triggerGlobalAuditRefresh() {
@@ -2223,6 +2503,7 @@
                 this.renderOTCSummary();
                 this.renderBillingSummary();
                 this.renderCreditsList();
+                this.renderProfitMargin(db, timeframe); 
                 
                 this.renderAnalyticsMatrixCharts(totalRevenue, totalExpenses);
                 this.renderDashboardRecentPatients(db, filteredVisits);
@@ -2302,7 +2583,6 @@
                 alert("Bill deleted successfully.");
             }
 
-            // ADDED: Filter & Sort for OTC Dropdown
             static filterOTCMedicineOptions() {
                 const db = SystemStorage.read();
                 const typeFilter = document.getElementById('otc-medicine-type-filter')?.value || 'ALL';
@@ -2321,7 +2601,6 @@
                     }
                 }
 
-                // Sort alphabetically
                 availableMeds.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
 
                 select.innerHTML = '<option value="" disabled selected>-- Select Medicine --</option>' + 
@@ -2371,7 +2650,7 @@
                     
                     const patParts = sale.category.split('] - ');
                     const patient = patParts.length > 1 ? patParts[1] : 'Walk-in';
-                    const displayTime = sale.time || '--:--:--'; // Fallback for old records
+                    const displayTime = sale.time || '--:--:--'; 
 
                     return `
                     <tr class="border-b border-slate-100 hover:bg-slate-50 font-medium text-xs">
@@ -2382,99 +2661,6 @@
                         <td class="p-3 text-center space-x-1 whitespace-nowrap">
                             <button onclick="UI.editOTCSale('${sale.ref}')" title="Edit OTC Sale" class="px-2 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold text-xs rounded transition-all cursor-pointer"><i class="fa-solid fa-pen"></i></button>
                             <button onclick="UI.deleteOTCSale('${sale.ref}')" title="Delete OTC Sale" class="px-2 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-xs rounded transition-all cursor-pointer"><i class="fa-solid fa-trash-can"></i></button>
-                        </td>
-                    </tr>
-                    `;
-                }).join('');
-            }
-
-            static renderFinanceLedgerGrid(db) {
-                const container = document.getElementById('finance-ledger-body');
-                if(!container) return;
-                container.innerHTML = "";
-
-                const timeframe = document.getElementById('dashboard-timeframe')?.value || 'TODAY';
-                const filtered = db.finance.filter(f => this.isDateInTimeframe(f.date, timeframe));
-                
-                let grossIn = filtered.filter(f => f.type === "INFLOW").reduce((a,c) => a+c.amount, 0);
-                let grossOut = filtered.filter(f => f.type === "OUTFLOW").reduce((a,c) => a+c.amount, 0);
-
-                document.getElementById('fin-gross-in').innerText = `+₹${grossIn.toLocaleString('en-IN', {minimumFractionDigits:2})}`;
-                document.getElementById('fin-gross-out').innerText = `-₹${grossOut.toLocaleString('en-IN', {minimumFractionDigits:2})}`;
-                document.getElementById('fin-net-profit').innerText = `₹${(grossIn - grossOut).toLocaleString('en-IN', {minimumFractionDigits:2})}`;
-
-                const sorted = [...filtered].sort((a,b) => {
-                    if (a.timestamp && b.timestamp) return b.timestamp - a.timestamp;
-                    return UI.parseIndianDate(b.date) - UI.parseIndianDate(a.date);
-                });
-
-                if(sorted.length === 0) {
-                    container.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400 italic font-medium">No ledger audit lines located inside this timeframe.</td></tr>`;
-                    return;
-                }
-
-                sorted.forEach((f, index) => {
-                    const displayTime = f.time || '--:--:--';
-                    const tr = document.createElement('tr');
-                    tr.className = "border-b border-slate-100 hover:bg-slate-50/50 text-slate-600 font-semibold font-mono";
-                    tr.innerHTML = `
-                        <td class="p-3 text-slate-500 text-[11px] font-sans whitespace-nowrap">${f.date} <br><span class="font-mono text-[10px] font-bold text-slate-400">${displayTime}</span></td>
-                        <td class="p-3 font-sans text-slate-700 text-xs font-bold">${f.category}</td>
-                        <td class="p-3 text-slate-400 text-[11px]">${f.ref}</td>
-                        <td class="p-3 text-right text-xs ${f.type === 'INFLOW' ? 'text-emerald-600 font-bold' : 'text-rose-600 font-bold'}">${f.type === 'INFLOW' ? '+' : '-'}₹${Number(f.amount).toFixed(2)}</td>
-                        <td class="p-3 text-right font-sans"><button onclick="UI.deleteFinanceLine(${index})" class="text-rose-400 hover:text-rose-600 transition-colors cursor-pointer text-xs"><i class="fa-solid fa-trash-can"></i></button></td>
-                    `;
-                    container.appendChild(tr);
-                });
-            }
-
-            static renderBillingSummary() {
-                const db = SystemStorage.read();
-                const tbody = document.getElementById('billing-summary-body');
-                const timeframe = document.getElementById('dashboard-timeframe')?.value || 'TODAY';
-                if(!tbody) return;
-
-                const billingFinance = (db.finance || []).filter(f => f.category && f.category.startsWith("Billing [") && this.isDateInTimeframe(f.date, timeframe));
-                
-                const billingCredits = (db.credits || []).filter(c => c.ref && c.ref.startsWith("INV-") && this.isDateInTimeframe(c.date, timeframe)).map(c => ({
-                    date: c.date,
-                    time: c.time,
-                    timestamp: c.timestamp,
-                    ref: c.ref,
-                    category: `Billing [Credit] - ${c.patientName}`,
-                    amount: c.totalAmount,
-                    isCredit: true
-                }));
-
-                const sortedBills = [...billingFinance, ...billingCredits].sort((a,b) => {
-                    if (a.timestamp && b.timestamp) return b.timestamp - a.timestamp;
-                    return UI.parseIndianDate(b.date) - UI.parseIndianDate(a.date);
-                });
-
-                if (sortedBills.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400 text-xs italic font-medium">No bills generated in this timeframe.</td></tr>`;
-                    return;
-                }
-
-                tbody.innerHTML = sortedBills.map((bill, index) => {
-                    const match = bill.category.match(/\[(.*?)\]/);
-                    const mode = match ? match[1] : 'Unknown';
-                    
-                    const patParts = bill.category.split('] - ');
-                    const patientWithVisit = patParts.length > 1 ? patParts[1] : 'Unknown';
-                    const patientName = patientWithVisit.split(' [Visit:')[0]; 
-                    const displayTime = bill.time || '--:--:--';
-
-                    return `
-                    <tr class="border-b border-slate-100 hover:bg-slate-50 font-medium text-xs">
-                        <td class="p-3 text-slate-500 whitespace-nowrap">${bill.date}</td>
-                        <td class="p-3 text-slate-400 font-mono text-[10px] font-bold whitespace-nowrap">${displayTime}</td>
-                        <td class="p-3 font-bold text-slate-700">${bill.ref}</td>
-                        <td class="p-3 font-bold text-blue-600">${patientName}</td>
-                        <td class="p-3 text-slate-600 font-bold">${mode}</td>
-                        <td class="p-3 text-right font-black text-emerald-600">₹${Number(bill.amount).toFixed(2)}</td>
-                        <td class="p-3 text-center space-x-1 whitespace-nowrap">
-                            <button onclick="UI.deleteBill('${bill.ref}')" title="Delete Bill" class="px-2 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-xs rounded transition-all cursor-pointer"><i class="fa-solid fa-trash-can"></i></button>
                         </td>
                     </tr>
                     `;
@@ -2506,7 +2692,6 @@
 
                 if (!confirm("Editing will reverse this sale temporarily, restock items, and load them back into your cart for modification. Continue?")) return;
 
-                // Restock items in DB
                 sale.cartItems.forEach(cartItem => {
                     const invItem = db.inventory.find(i => i.id === cartItem.id);
                     if (invItem) {
@@ -2514,7 +2699,6 @@
                     }
                 });
 
-                // Load into current UI cart
                 this.otcCart = JSON.parse(JSON.stringify(sale.cartItems));
                 document.getElementById('otc-receive-amount').value = isCredit ? sale.totalAmount : sale.amount;
 
@@ -2530,13 +2714,11 @@
                     document.getElementById('otc-payment-mode').value = match[1];
                 }
 
-                // Preserve old timestamps and refs
                 this.editingOTCDate = sale.date;
                 this.editingOTCTime = sale.time;
                 this.editingOTCTimestamp = sale.timestamp;
                 this.editingOTCRef = sale.ref;
 
-                // Remove finance/credit record from ledger
                 if (isCredit) {
                     db.credits.splice(index, 1);
                 } else {
@@ -2571,7 +2753,6 @@
                 if (!sale) return;
 
                 if (sale.cartItems && sale.cartItems.length > 0) {
-                    // Restock
                     sale.cartItems.forEach(cartItem => {
                         const invItem = db.inventory.find(i => i.id === cartItem.id);
                         if (invItem) {
@@ -2783,7 +2964,6 @@
                 const db = SystemStorage.read();
                 const patTag = otcPat ? ` - ${otcPat}` : ' - Walk-in';
                 
-                // Deduct stock
                 this.otcCart.forEach(cartItem => {
                     const invItem = db.inventory.find(i => i.id === cartItem.id);
                     if (invItem) {
@@ -3502,7 +3682,7 @@
             static deleteInventoryRecord(id) {
                 if(confirm("Confirm item drop: Erase target batch parameters entirely from stock indexes?")) {
                     const db = SystemStorage.read();
-                    db.inventory = db.inventory.filter(i => i.id !== id);
+                    db.inventory = db.inventory.filter(!== id);
                     SystemStorage.write(db);
                 }
             }
@@ -3815,7 +3995,6 @@
                     codeInput.value = `INV-${Math.floor(10000 + Math.random() * 90000)}`;
                 }
                 
-                // Clear visit fields on sync
                 const visitSelect = document.getElementById('bill-visit-date');
                 if(visitSelect) visitSelect.innerHTML = '<option value="">-- General Bill --</option>';
                 const visitIdInput = document.getElementById('bill-visit-id');
@@ -3826,7 +4005,7 @@
                 const db = SystemStorage.read();
                 const pId = document.getElementById('bill-patient-id').value;
                 const visitSelect = document.getElementById('bill-visit-date');
-                const visits = db.visits.filter(v => v.patientId === pId).sort((a,b) => UI.parseIndianDate(b.date) - UI.parseIndianDate(a.date));
+                const visits = db.visits.filter(v => v.patientId === pId).sort((a,b) => this.parseIndianDate(b.date) - this.parseIndianDate(a.date));
                 
                 if (visitSelect) {
                     visitSelect.innerHTML = '<option value="">-- General Bill --</option>' + 
