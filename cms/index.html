@@ -4059,11 +4059,13 @@
                 }
             }
 
-            // Initialize Runtime Sequence on View Ready State
-            window.addEventListener('DOMContentLoaded', () => {
-                checkActiveSession();
-                UI.initializeApplicationRuntime();
-            });
+           // Initialize Runtime Sequence on View Ready State
+window.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('login-overlay').classList.add('hidden'); // Forces bypass
+    currentUser = { id: 'test-user-123' }; // Fake user for local storage
+    SystemStorage.syncFromCloud();
+    UI.initializeApplicationRuntime();
+});
         </script>
     </body>
     </html>
