@@ -1749,8 +1749,8 @@
                     }
                 }
                 
-                const optionsHtml = '<option value="" data-type="" data-unitqty="" data-unittype="">Select medicine from stock</option>' + 
-                    filtered.map(item => `<option value="${item.name}" data-type="${item.type || ''}" data-unitqty="${item.unitQty || 1}" data-unittype="${item.unitType || 'Piece'}">${item.name}</option>`).join('');
+                const optionsHtml = '<option value="" data-type="" data-unitqty="">Select medicine from stock</option>' + 
+                    filtered.map(item => `<option value="${item.name}" data-type="${item.type || ''}" data-unitqty="${item.unitQty || 1}">${item.name}</option>`).join('');
                 
                 select.innerHTML = optionsHtml;
                 
@@ -1770,13 +1770,6 @@
                 
                 const option = select.options[select.selectedIndex];
                 const type = option ? option.dataset.type : '';
-                const unitType = option ? (option.dataset.unittype || 'Piece') : 'Piece';
-                
-                const mlLabel = document.querySelector('#v-ml-container label');
-                if(mlLabel) mlLabel.innerText = `Dose (${unitType})`;
-
-                const directQtyLabel = document.querySelector('#v-direct-qty-container label');
-                if(directQtyLabel) directQtyLabel.innerText = `Qty Given (${unitType})`;
                 
                 if(mlContainer) mlContainer.classList.add('hidden');
                 if(directQtyContainer) directQtyContainer.classList.add('hidden');
@@ -3731,6 +3724,45 @@
                 alert("Supplier pipeline directory synchronized successfully.");
             }
 
+            static renderFinanceLedgerGrid(db) {
+                const container = document.getElementById('finance-ledger-body');
+                if(!container) return;
+                container.innerHTML = "";
+
+                const timeframe = document.getElementById('dashboard-timeframe')?.value || 'TODAY';
+                const filtered = db.finance.filter(f => this.isDateInTimeframe(f.date, timeframe));
+                
+                let grossIn = filtered.filter(f => f.type === "INFLOW").reduce((a,c) => a+c.amount, 0);
+                let grossOut = filtered.filter(f => f.type === "OUTFLOW").reduce((a,c) => a+c.amount, 0);
+
+                document.getElementById('fin-gross-in').innerText = `+₹${grossIn.toLocaleString('en-IN', {minimumFractionDigits:2})}`;
+                document.getElementById('fin-gross-out').innerText = `-₹${grossOut.toLocaleString('en-IN', {minimumFractionDigits:2})}`;
+                document.getElementById('fin-net-profit').innerText = `₹${(grossIn - grossOut).toLocaleString('en-IN', {minimumFractionDigits:2})}`;
+
+                const sorted = [...filtered].sort((a,b) => {
+                    if (a.timestamp && b.timestamp) return b.timestamp - a.timestamp;
+                    return this.parseIndianDate(b.date) - this.parseIndianDate(a.date);
+                });
+
+                if(sorted.length === 0) {
+                    container.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400 italic font-medium">No ledger audit lines located inside this timeframe.</td></tr>`;
+                    return;
+                }
+
+                sorted.forEach((f, index) => {
+                    const tr = document.createElement('tr');
+                    tr.className = "border-b border-slate-100 hover:bg-slate-50/50 text-slate-600 font-semibold font-mono";
+                    tr.innerHTML = `
+                        <td class="p-3 text-slate-500 text-[11px]">${f.date} <br><span class="font-mono text-[9px]">${f.time || ''}</span></td>
+                        <td class="p-3 font-sans text-slate-700 text-xs font-bold">${f.category}</td>
+                        <td class="p-3 text-slate-400 text-[11px]">${f.ref}</td>
+                        <td class="p-3 text-right text-xs ${f.type === 'INFLOW' ? 'text-emerald-600 font-bold' : 'text-rose-600 font-bold'}">${f.type === 'INFLOW' ? '+' : '-'}₹${Number(f.amount).toFixed(2)}</td>
+                        <td class="p-3 text-right font-sans"><button onclick="UI.deleteFinanceLine(${index})" class="text-rose-400 hover:text-rose-600 transition-colors cursor-pointer text-xs"><i class="fa-solid fa-trash-can"></i></button></td>
+                    `;
+                    container.appendChild(tr);
+                });
+            }
+
             static deleteFinanceLine(idx) {
                 if(confirm("Confirm reversal: Rollback this operational transaction sequence completely? Balance metrics recalculate immediately.")) {
                     const db = SystemStorage.read();
@@ -4165,7 +4197,6 @@
                 planArea.value = currentText ? currentText + "\n" + finalLine : finalLine;
             }
 
-            // MODIFIED: Incorporates Dynamic Package Unit Type from Inventory mappings
             static addMedicineToPrescription() {
                 const medSelect = document.getElementById('v-medicine');
                 const doseSelect = document.getElementById('v-dose');
@@ -4180,13 +4211,9 @@
                     return;
                 }
 
-                // FETCH THE MEDICINE FROM DB TO GET EXACT UNIT TYPE (Piece, ML, Strip, etc.)
-                const db = SystemStorage.read();
-                const inventoryItem = db.inventory.find(i => i.name === medSelect.value);
-                const unitType = inventoryItem ? (inventoryItem.unitType || 'Piece') : 'Piece';
-
                 const medOption = medSelect.options[medSelect.selectedIndex];
                 const isVial = medOption.dataset.type === 'Vial';
+                const unitQty = parseFloat(medOption.dataset.unitqty) || 1;
                 const medType = medOption.dataset.type;
 
                 let prefix = "";
@@ -4227,22 +4254,22 @@
                 if(isVial) {
                     const mlDose = parseFloat(mlInput.value) || 0;
                     if(mlDose <= 0) {
-                        alert(`Please enter a valid Dose (${unitType}) for this prescription.`);
+                        alert("Please enter a valid Dose (ML) for this Vial prescription.");
                         return;
                     }
-                    lineContent = `${medNameWithPrefix} -- ${mlDose} ${unitType} per dose -- ${doseSelect.value} -- ${mealSelect.value} -- ${finalDuration}`;
+                    lineContent = `${medNameWithPrefix} -- ${mlDose} ML per dose -- ${doseSelect.value} -- ${mealSelect.value} -- ${finalDuration}`;
                     const totalMLNeeded = mlDose * dailyCount * days;
                     calculatedUnits = totalMLNeeded; 
                 } else if (directQtyTypes.includes(medOption.dataset.type)) {
                     const directQty = parseFloat(directQtyInput.value) || 0;
                     if(directQty <= 0) {
-                        alert(`Please enter a valid Qty Given (${unitType}) for this medicine type.`);
+                        alert("Please enter a valid Qty Given for this medicine type.");
                         return;
                     }
-                    lineContent = `${medNameWithPrefix} -- ${doseSelect.value} -- ${mealSelect.value} -- ${finalDuration} -- [Qty Dispensed: ${directQty} ${unitType}]`;
+                    lineContent = `${medNameWithPrefix} -- ${doseSelect.value} -- ${mealSelect.value} -- ${finalDuration} -- [Qty Dispensed: ${directQty}]`;
                     calculatedUnits = directQty;
                 } else {
-                    lineContent = `${medNameWithPrefix} -- ${doseSelect.value} (${unitType}) -- ${mealSelect.value} -- ${finalDuration}`;
+                    lineContent = `${medNameWithPrefix} -- ${doseSelect.value} -- ${mealSelect.value} -- ${finalDuration}`;
                     calculatedUnits = days * dailyCount;
                 }
 
