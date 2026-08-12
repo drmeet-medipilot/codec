@@ -649,6 +649,7 @@
                 </div>
             </div>
         </section>
+
         <section id="mod-finance" class="erp-section hidden space-y-6">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-5 gap-4">
                 <div>
@@ -1351,7 +1352,7 @@
 
     <div id="print-area" class="hidden font-mono text-sm bg-white text-slate-900 w-full max-w-full">
         </div>
-        <script>
+    <script>
         // =========================================================================
         // 1. SUPABASE CLOUD ENGINE
         // =========================================================================
@@ -1547,11 +1548,6 @@
             static editingOTCRef = null;
             static editingOTCTime = null;
             static editingOTCTimestamp = null;
-
-            // FIX: Guaranteed completely unique ID generation preventing ALL data overlays
-            static generateID(prefix) {
-                return `${prefix}-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`;
-            }
 
             static getTimestampData() {
                 const now = new Date();
@@ -1752,7 +1748,7 @@
                 }
                 
                 const optionsHtml = '<option value="" data-type="" data-unitqty="" data-unittype="">Select medicine from stock</option>' + 
-                    filtered.map(item => `<option value="${item.name}" data-type="${item.type \vert{}\vert{} ''}" data-unitqty="${item.unitQty || 1}" data-unittype="${item.unitType \vert{}\vert{} 'Piece'}">${item.name}</option>`).join('');
+                    filtered.map(item => `<option value="${item.name}" data-type="${item.type || ''}" data-unitqty="${item.unitQty || 1}" data-unittype="${item.unitType || 'Piece'}">${item.name}</option>`).join('');
                 
                 select.innerHTML = optionsHtml;
                 
@@ -1928,12 +1924,12 @@
                             <div style="padding:18px 22px;border-bottom:3px solid #1d4ed8;text-align:center;background:#eff6ff;">
                                 <div style="font-size:28px;font-weight:800;letter-spacing:.3px;color:#1d4ed8;text-transform:uppercase;">${clinic.name || 'Clinic Name'}</div>
                                 <div style="font-size:13px;color:#334155;margin-top:6px;">${clinic.address || 'Clinic Address'}</div>
-                                <div style="font-size:13px;color:#334155;margin-top:4px;">Consultant: ${docName} | Reg. No.: ${clinic.regno \vert{}\vert{} 'Not set'} \vert{} Contact:${clinic.mobile || 'Not set'}</div>
+                                <div style="font-size:13px;color:#334155;margin-top:4px;">Consultant: ${docName} | Reg. No.: ${clinic.regno || 'Not set'} | Contact: ${clinic.mobile || 'Not set'}</div>
                             </div>
                             <div style="padding:18px 22px 10px;">
                                 <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:10px 18px;font-size:13px;border-bottom:1px solid #cbd5e1;padding-bottom:12px;">
                                     <div><span style="font-weight:700;">Patient Name:</span> ${patient.name || 'Not recorded'}</div>
-                                    <div><span style="font-weight:700;">Age/Sex:</span> ${patient.ageVal \vert{}\vert{} ''}${patient.ageUnit || ''}</div>
+                                    <div><span style="font-weight:700;">Age/Sex:</span> ${patient.ageVal || ''} ${patient.ageUnit || ''}</div>
                                     <div><span style="font-weight:700;">Date:</span> ${visitDate}</div>
                                     <div><span style="font-weight:700;">Address:</span> ${patient.address || 'Not recorded'}</div>
                                     <div><span style="font-weight:700;">Contact:</span> ${patient.mobile || 'Not recorded'}</div>
@@ -1949,7 +1945,8 @@
                                         <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:#1d4ed8;text-transform:uppercase;margin-bottom:5px;">Diagnosis</div>
                                         <div style="min-height:48px;border:1px solid #cbd5e1;border-radius:10px;padding:10px 12px;font-size:14px;line-height:1.6;background:#f8fafc;">${diagnosis}</div>
                                     </div>
-                                    ${invHtml}${treatmentHtml}
+                                    ${invHtml}
+                                    ${treatmentHtml}
                                     <div>
                                         <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:#1d4ed8;text-transform:uppercase;margin-bottom:5px;">Prescription</div>
                                         <div style="min-height:220px;border:1.5px solid #94a3b8;border-radius:10px;padding:14px 14px 16px;font-size:15px;line-height:1.9;white-space:pre-wrap;background:#ffffff;">℞\n${rxText}</div>
@@ -2069,7 +2066,7 @@
                     jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
                 };
 
-                const msgText = `Hello ${patient.name},\nHere is your prescription from${clinic.name || 'our clinic'}. Please find the attached PDF document.`;
+                const msgText = `Hello ${patient.name},\nHere is your prescription from ${clinic.name || 'our clinic'}. Please find the attached PDF document.`;
                 let mobileNum = patient.mobile ? patient.mobile.replace(/\D/g, '') : '';
                 if(mobileNum.length === 10) mobileNum = '91' + mobileNum; 
 
@@ -2483,7 +2480,7 @@
                 
                 const codeInput = document.getElementById('bill-invoice-num');
                 if (codeInput && !codeInput.value) {
-                    codeInput.value = UI.generateID('INV');
+                    codeInput.value = `INV-${Math.floor(10000 + Math.random() * 90000)}`;
                 }
                 
                 const visitSelect = document.getElementById('bill-visit-date');
@@ -2565,7 +2562,7 @@
                 if(modeSelect.value === 'Credit') {
                     if(!db.credits) db.credits = [];
                     db.credits.push({
-                        id: UI.generateID('CRD'),
+                        id: `CRD-${Math.floor(10000 + Math.random() * 90000)}`,
                         patientId: targetPatient.id,
                         patientName: targetPatient.name,
                         ref: invCode,
@@ -2590,7 +2587,7 @@
                 SystemStorage.write(db);
                 
                 amtInput.value = "";
-                document.getElementById('bill-invoice-num').value = UI.generateID('INV');
+                document.getElementById('bill-invoice-num').value = `INV-${Math.floor(10000 + Math.random() * 90000)}`;
                 this.renderUPIQR();
                 
                 alert(`Invoice record committed successfully (Transaction ID: ${invCode}). balances modified.`);
@@ -2603,7 +2600,7 @@
                 const ts = UI.getTimestampData();
                 
                 const editId = document.getElementById('p-edit-id').value;
-                const newId = editId || UI.generateID('PT');
+                const newId = editId || `PT-${Math.floor(9000 + Math.random() * 999)}`;
                 
                 const pName = document.getElementById('p-name').value.trim();
                 const pMobile = document.getElementById('p-mobile').value.trim();
@@ -2995,7 +2992,7 @@
                 }
 
                 const visitPayload = {
-                    id: vId || UI.generateID('VST'),
+                    id: vId || `VST-${Math.floor(10000 + Math.random() * 90000)}`,
                     patientId: pId,
                     date: visitDate,
                     time: visitTime,
@@ -3412,7 +3409,7 @@
                 });
                 
                 const ts = this.getTimestampData();
-                const refCode = this.editingOTCRef || UI.generateID('OTC');
+                const refCode = this.editingOTCRef || `OTC-${Math.floor(100000 + Math.random() * 900000)}`;
                 const saleDate = this.editingOTCDate || ts.date;
                 const saleTime = this.editingOTCTime || ts.time;
                 const saleTimestamp = this.editingOTCTimestamp || ts.timestamp;
@@ -3424,7 +3421,7 @@
                     const targetPatient = db.patients.find(p => p.name.toLowerCase() === otcPat.toLowerCase()) || { id: 'WALK-IN', name: otcPat };
                     
                     db.credits.push({
-                        id: UI.generateID('CRD'),
+                        id: `CRD-${Math.floor(10000 + Math.random() * 90000)}`,
                         patientId: targetPatient.id,
                         patientName: targetPatient.name,
                         ref: refCode,
@@ -3512,7 +3509,7 @@
                 
                 if(!hasTodayVisit) {
                     db.visits.push({
-                        id: UI.generateID('VST'),
+                        id: `VST-${Math.floor(10000 + Math.random() * 90000)}`,
                         patientId: patientId,
                         date: ts.date,
                         time: ts.time,
@@ -3624,10 +3621,10 @@
                         if(cols.length < 3) continue; 
                         
                         let pid = cols[0];
-                        if(!pid || pid.trim() === '') pid = UI.generateID('PT');
+                        if(!pid || pid.trim() === '') pid = `PT-${Math.floor(9000 + Math.random() * 999)}`;
                         
                         if(db.patients.find(p => p.id === pid)) {
-                            pid = UI.generateID('PT'); 
+                            pid = `PT-${Math.floor(9000 + Math.random() * 999)}`; 
                         }
                         
                         db.patients.push({
@@ -4022,7 +4019,7 @@
                         }
                         
                         db.inventory.push({
-                            id: UI.generateID('MED'),
+                            id: `MED-${Math.floor(1000 + Math.random() * 9000)}`,
                             type: cols[0] || 'Other',
                             name: cols[1],
                             supplier: cols[2] || '',
@@ -4237,7 +4234,7 @@
                 const expiryVal = `${yearVal}-${monthVal}`;
 
                 const payload = {
-                    id: editId || UI.generateID('MED'),
+                    id: editId || `MED-${Math.floor(1000 + Math.random() * 9000)}`,
                     type: actualType,
                     name: document.getElementById('m-name').value.trim(),
                     supplier: document.getElementById('m-supplier').value,
