@@ -1352,7 +1352,7 @@
 
     <div id="print-area" class="hidden font-mono text-sm bg-white text-slate-900 w-full max-w-full">
         </div>
-    <script>
+        <script>
         // =========================================================================
         // 1. SUPABASE CLOUD ENGINE
         // =========================================================================
@@ -1430,7 +1430,7 @@
                     credits: [],
                     suppliers: [],
                     clinicProfile: { name: '', address: '', mobile: '', regno: '', doctor: '', degree: '', esignBase64: '', estampBase64: '', esignPin: '' },
-                    metadata: { lastUpdated: new Date().getTime(), softwareVersion: "2026.7.4 (Cloud Vault V2.1)" }
+                    metadata: { lastUpdated: new Date().getTime(), softwareVersion: "2026.7.4 (Cloud Vault V2.2)" }
                 };
             }
 
@@ -1556,6 +1556,36 @@
                     time: now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
                     timestamp: now.getTime()
                 };
+            }
+
+            // ROBUST ID GENERATOR - PREVENTS OVERWRITES
+            static generateSequentialID(db, collectionName, prefix = "") {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const yearMonth = `${year}${month}`; // e.g., 202608
+
+                let collection = [];
+                if (collectionName === 'finance_and_credits') {
+                    collection = [...(db.finance || []), ...(db.credits || [])];
+                } else {
+                    collection = db[collectionName] || [];
+                }
+
+                let maxSeq = 0;
+                collection.forEach(item => {
+                    const idStr = String(item.id || item.ref || "");
+                    if (idStr.startsWith(prefix + yearMonth)) {
+                        const numPart = idStr.substring((prefix + yearMonth).length);
+                        const num = parseInt(numPart, 10);
+                        if (!isNaN(num) && num > maxSeq) {
+                            maxSeq = num;
+                        }
+                    }
+                });
+
+                const nextSeq = String(maxSeq + 1).padStart(2, '0'); 
+                return `${prefix}${yearMonth}${nextSeq}`;
             }
 
             static startClock() {
@@ -2480,7 +2510,7 @@
                 
                 const codeInput = document.getElementById('bill-invoice-num');
                 if (codeInput && !codeInput.value) {
-                    codeInput.value = `INV-${Math.floor(10000 + Math.random() * 90000)}`;
+                    codeInput.value = UI.generateSequentialID(db, 'finance_and_credits', 'INV-');
                 }
                 
                 const visitSelect = document.getElementById('bill-visit-date');
@@ -2562,7 +2592,7 @@
                 if(modeSelect.value === 'Credit') {
                     if(!db.credits) db.credits = [];
                     db.credits.push({
-                        id: `CRD-${Math.floor(10000 + Math.random() * 90000)}`,
+                        id: UI.generateSequentialID(db, 'credits', 'CRD-'),
                         patientId: targetPatient.id,
                         patientName: targetPatient.name,
                         ref: invCode,
@@ -2587,7 +2617,7 @@
                 SystemStorage.write(db);
                 
                 amtInput.value = "";
-                document.getElementById('bill-invoice-num').value = `INV-${Math.floor(10000 + Math.random() * 90000)}`;
+                document.getElementById('bill-invoice-num').value = UI.generateSequentialID(db, 'finance_and_credits', 'INV-');
                 this.renderUPIQR();
                 
                 alert(`Invoice record committed successfully (Transaction ID: ${invCode}). balances modified.`);
@@ -2600,7 +2630,7 @@
                 const ts = UI.getTimestampData();
                 
                 const editId = document.getElementById('p-edit-id').value;
-                const newId = editId || `PT-${Math.floor(9000 + Math.random() * 999)}`;
+                const newId = editId || UI.generateSequentialID(db, 'patients', '');
                 
                 const pName = document.getElementById('p-name').value.trim();
                 const pMobile = document.getElementById('p-mobile').value.trim();
@@ -2992,7 +3022,7 @@
                 }
 
                 const visitPayload = {
-                    id: vId || `VST-${Math.floor(10000 + Math.random() * 90000)}`,
+                    id: vId || UI.generateSequentialID(db, 'visits', 'VST-'),
                     patientId: pId,
                     date: visitDate,
                     time: visitTime,
@@ -3409,7 +3439,7 @@
                 });
                 
                 const ts = this.getTimestampData();
-                const refCode = this.editingOTCRef || `OTC-${Math.floor(100000 + Math.random() * 900000)}`;
+                const refCode = this.editingOTCRef || UI.generateSequentialID(db, 'finance_and_credits', 'OTC-');
                 const saleDate = this.editingOTCDate || ts.date;
                 const saleTime = this.editingOTCTime || ts.time;
                 const saleTimestamp = this.editingOTCTimestamp || ts.timestamp;
@@ -3421,7 +3451,7 @@
                     const targetPatient = db.patients.find(p => p.name.toLowerCase() === otcPat.toLowerCase()) || { id: 'WALK-IN', name: otcPat };
                     
                     db.credits.push({
-                        id: `CRD-${Math.floor(10000 + Math.random() * 90000)}`,
+                        id: UI.generateSequentialID(db, 'credits', 'CRD-'),
                         patientId: targetPatient.id,
                         patientName: targetPatient.name,
                         ref: refCode,
@@ -3509,7 +3539,7 @@
                 
                 if(!hasTodayVisit) {
                     db.visits.push({
-                        id: `VST-${Math.floor(10000 + Math.random() * 90000)}`,
+                        id: UI.generateSequentialID(db, 'visits', 'VST-'),
                         patientId: patientId,
                         date: ts.date,
                         time: ts.time,
@@ -3621,10 +3651,10 @@
                         if(cols.length < 3) continue; 
                         
                         let pid = cols[0];
-                        if(!pid || pid.trim() === '') pid = `PT-${Math.floor(9000 + Math.random() * 999)}`;
+                        if(!pid || pid.trim() === '') pid = UI.generateSequentialID(db, 'patients', '');
                         
                         if(db.patients.find(p => p.id === pid)) {
-                            pid = `PT-${Math.floor(9000 + Math.random() * 999)}`; 
+                            pid = UI.generateSequentialID(db, 'patients', ''); 
                         }
                         
                         db.patients.push({
@@ -4019,7 +4049,7 @@
                         }
                         
                         db.inventory.push({
-                            id: `MED-${Math.floor(1000 + Math.random() * 9000)}`,
+                            id: UI.generateSequentialID(db, 'inventory', 'MED-'),
                             type: cols[0] || 'Other',
                             name: cols[1],
                             supplier: cols[2] || '',
@@ -4234,7 +4264,7 @@
                 const expiryVal = `${yearVal}-${monthVal}`;
 
                 const payload = {
-                    id: editId || `MED-${Math.floor(1000 + Math.random() * 9000)}`,
+                    id: editId || UI.generateSequentialID(db, 'inventory', 'MED-'),
                     type: actualType,
                     name: document.getElementById('m-name').value.trim(),
                     supplier: document.getElementById('m-supplier').value,
