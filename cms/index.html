@@ -549,7 +549,6 @@
             </div>
             
         </section>
-
         <section id="mod-inventory" class="erp-section hidden space-y-6">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-5 gap-4">
                 <div>
@@ -703,6 +702,7 @@
                 </div>
             </div>
         </section>
+        
         <section id="mod-settings" class="erp-section hidden space-y-6">
             <div class="border-b border-slate-200 pb-5">
                 <h2 class="text-3xl font-black animated-heading pb-1">Clinic Settings</h2>
@@ -757,6 +757,15 @@
                         </div>
                     </div>
 
+                    <!-- MIGRATION TOOL SECTION -->
+                    <div class="md:col-span-2 pt-4 border-t border-slate-100 mt-2">
+                        <h3 class="font-bold text-sm text-slate-800 mb-3"><i class="fa-solid fa-wand-magic-sparkles text-amber-500 mr-2"></i>Data Migration Tools</h3>
+                        <button onclick="UI.migrateTodaysIDs()" class="px-5 py-3 bg-amber-50 border border-amber-200 text-amber-700 font-bold rounded-xl shadow-sm hover:bg-amber-100 transition-all cursor-pointer active:scale-[0.99] flex items-center justify-center w-full md:w-auto text-xs">
+                            <i class="fa-solid fa-clock-rotate-left mr-2"></i> Sequence Today's Random IDs
+                        </button>
+                        <p class="text-[10px] text-slate-400 mt-2 font-medium">Use this tool to retroactively update all IDs generated today to the new chronological format (e.g., 20260801). It safely re-links all prescriptions and bills.</p>
+                    </div>
+
                     <div class="md:col-span-2 pt-4 border-t border-slate-100 mt-2">
                         <h3 class="font-bold text-sm text-slate-800 mb-3"><i class="fa-solid fa-triangle-exclamation text-rose-600 mr-2"></i>Danger Zone</h3>
                         <button onclick="UI.factoryResetData()" class="px-5 py-3 bg-white border border-rose-200 text-rose-600 font-bold rounded-xl shadow-sm hover:bg-rose-50 transition-all cursor-pointer active:scale-[0.99] flex items-center justify-center w-full md:w-auto text-xs">
@@ -775,6 +784,7 @@
         </section>
 
     </main>
+    
     <!-- REVISIT MODAL -->
     <div id="modal-revisit" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh] animate-zoom-in">
@@ -1430,7 +1440,7 @@
                     credits: [],
                     suppliers: [],
                     clinicProfile: { name: '', address: '', mobile: '', regno: '', doctor: '', degree: '', esignBase64: '', estampBase64: '', esignPin: '' },
-                    metadata: { lastUpdated: new Date().getTime(), softwareVersion: "2026.7.4 (Cloud Vault V2.2)" }
+                    metadata: { lastUpdated: new Date().getTime(), softwareVersion: "2026.8.0 (Sequential Core V3)" }
                 };
             }
 
@@ -1534,6 +1544,7 @@
                 }
             }
         }
+
         /**
          * INTERFACE AND VIEW STATE LOGIC CONTROLLER MATRIX
          */
@@ -1558,7 +1569,9 @@
                 };
             }
 
-            // ROBUST ID GENERATOR - PREVENTS OVERWRITES
+            // =========================================================================
+            // CORE ID GENERATOR: STRICT CHRONOLOGICAL SEQUENCE (e.g. 20260801)
+            // =========================================================================
             static generateSequentialID(db, collectionName, prefix = "") {
                 const now = new Date();
                 const year = now.getFullYear();
@@ -1588,6 +1601,96 @@
                 return `${prefix}${yearMonth}${nextSeq}`;
             }
 
+            // =========================================================================
+            // MIGRATION TOOL: RETROACTIVELY FIX TODAY'S RANDOM IDs TO SEQUENTIAL
+            // =========================================================================
+            static migrateTodaysIDs() {
+                if(!confirm("Are you sure you want to re-sequence today's records? This will update randomly generated IDs from today into the new chronological format (e.g., 20260801) and relink all histories.")) return;
+                
+                const db = SystemStorage.read();
+                const ts = UI.getTimestampData();
+                const todayDate = ts.date;
+
+                let patientMap = {};
+                let visitMap = {};
+
+                // 1. Migrate Patients from today
+                const todaysPatients = db.patients.filter(p => p.createdAt === todayDate).sort((a,b) => a.timestamp - b.timestamp);
+                todaysPatients.forEach(p => {
+                    const oldId = p.id;
+                    if(oldId.startsWith("PT-") || oldId.length < 8) {
+                        const newId = UI.generateSequentialID(db, 'patients', '');
+                        p.id = newId;
+                        patientMap[oldId] = newId;
+                    }
+                });
+
+                // Relink patient histories
+                db.visits.forEach(v => { if(patientMap[v.patientId]) v.patientId = patientMap[v.patientId]; });
+                db.credits.forEach(c => { if(patientMap[c.patientId]) c.patientId = patientMap[c.patientId]; });
+
+                // 2. Migrate Visits from today
+                const todaysVisits = db.visits.filter(v => v.date === todayDate).sort((a,b) => a.timestamp - b.timestamp);
+                todaysVisits.forEach(v => {
+                    const oldId = v.id;
+                    if(oldId.startsWith("VST-") && oldId.length < 11) {
+                        const newId = UI.generateSequentialID(db, 'visits', 'VST-');
+                        v.id = newId;
+                        visitMap[oldId] = newId;
+                    }
+                });
+
+                db.finance.forEach(f => {
+                    if(f.category.includes("[Visit: ")) {
+                        for (let oldId in visitMap) {
+                            if (f.category.includes(oldId)) {
+                                f.category = f.category.replace(oldId, visitMap[oldId]);
+                            }
+                        }
+                    }
+                });
+
+                // 3. Migrate Finance & Credits Refs from today
+                const todaysFinance = db.finance.filter(f => f.date === todayDate).sort((a,b) => a.timestamp - b.timestamp);
+                todaysFinance.forEach(f => {
+                    const oldRef = f.ref;
+                    if(oldRef.startsWith("INV-") && oldRef.length < 11) {
+                        f.ref = UI.generateSequentialID(db, 'finance_and_credits', 'INV-');
+                    } else if (oldRef.startsWith("OTC-") && oldRef.length < 11) {
+                        f.ref = UI.generateSequentialID(db, 'finance_and_credits', 'OTC-');
+                    }
+                });
+
+                const todaysCredits = db.credits.filter(c => c.date === todayDate).sort((a,b) => a.timestamp - b.timestamp);
+                todaysCredits.forEach(c => {
+                    const oldRef = c.ref;
+                    if(oldRef.startsWith("INV-") && oldRef.length < 11) {
+                        c.ref = UI.generateSequentialID(db, 'finance_and_credits', 'INV-');
+                    } else if (oldRef.startsWith("OTC-") && oldRef.length < 11) {
+                        c.ref = UI.generateSequentialID(db, 'finance_and_credits', 'OTC-');
+                    }
+                });
+
+                // 4. Migrate ALL old Inventory IDs
+                db.inventory.forEach(i => {
+                    const oldId = i.id;
+                    if(oldId.startsWith("MED-") && oldId.length < 11) {
+                        const newId = UI.generateSequentialID(db, 'inventory', 'MED-');
+                        i.id = newId;
+                        db.finance.forEach(f => {
+                            if (f.cartItems) f.cartItems.forEach(cartItem => { if(cartItem.id === oldId) cartItem.id = newId; });
+                        });
+                        db.credits.forEach(c => {
+                            if (c.cartItems) c.cartItems.forEach(cartItem => { if(cartItem.id === oldId) cartItem.id = newId; });
+                        });
+                    }
+                });
+
+                SystemStorage.write(db);
+                UI.triggerGlobalAuditRefresh();
+                alert("Migration Complete! All applicable random records have been mathematically sequenced.");
+            }
+
             static startClock() {
                 const clockEl = document.getElementById('dash-time');
                 if(!clockEl) return;
@@ -1597,7 +1700,6 @@
                 }, 1000);
             }
 
-            // Utility to automatically compress uploaded images to prevent LocalStorage failures
             static compressImage(file, callback) {
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
@@ -1626,7 +1728,6 @@
                         canvas.width = width;
                         canvas.height = height;
                         ctx.drawImage(img, 0, 0, width, height);
-                        // Save image as lightweight JPEG
                         callback(canvas.toDataURL('image/jpeg', 0.8));
                     };
                 };
@@ -1800,7 +1901,6 @@
                 const type = option ? option.dataset.type : '';
                 const unitType = option ? (option.dataset.unittype || 'Piece') : 'Piece';
                 
-                // Dynamically update UI labels with proper unit types
                 const mlLabel = document.querySelector('#v-ml-container label');
                 if(mlLabel) mlLabel.innerText = `Dose (${unitType})`;
 
@@ -1869,12 +1969,10 @@
 
             static saveClinicProfile() {
                 const db = SystemStorage.read();
-                
                 const safeVal = (id) => {
                     const el = document.getElementById(id);
                     return el && el.value ? el.value.trim() : '';
                 };
-
                 db.clinicProfile = {
                     name: safeVal('clinic-name'),
                     address: safeVal('clinic-address'),
@@ -1886,7 +1984,6 @@
                     estampBase64: safeVal('clinic-estamp-base64'),
                     esignPin: safeVal('clinic-esign-pin')
                 };
-                
                 SystemStorage.write(db);
                 alert('Clinic profile & E-Security details securely saved to the Cloud Vault.');
             }
