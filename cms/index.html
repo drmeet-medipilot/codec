@@ -1568,17 +1568,15 @@
             }
 
             // =========================================================================
-            // CORE ID GENERATOR: STRICT CHRONOLOGICAL SEQUENCE (e.g. 26081301)
+            // CORE ID GENERATOR: STRICT CONTINUOUS SEQUENCE (e.g. 202600001)
             // =========================================================================
             static generateSequentialID(db, collectionName, prefix = "") {
                 const now = new Date();
-                const year = String(now.getFullYear()).substring(2);
-                const month = String(now.getMonth() + 1).padStart(2, '0');
-                const day = String(now.getDate()).padStart(2, '0');
-                const datePrefix = `${year}${month}${day}`;
+                const year = String(now.getFullYear()); // 2026
 
                 let collection = [];
                 if (collectionName === 'finance_and_credits') {
+                    // બિલ અને ક્રેડિટ બંનેના રેકોર્ડ ભેગા ચેક કરશે 
                     collection = [...(db.finance || []), ...(db.credits || [])];
                 } else {
                     collection = db[collectionName] || [];
@@ -1589,8 +1587,9 @@
                     const idsToCheck = [item.id, item.ref];
                     
                     idsToCheck.forEach(idStr => {
-                        if (idStr && typeof idStr === 'string' && idStr.startsWith(prefix + datePrefix)) {
-                            const numPart = idStr.substring((prefix + datePrefix).length);
+                        // ચેક કરશે કે ID ની શરૂઆત (Prefix + 2026) થી થાય છે કે નહીં
+                        if (idStr && typeof idStr === 'string' && idStr.startsWith(prefix + year)) {
+                            const numPart = idStr.substring((prefix + year).length);
                             const num = parseInt(numPart, 10);
                             if (!isNaN(num) && num > maxSeq) {
                                 maxSeq = num;
@@ -1599,10 +1598,10 @@
                     });
                 });
 
-                const nextSeq = String(maxSeq + 1).padStart(2, '0'); 
-                return `${prefix}${datePrefix}${nextSeq}`;
+                // સળંગ 5 આંકડાનો નંબર બનાવશે (દા.ત. 00001 થી 99999)
+                const nextSeq = String(maxSeq + 1).padStart(5, '0'); 
+                return `${prefix}${year}${nextSeq}`;
             }
-
             // =========================================================================
             // MIGRATION TOOL: RETROACTIVELY FIX TODAY'S RANDOM IDs TO SEQUENTIAL
             // =========================================================================
