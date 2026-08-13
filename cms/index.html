@@ -1569,7 +1569,7 @@
                 };
             }
 
-            // =========================================================================
+           // =========================================================================
             // CORE ID GENERATOR: STRICT CHRONOLOGICAL SEQUENCE (e.g. 26081301)
             // =========================================================================
             static generateSequentialID(db, collectionName, prefix = "") {
@@ -1588,14 +1588,23 @@
 
                 let maxSeq = 0;
                 collection.forEach(item => {
-                    const idStr = String(item.id || item.ref || "");
-                    if (idStr.startsWith(prefix + datePrefix)) {
-                        const numPart = idStr.substring((prefix + datePrefix).length);
-                        const num = parseInt(numPart, 10);
-                        if (!isNaN(num) && num > maxSeq) {
-                            maxSeq = num;
+                    // Check BOTH 'id' and 'ref' properties to prevent Credit records from masking the Invoice sequence
+                    const idsToCheck = [item.id, item.ref];
+                    
+                    idsToCheck.forEach(idStr => {
+                        if (idStr && typeof idStr === 'string' && idStr.startsWith(prefix + datePrefix)) {
+                            const numPart = idStr.substring((prefix + datePrefix).length);
+                            const num = parseInt(numPart, 10);
+                            if (!isNaN(num) && num > maxSeq) {
+                                maxSeq = num;
+                            }
                         }
-                    }
+                    });
+                });
+
+                const nextSeq = String(maxSeq + 1).padStart(2, '0'); 
+                return `${prefix}${datePrefix}${nextSeq}`;
+            }
                 });
 
                 const nextSeq = String(maxSeq + 1).padStart(2, '0'); 
@@ -4478,4 +4487,3 @@
     </script>
 </body>
 </html>
-                            
