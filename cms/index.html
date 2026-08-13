@@ -1568,16 +1568,15 @@
                     timestamp: now.getTime()
                 };
             }
-
-            // =========================================================================
+// =========================================================================
             // CORE ID GENERATOR: STRICT CHRONOLOGICAL SEQUENCE (e.g. 26081301)
             // =========================================================================
             static generateSequentialID(db, collectionName, prefix = "") {
                 const now = new Date();
-                const year = String(now.getFullYear()).substring(2); // '26'
-                const month = String(now.getMonth() + 1).padStart(2, '0');
-                const day = String(now.getDate()).padStart(2, '0');
-                const datePrefix = `${year}${month}${day}`; // e.g., 260813
+                const year = String(now.getFullYear()).substring(2); // Extracts '26' from 2026
+                const month = String(now.getMonth() + 1).padStart(2, '0'); // '08'
+                const day = String(now.getDate()).padStart(2, '0'); // '13'
+                const datePrefix = `${year}${month}${day}`; // Combines to e.g., 260813
 
                 let collection = [];
                 if (collectionName === 'finance_and_credits') {
