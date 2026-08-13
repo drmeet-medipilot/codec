@@ -1568,7 +1568,7 @@
             }
 
             // =========================================================================
-            // CORE ID GENERATOR: STRICT CONTINUOUS SEQUENCE (e.g. 202600001)
+            // CORE ID GENERATOR: STRICT CONTINUOUS SEQUENCE (Starts from 202600801)
             // =========================================================================
             static generateSequentialID(db, collectionName, prefix = "") {
                 const now = new Date();
@@ -1582,12 +1582,13 @@
                     collection = db[collectionName] || [];
                 }
 
-                let maxSeq = 0;
+                // અહીં બેઝ નંબર 800 રાખ્યો છે, જેથી પહેલો નંબર 801 આવે (2026 + 00801)
+                let maxSeq = 800; 
+                
                 collection.forEach(item => {
                     const idsToCheck = [item.id, item.ref];
                     
                     idsToCheck.forEach(idStr => {
-                        // ચેક કરશે કે ID ની શરૂઆત (Prefix + 2026) થી થાય છે કે નહીં
                         if (idStr && typeof idStr === 'string' && idStr.startsWith(prefix + year)) {
                             const numPart = idStr.substring((prefix + year).length);
                             const num = parseInt(numPart, 10);
@@ -1598,7 +1599,7 @@
                     });
                 });
 
-                // સળંગ 5 આંકડાનો નંબર બનાવશે (દા.ત. 00001 થી 99999)
+                // 5 આંકડાનું ફોર્મેટ (દા.ત. 00801)
                 const nextSeq = String(maxSeq + 1).padStart(5, '0'); 
                 return `${prefix}${year}${nextSeq}`;
             }
