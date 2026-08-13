@@ -1326,6 +1326,7 @@
         const supabaseApp = window.supabase.createClient(supabaseUrl, supabaseKey);
         let currentUser = null;
 
+        // AUTO-LOGIN CHECK ON REFRESH
         async function checkActiveSession() {
             const { data: { session } } = await supabaseApp.auth.getSession();
             if (session) {
@@ -1335,6 +1336,7 @@
             }
         }
 
+        // LOGIN LOGIC
         async function processLogin() {
             const u = document.getElementById('login-user').value.trim();
             const p = document.getElementById('login-pass').value.trim();
@@ -1350,6 +1352,7 @@
             }
         }
 
+        // REGISTER LOGIC
         async function processRegister() {
             const u = document.getElementById('login-user').value.trim();
             const p = document.getElementById('login-pass').value.trim();
@@ -1366,6 +1369,7 @@
             }
         }
         
+        // LOGOUT LOGIC
         async function processLogout() {
             if (currentUser) {
                 localStorage.removeItem(`medipilot_vault_${currentUser.id}`);
@@ -1376,6 +1380,9 @@
             window.location.reload(); 
         }
 
+        /**
+         * CLOUD VAULT SYSTEM (JSONB ENGINE)
+         */
         class SystemStorage {
             static cache = null;
 
@@ -1463,6 +1470,7 @@
                         if(localStr) localData = JSON.parse(localStr);
                     } catch(e) {}
 
+                    // Smart Merge: Compare Timestamps
                     let cloudTime = cloudData?.metadata?.lastUpdated || 0;
                     let localTime = localData?.metadata?.lastUpdated || 0;
 
@@ -1492,6 +1500,9 @@
             }
         }
 
+        /**
+         * INTERFACE AND VIEW STATE LOGIC CONTROLLER MATRIX
+         */
         class UI {
             static activeCharts = {};
             static qrCodeInstance = null;
@@ -1515,7 +1526,7 @@
 
             // =========================================================================
             // CORE ID GENERATOR: 100-YEAR ROBUST UNIQUE TIMESTAMP SEQUENCE
-            // This replaces the old count-based generator to eliminate identical IDs
+            // This guarantees no two IDs will ever be the same, down to the millisecond.
             // =========================================================================
             static generateUniqueRef(prefix = "") {
                 const now = new Date();
@@ -1526,7 +1537,6 @@
                 const min = String(now.getMinutes()).padStart(2, '0');
                 const ss = String(now.getSeconds()).padStart(2, '0');
                 const ms = String(now.getMilliseconds()).padStart(3, '0');
-                // 3 random digits to guarantee uniqueness even in the same millisecond across tabs
                 const rnd = Math.floor(Math.random() * 1000).toString().padStart(3, '0'); 
                 
                 return `${prefix}${yy}${mm}${dd}${hh}${min}${ss}${ms}${rnd}`;
@@ -1810,7 +1820,7 @@
                 }
                 
                 const optionsHtml = '<option value="" data-type="" data-unitqty="" data-unittype="">Select medicine from stock</option>' + 
-                    filtered.map(item => `<option value="${item.name}" data-type="${item.type \vert{}\vert{} ''}" data-unitqty="${item.unitQty || 1}" data-unittype="${item.unitType \vert{}\vert{} 'Piece'}">${item.name}</option>`).join('');
+                    filtered.map(item => `<option value="${item.name}" data-type="${item.type || ''}" data-unitqty="${item.unitQty || 1}" data-unittype="${item.unitType || 'Piece'}">${item.name}</option>`).join('');
                 
                 select.innerHTML = optionsHtml;
                 
@@ -1982,12 +1992,12 @@
                             <div style="padding:18px 22px;border-bottom:3px solid #1d4ed8;text-align:center;background:#eff6ff;">
                                 <div style="font-size:28px;font-weight:800;letter-spacing:.3px;color:#1d4ed8;text-transform:uppercase;">${clinic.name || 'Clinic Name'}</div>
                                 <div style="font-size:13px;color:#334155;margin-top:6px;">${clinic.address || 'Clinic Address'}</div>
-                                <div style="font-size:13px;color:#334155;margin-top:4px;">Consultant: ${docName} | Reg. No.: ${clinic.regno \vert{}\vert{} 'Not set'} \vert{} Contact:${clinic.mobile || 'Not set'}</div>
+                                <div style="font-size:13px;color:#334155;margin-top:4px;">Consultant: ${docName} | Reg. No.: ${clinic.regno || 'Not set'} | Contact: ${clinic.mobile || 'Not set'}</div>
                             </div>
                             <div style="padding:18px 22px 10px;">
                                 <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:10px 18px;font-size:13px;border-bottom:1px solid #cbd5e1;padding-bottom:12px;">
                                     <div><span style="font-weight:700;">Patient Name:</span> ${patient.name || 'Not recorded'}</div>
-                                    <div><span style="font-weight:700;">Age/Sex:</span> ${patient.ageVal \vert{}\vert{} ''}${patient.ageUnit || ''}</div>
+                                    <div><span style="font-weight:700;">Age/Sex:</span> ${patient.ageVal || ''} ${patient.ageUnit || ''}</div>
                                     <div><span style="font-weight:700;">Date:</span> ${visitDate}</div>
                                     <div><span style="font-weight:700;">Address:</span> ${patient.address || 'Not recorded'}</div>
                                     <div><span style="font-weight:700;">Contact:</span> ${patient.mobile || 'Not recorded'}</div>
@@ -2003,7 +2013,8 @@
                                         <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:#1d4ed8;text-transform:uppercase;margin-bottom:5px;">Diagnosis</div>
                                         <div style="min-height:48px;border:1px solid #cbd5e1;border-radius:10px;padding:10px 12px;font-size:14px;line-height:1.6;background:#f8fafc;">${diagnosis}</div>
                                     </div>
-                                    ${invHtml}${treatmentHtml}
+                                    ${invHtml}
+                                    ${treatmentHtml}
                                     <div>
                                         <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:#1d4ed8;text-transform:uppercase;margin-bottom:5px;">Prescription</div>
                                         <div style="min-height:220px;border:1.5px solid #94a3b8;border-radius:10px;padding:14px 14px 16px;font-size:15px;line-height:1.9;white-space:pre-wrap;background:#ffffff;">℞\n${rxText}</div>
@@ -2123,7 +2134,7 @@
                     jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
                 };
 
-                const msgText = `Hello ${patient.name},\nHere is your prescription from${clinic.name || 'our clinic'}. Please find the attached PDF document.`;
+                const msgText = `Hello ${patient.name},\nHere is your prescription from ${clinic.name || 'our clinic'}. Please find the attached PDF document.`;
                 let mobileNum = patient.mobile ? patient.mobile.replace(/\D/g, '') : '';
                 if(mobileNum.length === 10) mobileNum = '91' + mobileNum; 
 
@@ -2384,7 +2395,7 @@
                 availableMeds.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
 
                 select.innerHTML = '<option value="" disabled selected>-- Select Medicine --</option>' + 
-                    availableMeds.map(i => `<option value="${i.id}">${i.name} (Stock:${parseFloat(Number(i.qty).toFixed(2))})</option>`).join('');
+                    availableMeds.map(i => `<option value="${i.id}">${i.name} (Stock: ${parseFloat(Number(i.qty).toFixed(2))})</option>`).join('');
             }
 
             static syncOTCDropdowns(db) {
@@ -2561,7 +2572,6 @@
             static handleBillingVisitChange() {
                 document.getElementById('bill-visit-id').value = document.getElementById('bill-visit-date').value;
             }
-
             static renderUPIQR() {
                 const mode = document.getElementById('bill-payment-mode').value;
                 const amt = parseFloat(document.getElementById('bill-amount').value) || 0;
@@ -3629,7 +3639,6 @@
                     container.appendChild(tr);
                 });
             }
-
             static exportPatientsCSV() {
                 const db = SystemStorage.read();
                 let csvContent = "data:text/csv;charset=utf-8,";
@@ -4394,4 +4403,3 @@
     </script>
 </body>
 </html>
-                                
