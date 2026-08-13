@@ -1568,7 +1568,8 @@
                     timestamp: now.getTime()
                 };
             }
-// =========================================================================
+
+           // =========================================================================
             // CORE ID GENERATOR: STRICT CHRONOLOGICAL SEQUENCE (e.g. 26081301)
             // =========================================================================
             static generateSequentialID(db, collectionName, prefix = "") {
@@ -1595,6 +1596,11 @@
                             maxSeq = num;
                         }
                     }
+                });
+
+                const nextSeq = String(maxSeq + 1).padStart(2, '0'); 
+                return `${prefix}${datePrefix}${nextSeq}`;
+            }
                 });
 
                 const nextSeq = String(maxSeq + 1).padStart(2, '0'); 
@@ -4475,5 +4481,4 @@
         });
     </script>
 </body>
-</html>
-                            
+</html>                    
