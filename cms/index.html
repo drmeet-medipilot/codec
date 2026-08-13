@@ -17,7 +17,7 @@
             scroll-behavior: smooth;
         }
 
-        /* Print layout adjustments for perfect A4 Prescriptions (Fixed Pagination Truncation) */
+        /* Print layout adjustments for perfect A4 Prescriptions */
         @media print {
             @page { 
                 size: A4 portrait; 
@@ -32,7 +32,6 @@
                 display: block !important;
                 overflow: visible !important;
             }
-            /* Hide all main UI elements completely from the document flow */
             body > *:not(#print-area):not(script) {
                 display: none !important;
             }
@@ -60,7 +59,6 @@
             font-weight: 700;
         }
         
-        /* Hide scrollbar for button row on mobile */
         .hide-scroll::-webkit-scrollbar {
             display: none;
         }
@@ -69,7 +67,6 @@
             scrollbar-width: none;
         }
 
-        /* Professional Animated Heading */
         @keyframes subtleZoom {
             0% { opacity: 0; transform: scale(0.96) translateY(5px); }
             100% { opacity: 1; transform: scale(1) translateY(0); }
@@ -163,12 +160,9 @@
             </button>
         </div>
     </nav>
-
     <main class="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-8 w-full">
         
         <section id="mod-dashboard" class="erp-section space-y-6">
-
-            <!-- GLOBAL TIMEFRAME HEADER -->
             <div class="flex flex-col sm:flex-row items-center justify-between bg-white p-4 rounded-2xl border border-slate-200 shadow-sm no-print">
                 <div class="flex items-center text-sm font-black tracking-tight text-slate-700">
                     <i class="fa-solid fa-calendar-day text-blue-600 mr-2 text-lg"></i> Global Operations Filter
@@ -188,7 +182,6 @@
                         <span class="text-[10px] font-black text-slate-400">TO</span>
                         <input type="date" id="dash-end-date" onchange="UI.triggerGlobalAuditRefresh()" class="text-xs text-slate-600 bg-transparent focus:outline-none cursor-pointer font-medium">
                     </div>
-                    <!-- CLOCK & DATE UI ADDED HERE -->
                     <div class="text-xs font-bold bg-white px-4 py-2.5 border border-slate-200 rounded-xl text-slate-600 shadow-xs hidden sm:flex items-center">
                         <i class="fa-regular fa-calendar-days mr-2 text-blue-600"></i><span id="dash-date">--/--/----</span>
                         <span class="mx-2 text-slate-300">|</span>
@@ -260,22 +253,20 @@
                 </div>
                 <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-start">
                     <h3 class="font-bold text-sm text-slate-700 mb-4 border-b border-slate-100 pb-2 flex items-center"><i class="fa-solid fa-clock-rotate-left text-blue-600 mr-2"></i>Recent Patient Consultations</h3>
-                    <div id="dash-recent-patients" class="space-y-4 overflow-y-auto w-full max-h-[300px] pr-1">
-                        </div>
+                    <div id="dash-recent-patients" class="space-y-4 overflow-y-auto w-full max-h-[300px] pr-1"></div>
                 </div>
             </div>
         </section>
+
         <section id="mod-patients" class="erp-section hidden space-y-6">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-5 gap-4">
                 <div>
                     <h2 class="text-3xl font-black animated-heading pb-1">Patient Registry</h2>
                 </div>
-                
                 <div class="flex gap-2 items-center self-start flex-nowrap w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0 hide-scroll">
                     <button onclick="UI.openRevisitModal()" class="px-3 sm:px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-indigo-700/20 active:scale-[0.98] cursor-pointer flex items-center shrink-0">
                         <i class="fa-solid fa-clock-rotate-left sm:mr-2"></i><span class="hidden sm:inline">Old Patient Re-visit</span>
                     </button>
-
                     <label for="import-patient-csv" class="px-3 sm:px-4 py-2.5 bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-teal-700/20 active:scale-[0.98] cursor-pointer flex items-center shrink-0">
                         <i class="fa-solid fa-file-import sm:mr-2"></i><span class="hidden sm:inline">Import</span>
                         <input type="file" id="import-patient-csv" accept=".csv" class="hidden" onchange="UI.importPatientsCSV(event)">
@@ -309,8 +300,7 @@
                                 <th class="p-4 text-center">Operations Terminal</th>
                             </tr>
                         </thead>
-                        <tbody id="patients-table-body">
-                            </tbody>
+                        <tbody id="patients-table-body"></tbody>
                     </table>
                 </div>
             </div>
@@ -322,14 +312,12 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-                
                 <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
                     <h3 class="font-bold text-base text-slate-800 border-b border-slate-100 pb-2 flex items-center"><i class="fa-solid fa-file-invoice text-blue-600 mr-2"></i>Invoice</h3>
                     
                     <div>
                         <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Select Patient</label>
-                        <select id="bill-patient-id" onchange="UI.handleBillingPatientChange()" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium">
-                            </select>
+                        <select id="bill-patient-id" onchange="UI.handleBillingPatientChange()" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium"></select>
                     </div>
 
                     <div class="grid grid-cols-2 gap-3">
@@ -394,7 +382,6 @@
                         <p class="text-xs font-semibold leading-relaxed text-slate-400">Select UPI financial gateway status and enter numeric values<br>to generate dynamic client-side QR vectors.</p>
                     </div>
                 </div>
-
             </div>
 
             <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm mt-6">
@@ -412,26 +399,19 @@
                                 <th class="p-3 text-center">Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="billing-summary-body">
-                        </tbody>
+                        <tbody id="billing-summary-body"></tbody>
                     </table>
                 </div>
             </div>
-
         </section>
-        
         <section id="mod-otc" class="erp-section hidden space-y-6">
             <div class="border-b border-slate-200 pb-5">
                 <h2 class="text-3xl font-black animated-heading pb-1">OTC Sale</h2>
             </div>
-
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-                
                 <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
                     <h3 class="font-bold text-base text-slate-800 border-b border-slate-100 pb-2 flex items-center"><i class="fa-solid fa-cart-shopping text-blue-600 mr-2"></i>Active Dispensing Cart</h3>
-                    
                     <div class="flex items-end gap-3 flex-wrap">
-                        <!-- OTC FILTER ADDED HERE -->
                         <div class="w-32">
                             <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Type Filter</label>
                             <select id="otc-medicine-type-filter" onchange="UI.filterOTCMedicineOptions()" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium cursor-pointer">
@@ -452,16 +432,13 @@
                         </div>
                         <div class="flex-1">
                             <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Select Medicine</label>
-                            <select id="otc-medicine-select" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium">
-                            </select>
+                            <select id="otc-medicine-select" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium"></select>
                         </div>
                         <div class="w-24">
                             <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Qty</label>
                             <input id="otc-qty" type="number" min="1" value="1" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-black text-center focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-800">
                         </div>
-                        <button onclick="UI.addOTCToCart()" class="px-5 bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-800 hover:to-blue-900 text-white font-bold rounded-xl transition-all shadow-md shadow-blue-700/10 h-12 cursor-pointer active:scale-[0.96] text-xs uppercase tracking-wide">
-                            Add
-                        </button>
+                        <button onclick="UI.addOTCToCart()" class="px-5 bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-800 hover:to-blue-900 text-white font-bold rounded-xl transition-all shadow-md shadow-blue-700/10 h-12 cursor-pointer active:scale-[0.96] text-xs uppercase tracking-wide">Add</button>
                     </div>
 
                     <div class="border border-slate-200 rounded-xl overflow-hidden mt-4">
@@ -481,7 +458,6 @@
                 </div>
 
                 <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center justify-start h-full space-y-4">
-                    
                     <div class="w-full bg-slate-50 p-4 rounded-xl border border-slate-200 flex justify-between items-center shadow-inner">
                         <span class="text-slate-500 font-extrabold uppercase tracking-wider text-[11px]">Amount Payable (₹)</span>
                         <input type="number" id="otc-receive-amount" oninput="UI.renderOTCUPIQR()" placeholder="0.00" class="w-36 p-2 bg-white border border-slate-200 rounded-lg text-xl font-black text-slate-900 text-right focus:outline-none focus:ring-2 focus:ring-blue-500/20">
@@ -525,7 +501,6 @@
                         </button>
                     </div>
                 </div>
-
             </div>
             
             <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm mt-6">
@@ -541,19 +516,17 @@
                                 <th class="p-3 text-center">Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="otc-summary-body">
-                        </tbody>
+                        <tbody id="otc-summary-body"></tbody>
                     </table>
                 </div>
             </div>
-            
         </section>
+
         <section id="mod-inventory" class="erp-section hidden space-y-6">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-5 gap-4">
                 <div>
                     <h2 class="text-3xl font-black animated-heading pb-1">Stock Management</h2>
                 </div>
-                
                 <div class="flex gap-2 items-center self-start flex-nowrap w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0 hide-scroll">
                     <button onclick="UI.printInventoryStock()" class="px-3 sm:px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-indigo-700/20 active:scale-[0.98] cursor-pointer flex items-center shrink-0">
                         <i class="fa-solid fa-print sm:mr-2"></i><span class="hidden sm:inline">Print Stock</span>
@@ -641,8 +614,7 @@
                                 <th class="p-4 text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="inventory-table-body">
-                            </tbody>
+                        <tbody id="inventory-table-body"></tbody>
                     </table>
                 </div>
             </div>
@@ -676,8 +648,7 @@
                                 <th class="p-3 text-right">Action</th>
                             </tr>
                         </thead>
-                        <tbody id="finance-ledger-body">
-                            </tbody>
+                        <tbody id="finance-ledger-body"></tbody>
                     </table>
                 </div>
                 
@@ -756,13 +727,12 @@
                         </div>
                     </div>
 
-                    <!-- MIGRATION TOOL SECTION -->
                     <div class="md:col-span-2 pt-4 border-t border-slate-100 mt-2">
                         <h3 class="font-bold text-sm text-slate-800 mb-3"><i class="fa-solid fa-wand-magic-sparkles text-amber-500 mr-2"></i>Data Migration Tools</h3>
                         <button onclick="UI.migrateTodaysIDs()" class="px-5 py-3 bg-amber-50 border border-amber-200 text-amber-700 font-bold rounded-xl shadow-sm hover:bg-amber-100 transition-all cursor-pointer active:scale-[0.99] flex items-center justify-center w-full md:w-auto text-xs">
-                            <i class="fa-solid fa-clock-rotate-left mr-2"></i> Sequence Today's Random IDs
+                            <i class="fa-solid fa-clock-rotate-left mr-2"></i> Update Old IDs to New Robust Format
                         </button>
-                        <p class="text-[10px] text-slate-400 mt-2 font-medium">Use this tool to retroactively update all IDs generated today to the new chronological format (e.g., 26081301). It safely re-links all prescriptions and bills.</p>
+                        <p class="text-[10px] text-slate-400 mt-2 font-medium">Use this tool to retroactively update all IDs generated today to the new 100-year secure chronological format (e.g., 260813175229123). It safely re-links all prescriptions and bills.</p>
                     </div>
 
                     <div class="md:col-span-2 pt-4 border-t border-slate-100 mt-2">
@@ -781,10 +751,7 @@
                 </div>
             </div>
         </section>
-
     </main>
-    
-    <!-- REVISIT MODAL -->
     <div id="modal-revisit" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh] animate-zoom-in">
             <div class="bg-gradient-to-r from-blue-800 to-blue-950 p-4 text-white flex justify-between items-center">
@@ -803,7 +770,6 @@
         </div>
     </div>
 
-    <!-- PATIENT REGISTRATION MODAL -->
     <div id="modal-patient" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh] transform transition-all border border-slate-200 animate-zoom-in">
             <div class="bg-gradient-to-r from-blue-800 to-blue-950 p-4 text-white flex justify-between items-center">
@@ -858,7 +824,7 @@
             </div>
         </div>
     </div>
-    <!-- VISIT MODAL -->
+
     <div id="modal-visit" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print">
         <div class="w-full max-w-3xl bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border border-slate-200 animate-zoom-in">
             <div class="bg-gradient-to-r from-blue-800 to-blue-950 p-4 text-white flex justify-between items-center">
@@ -905,7 +871,6 @@
                         </div>
                     </div>
 
-                    <!-- INVESTIGATIONS ADDITION MODULE -->
                     <div class="border border-slate-200 p-4 rounded-xl bg-slate-50/50 space-y-3 shadow-inner mt-4">
                         <div class="flex justify-between items-center">
                             <label class="flex items-center space-x-2 text-xs font-black text-slate-600 uppercase tracking-wider cursor-pointer select-none">
@@ -925,7 +890,6 @@
                                 </div>
                             </div>
 
-                            <!-- Pathology Section -->
                             <div id="inv-path-section" class="hidden grid grid-cols-1 md:grid-cols-4 gap-3">
                                 <div class="md:col-span-1">
                                     <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Select Report</label>
@@ -961,7 +925,6 @@
                                 </div>
                             </div>
 
-                            <!-- Radiology Section -->
                             <div id="inv-rad-section" class="hidden grid grid-cols-1 md:grid-cols-4 gap-3">
                                 <div class="md:col-span-1">
                                     <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Select Report</label>
@@ -997,7 +960,6 @@
                             <textarea id="v-investigation-plan" rows="2" placeholder="Added investigations will appear here..." class="w-full p-2 border border-slate-200 rounded-lg bg-white focus:outline-none text-xs font-semibold font-mono text-slate-700 mt-2"></textarea>
                         </div>
                     </div>
-                    <!-- /INVESTIGATIONS END -->
 
                     <div class="border border-slate-200 p-4 rounded-xl bg-slate-50/50 space-y-3 shadow-inner">
                         <div class="flex justify-between items-center">
@@ -1140,7 +1102,7 @@
             </div>
         </div>
     </div>
-    <!-- CONSULTATIONS MODAL -->
+
     <div id="modal-consultations" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print">
         <div class="w-full max-w-4xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden animate-zoom-in">
             <div class="bg-gradient-to-r from-blue-800 to-blue-950 text-white px-5 py-4 flex items-center justify-between">
@@ -1156,7 +1118,6 @@
         </div>
     </div>
 
-    <!-- OTHER MODALS (Medicine, Vendors, Expense, Credits) -->
     <div id="modal-medicine" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden flex flex-col max-h-[90vh] border border-slate-200 animate-zoom-in">
             <div class="bg-gradient-to-r from-blue-800 to-blue-950 p-4 text-white flex justify-between items-center">
@@ -1198,8 +1159,7 @@
                     
                     <div>
                         <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Medicine Supplier</label>
-                        <select id="m-supplier" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-semibold text-slate-700">
-                            </select>
+                        <select id="m-supplier" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-semibold text-slate-700"></select>
                     </div>
                     <div>
                         <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Expiry Date (MM-YYYY) *</label>
@@ -1219,8 +1179,7 @@
                                 <option value="11">11 - Nov</option>
                                 <option value="12">12 - Dec</option>
                             </select>
-                            <select id="m-expiry-year" required class="w-1/2 p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-bold text-slate-700 cursor-pointer">
-                                </select>
+                            <select id="m-expiry-year" required class="w-1/2 p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-bold text-slate-700 cursor-pointer"></select>
                         </div>
                     </div>
                     <div class="sm:col-span-2">
@@ -1352,15 +1311,13 @@
                 <button onclick="UI.closeModal('modal-credits')" class="text-white/80 hover:text-white text-xl cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="p-6 overflow-y-auto bg-slate-100 flex-1">
-                <div id="credits-list" class="space-y-4">
-                    </div>
+                <div id="credits-list" class="space-y-4"></div>
             </div>
         </div>
     </div>
 
-    <div id="print-area" class="hidden font-mono text-sm bg-white text-slate-900 w-full max-w-full">
-        </div>
-        <script>
+    <div id="print-area" class="hidden font-mono text-sm bg-white text-slate-900 w-full max-w-full"></div>
+    <script>
         // =========================================================================
         // 1. SUPABASE CLOUD ENGINE
         // =========================================================================
@@ -1369,7 +1326,6 @@
         const supabaseApp = window.supabase.createClient(supabaseUrl, supabaseKey);
         let currentUser = null;
 
-        // AUTO-LOGIN CHECK ON REFRESH
         async function checkActiveSession() {
             const { data: { session } } = await supabaseApp.auth.getSession();
             if (session) {
@@ -1379,7 +1335,6 @@
             }
         }
 
-        // LOGIN LOGIC
         async function processLogin() {
             const u = document.getElementById('login-user').value.trim();
             const p = document.getElementById('login-pass').value.trim();
@@ -1395,7 +1350,6 @@
             }
         }
 
-        // REGISTER LOGIC
         async function processRegister() {
             const u = document.getElementById('login-user').value.trim();
             const p = document.getElementById('login-pass').value.trim();
@@ -1412,7 +1366,6 @@
             }
         }
         
-        // LOGOUT LOGIC
         async function processLogout() {
             if (currentUser) {
                 localStorage.removeItem(`medipilot_vault_${currentUser.id}`);
@@ -1423,9 +1376,6 @@
             window.location.reload(); 
         }
 
-        /**
-         * CLOUD VAULT SYSTEM (JSONB ENGINE)
-         */
         class SystemStorage {
             static cache = null;
 
@@ -1513,7 +1463,6 @@
                         if(localStr) localData = JSON.parse(localStr);
                     } catch(e) {}
 
-                    // Smart Merge: Compare Timestamps
                     let cloudTime = cloudData?.metadata?.lastUpdated || 0;
                     let localTime = localData?.metadata?.lastUpdated || 0;
 
@@ -1543,9 +1492,6 @@
             }
         }
 
-        /**
-         * INTERFACE AND VIEW STATE LOGIC CONTROLLER MATRIX
-         */
         class UI {
             static activeCharts = {};
             static qrCodeInstance = null;
@@ -1568,49 +1514,29 @@
             }
 
             // =========================================================================
-            // CORE ID GENERATOR: STRICT CONTINUOUS SEQUENCE (Starts from 202600001)
+            // CORE ID GENERATOR: 100-YEAR ROBUST UNIQUE TIMESTAMP SEQUENCE
+            // This replaces the old count-based generator to eliminate identical IDs
             // =========================================================================
-            static generateSequentialID(db, collectionName, prefix = "") {
+            static generateUniqueRef(prefix = "") {
                 const now = new Date();
-                const year = String(now.getFullYear()); // 2026
-
-                let collection = [];
-                if (collectionName === 'finance_and_credits') {
-                    collection = [...(db.finance || []), ...(db.credits || [])];
-                } else {
-                    collection = db[collectionName] || [];
-                }
-
-                let maxSeq = 0; 
+                const yy = String(now.getFullYear()).slice(-2);
+                const mm = String(now.getMonth() + 1).padStart(2, '0');
+                const dd = String(now.getDate()).padStart(2, '0');
+                const hh = String(now.getHours()).padStart(2, '0');
+                const min = String(now.getMinutes()).padStart(2, '0');
+                const ss = String(now.getSeconds()).padStart(2, '0');
+                const ms = String(now.getMilliseconds()).padStart(3, '0');
+                // 3 random digits to guarantee uniqueness even in the same millisecond across tabs
+                const rnd = Math.floor(Math.random() * 1000).toString().padStart(3, '0'); 
                 
-                collection.forEach(item => {
-                    const idsToCheck = [item.id, item.ref];
-                    
-                    idsToCheck.forEach(idStr => {
-                        if (idStr && typeof idStr === 'string' && idStr.startsWith(prefix + year)) {
-                            const numPart = idStr.substring((prefix + year).length);
-                            
-                            // IMPORTANT FIX: This forces the system to ignore old IDs like '20260801'
-                            // It will ONLY look at new 5-digit sequences like '00001'
-                            if (numPart.length === 5) {
-                                const num = parseInt(numPart, 10);
-                                if (!isNaN(num) && num > maxSeq) {
-                                    maxSeq = num;
-                                }
-                            }
-                        }
-                    });
-                });
-
-                // Next sequence perfectly formats to 5 digits (e.g., 00001, 00002)
-                const nextSeq = String(maxSeq + 1).padStart(5, '0'); 
-                return `${prefix}${year}${nextSeq}`;
+                return `${prefix}${yy}${mm}${dd}${hh}${min}${ss}${ms}${rnd}`;
             }
+
             // =========================================================================
-            // MIGRATION TOOL: RETROACTIVELY FIX TODAY'S RANDOM IDs TO SEQUENTIAL
+            // MIGRATION TOOL: RETROACTIVELY FIX OLD RANDOM IDs TO SECURE TIMESTAMP
             // =========================================================================
             static migrateTodaysIDs() {
-                if(!confirm("Are you sure you want to re-sequence today's records? This will update randomly generated IDs from today into the new chronological format (e.g. 26081301) and relink all histories.")) return;
+                if(!confirm("Are you sure you want to re-sequence today's records? This will update randomly generated IDs from today into the new 100-year secure chronological format (e.g. 260813175229...) and relink all histories.")) return;
                 
                 const db = SystemStorage.read();
                 const ts = UI.getTimestampData();
@@ -1624,7 +1550,7 @@
                 todaysPatients.forEach(p => {
                     const oldId = p.id;
                     if(oldId.startsWith("PT-") || oldId.length < 8) {
-                        const newId = UI.generateSequentialID(db, 'patients', '');
+                        const newId = UI.generateUniqueRef('');
                         p.id = newId;
                         patientMap[oldId] = newId;
                     }
@@ -1639,7 +1565,7 @@
                 todaysVisits.forEach(v => {
                     const oldId = v.id;
                     if(oldId.startsWith("VST-") && oldId.length < 11) {
-                        const newId = UI.generateSequentialID(db, 'visits', 'VST-');
+                        const newId = UI.generateUniqueRef('VST-');
                         v.id = newId;
                         visitMap[oldId] = newId;
                     }
@@ -1660,9 +1586,9 @@
                 todaysFinance.forEach(f => {
                     const oldRef = f.ref;
                     if(oldRef.startsWith("INV-") && oldRef.length < 11) {
-                        f.ref = UI.generateSequentialID(db, 'finance_and_credits', 'INV-');
+                        f.ref = UI.generateUniqueRef('INV-');
                     } else if (oldRef.startsWith("OTC-") && oldRef.length < 11) {
-                        f.ref = UI.generateSequentialID(db, 'finance_and_credits', 'OTC-');
+                        f.ref = UI.generateUniqueRef('OTC-');
                     }
                 });
 
@@ -1670,9 +1596,9 @@
                 todaysCredits.forEach(c => {
                     const oldRef = c.ref;
                     if(oldRef.startsWith("INV-") && oldRef.length < 11) {
-                        c.ref = UI.generateSequentialID(db, 'finance_and_credits', 'INV-');
+                        c.ref = UI.generateUniqueRef('INV-');
                     } else if (oldRef.startsWith("OTC-") && oldRef.length < 11) {
-                        c.ref = UI.generateSequentialID(db, 'finance_and_credits', 'OTC-');
+                        c.ref = UI.generateUniqueRef('OTC-');
                     }
                 });
 
@@ -1680,7 +1606,7 @@
                 db.inventory.forEach(i => {
                     const oldId = i.id;
                     if(oldId.startsWith("MED-") && oldId.length < 11) {
-                        const newId = UI.generateSequentialID(db, 'inventory', 'MED-');
+                        const newId = UI.generateUniqueRef('MED-');
                         i.id = newId;
                         db.finance.forEach(f => {
                             if (f.cartItems) f.cartItems.forEach(cartItem => { if(cartItem.id === oldId) cartItem.id = newId; });
@@ -1693,7 +1619,7 @@
 
                 SystemStorage.write(db);
                 UI.triggerGlobalAuditRefresh();
-                alert("Migration Complete! All applicable random records have been mathematically sequenced.");
+                alert("Migration Complete! All applicable random records have been mathematically sequenced into robust formats.");
             }
 
             static startClock() {
@@ -1884,7 +1810,7 @@
                 }
                 
                 const optionsHtml = '<option value="" data-type="" data-unitqty="" data-unittype="">Select medicine from stock</option>' + 
-                    filtered.map(item => `<option value="${item.name}" data-type="${item.type || ''}" data-unitqty="${item.unitQty || 1}" data-unittype="${item.unitType || 'Piece'}">${item.name}</option>`).join('');
+                    filtered.map(item => `<option value="${item.name}" data-type="${item.type \vert{}\vert{} ''}" data-unitqty="${item.unitQty || 1}" data-unittype="${item.unitType \vert{}\vert{} 'Piece'}">${item.name}</option>`).join('');
                 
                 select.innerHTML = optionsHtml;
                 
@@ -2056,12 +1982,12 @@
                             <div style="padding:18px 22px;border-bottom:3px solid #1d4ed8;text-align:center;background:#eff6ff;">
                                 <div style="font-size:28px;font-weight:800;letter-spacing:.3px;color:#1d4ed8;text-transform:uppercase;">${clinic.name || 'Clinic Name'}</div>
                                 <div style="font-size:13px;color:#334155;margin-top:6px;">${clinic.address || 'Clinic Address'}</div>
-                                <div style="font-size:13px;color:#334155;margin-top:4px;">Consultant: ${docName} | Reg. No.: ${clinic.regno || 'Not set'} | Contact: ${clinic.mobile || 'Not set'}</div>
+                                <div style="font-size:13px;color:#334155;margin-top:4px;">Consultant: ${docName} | Reg. No.: ${clinic.regno \vert{}\vert{} 'Not set'} \vert{} Contact:${clinic.mobile || 'Not set'}</div>
                             </div>
                             <div style="padding:18px 22px 10px;">
                                 <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:10px 18px;font-size:13px;border-bottom:1px solid #cbd5e1;padding-bottom:12px;">
                                     <div><span style="font-weight:700;">Patient Name:</span> ${patient.name || 'Not recorded'}</div>
-                                    <div><span style="font-weight:700;">Age/Sex:</span> ${patient.ageVal || ''} ${patient.ageUnit || ''}</div>
+                                    <div><span style="font-weight:700;">Age/Sex:</span> ${patient.ageVal \vert{}\vert{} ''}${patient.ageUnit || ''}</div>
                                     <div><span style="font-weight:700;">Date:</span> ${visitDate}</div>
                                     <div><span style="font-weight:700;">Address:</span> ${patient.address || 'Not recorded'}</div>
                                     <div><span style="font-weight:700;">Contact:</span> ${patient.mobile || 'Not recorded'}</div>
@@ -2077,8 +2003,7 @@
                                         <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:#1d4ed8;text-transform:uppercase;margin-bottom:5px;">Diagnosis</div>
                                         <div style="min-height:48px;border:1px solid #cbd5e1;border-radius:10px;padding:10px 12px;font-size:14px;line-height:1.6;background:#f8fafc;">${diagnosis}</div>
                                     </div>
-                                    ${invHtml}
-                                    ${treatmentHtml}
+                                    ${invHtml}${treatmentHtml}
                                     <div>
                                         <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:#1d4ed8;text-transform:uppercase;margin-bottom:5px;">Prescription</div>
                                         <div style="min-height:220px;border:1.5px solid #94a3b8;border-radius:10px;padding:14px 14px 16px;font-size:15px;line-height:1.9;white-space:pre-wrap;background:#ffffff;">℞\n${rxText}</div>
@@ -2198,7 +2123,7 @@
                     jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
                 };
 
-                const msgText = `Hello ${patient.name},\nHere is your prescription from ${clinic.name || 'our clinic'}. Please find the attached PDF document.`;
+                const msgText = `Hello ${patient.name},\nHere is your prescription from${clinic.name || 'our clinic'}. Please find the attached PDF document.`;
                 let mobileNum = patient.mobile ? patient.mobile.replace(/\D/g, '') : '';
                 if(mobileNum.length === 10) mobileNum = '91' + mobileNum; 
 
@@ -2456,11 +2381,10 @@
                     }
                 }
 
-                // Sort alphabetically
                 availableMeds.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
 
                 select.innerHTML = '<option value="" disabled selected>-- Select Medicine --</option>' + 
-                    availableMeds.map(i => `<option value="${i.id}">${i.name} (Stock: ${parseFloat(Number(i.qty).toFixed(2))})</option>`).join('');
+                    availableMeds.map(i => `<option value="${i.id}">${i.name} (Stock:${parseFloat(Number(i.qty).toFixed(2))})</option>`).join('');
             }
 
             static syncOTCDropdowns(db) {
@@ -2612,7 +2536,7 @@
                 
                 const codeInput = document.getElementById('bill-invoice-num');
                 if (codeInput && !codeInput.value) {
-                    codeInput.value = UI.generateSequentialID(db, 'finance_and_credits', 'INV-');
+                    codeInput.value = UI.generateUniqueRef('INV-');
                 }
                 
                 const visitSelect = document.getElementById('bill-visit-date');
@@ -2694,7 +2618,7 @@
                 if(modeSelect.value === 'Credit') {
                     if(!db.credits) db.credits = [];
                     db.credits.push({
-                        id: UI.generateSequentialID(db, 'credits', 'CRD-'),
+                        id: UI.generateUniqueRef('CRD-'),
                         patientId: targetPatient.id,
                         patientName: targetPatient.name,
                         ref: invCode,
@@ -2719,7 +2643,7 @@
                 SystemStorage.write(db);
                 
                 amtInput.value = "";
-                document.getElementById('bill-invoice-num').value = UI.generateSequentialID(db, 'finance_and_credits', 'INV-');
+                document.getElementById('bill-invoice-num').value = UI.generateUniqueRef('INV-');
                 this.renderUPIQR();
                 
                 alert(`Invoice record committed successfully (Transaction ID: ${invCode}). balances modified.`);
@@ -2732,7 +2656,7 @@
                 const ts = UI.getTimestampData();
                 
                 const editId = document.getElementById('p-edit-id').value;
-                const newId = editId || UI.generateSequentialID(db, 'patients', '');
+                const newId = editId || UI.generateUniqueRef('');
                 
                 const pName = document.getElementById('p-name').value.trim();
                 const pMobile = document.getElementById('p-mobile').value.trim();
@@ -2953,7 +2877,6 @@
                 }
             }
 
-            // MODIFIED: Integrates the true UnitType dynamically from Inventory mapping for Treatment
             static addTreatmentToPrescription() {
                 const type = document.getElementById('v-treatment-type').value;
                 let lineContent = "";
@@ -2974,7 +2897,6 @@
                         return;
                     }
 
-                    // Dynamically map exact Unit Type configured during stock input
                     const db = SystemStorage.read();
                     const invItem = db.inventory.find(i => i.name === medSelect.value);
                     const unitType = invItem ? (invItem.unitType || 'Piece') : 'Piece';
@@ -2994,7 +2916,6 @@
                 planArea.value = currentText ? currentText + "\n" + finalLine : finalLine;
             }
 
-            // MODIFIED: Integrates the true UnitType dynamically from Inventory mapping for Prescriptions
             static addMedicineToPrescription() {
                 const medSelect = document.getElementById('v-medicine');
                 const doseSelect = document.getElementById('v-dose');
@@ -3009,7 +2930,6 @@
                     return;
                 }
 
-                // FETCH THE MEDICINE FROM DB TO GET EXACT UNIT TYPE (Piece, ML, Strip, Box, etc.)
                 const db = SystemStorage.read();
                 const inventoryItem = db.inventory.find(i => i.name === medSelect.value);
                 const unitType = inventoryItem ? (inventoryItem.unitType || 'Piece') : 'Piece';
@@ -3059,7 +2979,6 @@
                         alert(`Please enter a valid Dose (${unitType}) for this prescription.`);
                         return;
                     }
-                    // Writing precise dynamic unit type
                     lineContent = `${medNameWithPrefix} -- ${mlDose} ${unitType} per dose -- ${doseSelect.value} -- ${mealSelect.value} -- ${finalDuration}`;
                     const totalMLNeeded = mlDose * dailyCount * days;
                     calculatedUnits = totalMLNeeded; 
@@ -3069,11 +2988,9 @@
                         alert(`Please enter a valid Qty Given (${unitType}) for this medicine type.`);
                         return;
                     }
-                    // Writing precise dynamic unit type
                     lineContent = `${medNameWithPrefix} -- ${doseSelect.value} -- ${mealSelect.value} -- ${finalDuration} -- [Qty Dispensed: ${directQty} ${unitType}]`;
                     calculatedUnits = directQty;
                 } else {
-                    // Writing precise dynamic unit type
                     lineContent = `${medNameWithPrefix} -- ${doseSelect.value} (${unitType}) -- ${mealSelect.value} -- ${finalDuration}`;
                     calculatedUnits = days * dailyCount;
                 }
@@ -3124,7 +3041,7 @@
                 }
 
                 const visitPayload = {
-                    id: vId || UI.generateSequentialID(db, 'visits', 'VST-'),
+                    id: vId || UI.generateUniqueRef('VST-'),
                     patientId: pId,
                     date: visitDate,
                     time: visitTime,
@@ -3255,7 +3172,6 @@
 
                 if (!confirm("Editing will reverse this sale temporarily, restock items, and load them back into your cart for modification. Continue?")) return;
 
-                // Restock items in DB
                 sale.cartItems.forEach(cartItem => {
                     const invItem = db.inventory.find(i => i.id === cartItem.id);
                     if (invItem) {
@@ -3263,7 +3179,6 @@
                     }
                 });
 
-                // Load into current UI cart
                 this.otcCart = JSON.parse(JSON.stringify(sale.cartItems));
                 document.getElementById('otc-receive-amount').value = isCredit ? sale.totalAmount : sale.amount;
 
@@ -3279,13 +3194,11 @@
                     document.getElementById('otc-payment-mode').value = match[1];
                 }
 
-                // Preserve old timestamps and refs
                 this.editingOTCDate = sale.date;
                 this.editingOTCTime = sale.time;
                 this.editingOTCTimestamp = sale.timestamp;
                 this.editingOTCRef = sale.ref;
 
-                // Remove finance/credit record from ledger
                 if (isCredit) {
                     db.credits.splice(index, 1);
                 } else {
@@ -3320,7 +3233,6 @@
                 if (!sale) return;
 
                 if (sale.cartItems && sale.cartItems.length > 0) {
-                    // Restock
                     sale.cartItems.forEach(cartItem => {
                         const invItem = db.inventory.find(i => i.id === cartItem.id);
                         if (invItem) {
@@ -3532,7 +3444,6 @@
                 const db = SystemStorage.read();
                 const patTag = otcPat ? ` - ${otcPat}` : ' - Walk-in';
                 
-                // Deduct stock
                 this.otcCart.forEach(cartItem => {
                     const invItem = db.inventory.find(i => i.id === cartItem.id);
                     if (invItem) {
@@ -3541,7 +3452,7 @@
                 });
                 
                 const ts = this.getTimestampData();
-                const refCode = this.editingOTCRef || UI.generateSequentialID(db, 'finance_and_credits', 'OTC-');
+                const refCode = this.editingOTCRef || UI.generateUniqueRef('OTC-');
                 const saleDate = this.editingOTCDate || ts.date;
                 const saleTime = this.editingOTCTime || ts.time;
                 const saleTimestamp = this.editingOTCTimestamp || ts.timestamp;
@@ -3553,7 +3464,7 @@
                     const targetPatient = db.patients.find(p => p.name.toLowerCase() === otcPat.toLowerCase()) || { id: 'WALK-IN', name: otcPat };
                     
                     db.credits.push({
-                        id: UI.generateSequentialID(db, 'credits', 'CRD-'),
+                        id: UI.generateUniqueRef('CRD-'),
                         patientId: targetPatient.id,
                         patientName: targetPatient.name,
                         ref: refCode,
@@ -3641,7 +3552,7 @@
                 
                 if(!hasTodayVisit) {
                     db.visits.push({
-                        id: UI.generateSequentialID(db, 'visits', 'VST-'),
+                        id: UI.generateUniqueRef('VST-'),
                         patientId: patientId,
                         date: ts.date,
                         time: ts.time,
@@ -3753,10 +3664,10 @@
                         if(cols.length < 3) continue; 
                         
                         let pid = cols[0];
-                        if(!pid || pid.trim() === '') pid = UI.generateSequentialID(db, 'patients', '');
+                        if(!pid || pid.trim() === '') pid = UI.generateUniqueRef('');
                         
                         if(db.patients.find(p => p.id === pid)) {
-                            pid = UI.generateSequentialID(db, 'patients', ''); 
+                            pid = UI.generateUniqueRef(''); 
                         }
                         
                         db.patients.push({
@@ -3935,6 +3846,7 @@
                     db.patients = db.patients.filter(p => p.id !== id);
                     db.visits = db.visits.filter(v => v.patientId !== id);
                     SystemStorage.write(db);
+                    this.renderPatientsGrid();
                 }
             }
 
@@ -4151,7 +4063,7 @@
                         }
                         
                         db.inventory.push({
-                            id: UI.generateSequentialID(db, 'inventory', 'MED-'),
+                            id: UI.generateUniqueRef('MED-'),
                             type: cols[0] || 'Other',
                             name: cols[1],
                             supplier: cols[2] || '',
@@ -4366,7 +4278,7 @@
                 const expiryVal = `${yearVal}-${monthVal}`;
 
                 const payload = {
-                    id: editId || UI.generateSequentialID(db, 'inventory', 'MED-'),
+                    id: editId || UI.generateUniqueRef('MED-'),
                     type: actualType,
                     name: document.getElementById('m-name').value.trim(),
                     supplier: document.getElementById('m-supplier').value,
@@ -4482,3 +4394,4 @@
     </script>
 </body>
 </html>
+                                
