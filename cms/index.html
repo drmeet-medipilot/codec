@@ -521,7 +521,6 @@
                 </div>
             </div>
         </section>
-
         <section id="mod-inventory" class="erp-section hidden space-y-6">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-5 gap-4">
                 <div>
@@ -626,6 +625,9 @@
                     <h2 class="text-3xl font-black animated-heading pb-1">Accounts & Ledger</h2>
                 </div>
                 <div class="flex gap-2.5 self-start flex-wrap">
+                    <button onclick="UI.openDayWiseModal()" class="px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer flex items-center active:scale-[0.97]">
+                        <i class="fa-solid fa-calendar-check mr-2"></i>Day-Wise Counter
+                    </button>
                     <button onclick="UI.openCreditsModal()" class="px-4 py-2.5 bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-800 hover:to-blue-900 text-white rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer flex items-center active:scale-[0.97]">
                         <i class="fa-solid fa-hand-holding-dollar mr-2"></i>Credit
                     </button>
@@ -1316,6 +1318,34 @@
         </div>
     </div>
 
+    <!-- NEW DAY-WISE COUNTER MODAL -->
+    <div id="modal-daywise" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print">
+        <div class="w-full max-w-2xl bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border border-slate-200 animate-zoom-in">
+            <div class="bg-gradient-to-r from-emerald-700 to-emerald-900 p-4 text-white flex justify-between items-center">
+                <h3 class="font-bold text-sm uppercase tracking-wide"><i class="fa-solid fa-calendar-check mr-2"></i>Day-Wise Total Revenue</h3>
+                <button onclick="UI.closeModal('modal-daywise')" class="text-white/80 hover:text-white text-xl cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-6 overflow-y-auto bg-slate-50 flex-1">
+                <p class="text-xs text-slate-500 mb-4 font-medium"><i class="fa-solid fa-circle-info mr-1 text-blue-600"></i> Below is the aggregated day-wise total revenue (INFLOW) recorded across all historical and new data in your ledger.</p>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm bg-white rounded-xl shadow-sm border border-slate-200">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-500 uppercase font-bold text-[11px] tracking-wider border-b border-slate-200">
+                                <th class="p-4 rounded-tl-xl">Date Vector</th>
+                                <th class="p-4 text-right rounded-tr-xl">Total Revenue (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="daywise-list-body">
+                            <!-- Populated via Javascript -->
+                        </tbody>
+                        <tfoot id="daywise-list-foot" class="bg-emerald-50 font-black text-emerald-800 text-sm border-t-2 border-emerald-200">
+                            <!-- Total of totals -->
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
     <div id="print-area" class="hidden font-mono text-sm bg-white text-slate-900 w-full max-w-full"></div>
     <script>
         // =========================================================================
@@ -1526,7 +1556,6 @@
 
             // =========================================================================
             // CORE ID GENERATOR: 100-YEAR ROBUST UNIQUE TIMESTAMP SEQUENCE
-            // This guarantees no two IDs will ever be the same, down to the millisecond.
             // =========================================================================
             static generateUniqueRef(prefix = "") {
                 const now = new Date();
@@ -1723,26 +1752,6 @@
 
             static renderGreeting() {
                 const db = SystemStorage.read();
-                const hour = new Date().getHours();
-                let greeting = 'Good Evening';
-                
-                if (hour >= 5 && hour < 12) {
-                    greeting = 'Good Morning';
-                } else if (hour >= 12 && hour < 17) {
-                    greeting = 'Good Afternoon';
-                }
-                
-                let docName = db.clinicProfile?.doctor?.trim() || '';
-                let finalName = "Dr.";
-                
-                if (docName) {
-                    if (docName.toLowerCase().startsWith('dr.') || docName.toLowerCase().startsWith('dr ')) {
-                        finalName = docName;
-                    } else {
-                        finalName = "Dr. " + docName;
-                    }
-                }
-                
                 const greetingEl = document.getElementById('dashboard-greeting');
                 if (greetingEl) {
                     greetingEl.innerText = `Clinic Management System`;
@@ -1832,9 +1841,7 @@
             static handlePrescriptionMedicineChange() {
                 const select = document.getElementById('v-medicine');
                 const mlContainer = document.getElementById('v-ml-container');
-                const mlInput = document.getElementById('v-ml-input');
                 const directQtyContainer = document.getElementById('v-direct-qty-container');
-                const directQtyInput = document.getElementById('v-direct-qty-input');
                 
                 if(!select) return;
                 
@@ -2170,8 +2177,7 @@
                     if(node) node.remove();
                 });
             }
-
-            static initializeApplicationRuntime() {
+    static initializeApplicationRuntime() {
                 UI.startClock();
                 
                 document.querySelectorAll('.nav-link').forEach(btn => {
@@ -2249,6 +2255,61 @@
                 this.renderCreditsList();
                 this.openModal('modal-credits');
             }
+
+            // =========================================================================
+            // NEW FEATURE: DAY-WISE COUNTER LOGIC
+            // =========================================================================
+            static openDayWiseModal() {
+                this.renderDayWiseList();
+                this.openModal('modal-daywise');
+            }
+
+            static renderDayWiseList() {
+                const db = SystemStorage.read();
+                const tbody = document.getElementById('daywise-list-body');
+                const tfoot = document.getElementById('daywise-list-foot');
+                
+                if(!tbody || !tfoot) return;
+
+                // Aggregate INFLOW amounts by Date
+                const revenueMap = {};
+                (db.finance || []).filter(f => f.type === "INFLOW").forEach(f => {
+                    if(!revenueMap[f.date]) {
+                        revenueMap[f.date] = 0;
+                    }
+                    revenueMap[f.date] += parseFloat(f.amount) || 0;
+                });
+
+                // Sort dates from newest to oldest
+                const sortedDates = Object.keys(revenueMap).sort((a,b) => UI.parseIndianDate(b) - UI.parseIndianDate(a));
+                
+                let totalLifetimeRevenue = 0;
+
+                if (sortedDates.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="2" class="p-4 text-center text-slate-400 text-xs italic font-medium">No revenue data available yet.</td></tr>`;
+                    tfoot.innerHTML = `<tr><td class="p-4 text-right">Total:</td><td class="p-4 text-right">₹0.00</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = sortedDates.map(date => {
+                    const dayTotal = revenueMap[date];
+                    totalLifetimeRevenue += dayTotal;
+                    return `
+                    <tr class="border-b border-slate-100 hover:bg-slate-50 font-medium text-xs">
+                        <td class="p-4 font-bold text-slate-700">${date}</td>
+                        <td class="p-4 text-right font-black text-emerald-600">₹${dayTotal.toFixed(2)}</td>
+                    </tr>
+                    `;
+                }).join('');
+
+                tfoot.innerHTML = `
+                    <tr>
+                        <td class="p-4 text-right uppercase tracking-wider">Grand Total (All Time):</td>
+                        <td class="p-4 text-right text-base">₹${totalLifetimeRevenue.toFixed(2)}</td>
+                    </tr>
+                `;
+            }
+            // =========================================================================
 
             static triggerInventoryFilter() {
                 this.renderInventoryGrid(SystemStorage.read(), this.currentInventoryFilter);
