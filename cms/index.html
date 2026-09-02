@@ -1334,7 +1334,6 @@
     </div>
 
     <div id="print-area" class="hidden font-mono text-sm bg-white text-slate-900 w-full max-w-full"></div>
-    
     <script>
         // =========================================================================
         // 1. SUPABASE CLOUD ENGINE
@@ -2343,8 +2342,11 @@
                 const finIdx = db.finance.findIndex(f => f.ref === refCode);
                 if(finIdx !== -1) db.finance.splice(finIdx, 1);
                 
-                const credIdx = db.credits.findIndex(c => c.ref === refCode);
-                if(credIdx !== -1) db.credits.splice(credIdx, 1);
+                const credIdx = db.credits.findIndex(c => c.ref === refCode || (c.ref && c.ref.includes(refCode)));
+                if(credIdx !== -1) {
+                    // Note: If deleting a consolidated credit bill, this entirely removes the credit profile.
+                    db.credits.splice(credIdx, 1); 
+                }
                 
                 SystemStorage.write(db);
                 this.renderBillingSummary();
@@ -2387,7 +2389,7 @@
                 if(!tbody) return;
 
                 const otcFinance = (db.finance || []).filter(f => f.category && f.category.includes("OTC Pharmacy") && this.isDateInTimeframe(f.date, timeframe));
-                const otcCredits = (db.credits || []).filter(c => c.ref && c.ref.startsWith("OTC-") && this.isDateInTimeframe(c.date, timeframe)).map(c => ({
+                const otcCredits = (db.credits || []).filter(c => c.ref && c.ref.includes("OTC-") && this.isDateInTimeframe(c.date, timeframe)).map(c => ({
                     date: c.date,
                     time: c.time,
                     timestamp: c.timestamp,
@@ -2414,11 +2416,14 @@
                     const patParts = sale.category.split('] - ');
                     const patient = patParts.length > 1 ? patParts[1] : 'Walk-in';
                     const displayTime = sale.time || '--:--:--';
+                    
+                    // Display only the primary ref in the summary if it's a consolidated log
+                    const displayRef = sale.ref.split(", ")[0] + (sale.ref.includes(",") ? " (+)" : "");
 
                     return `
                     <tr class="border-b border-slate-100 hover:bg-slate-50 font-medium text-xs">
                         <td class="p-3 text-slate-500 whitespace-nowrap">${sale.date}<br><span class="text-[10px] font-mono text-slate-400 font-bold">${displayTime}</span></td>
-                        <td class="p-3 font-bold text-slate-700">${sale.ref} <span class="text-[10px] font-normal text-slate-400 ml-1">(${patient})</span></td>
+                        <td class="p-3 font-bold text-slate-700">${displayRef} <span class="text-[10px] font-normal text-slate-400 ml-1">(${patient})</span></td>
                         <td class="p-3 text-slate-600 font-bold">${mode}</td>
                         <td class="p-3 text-right font-black text-emerald-600">₹${Number(sale.amount).toFixed(2)}</td>
                         <td class="p-3 text-center space-x-1 whitespace-nowrap">
@@ -2456,12 +2461,13 @@
 
                 sorted.forEach((f, index) => {
                     const displayTime = f.time || '--:--:--';
+                    const displayRef = f.ref.includes(",") ? f.ref.split(", ")[0] + " (+)" : f.ref;
                     const tr = document.createElement('tr');
                     tr.className = "border-b border-slate-100 hover:bg-slate-50/50 text-slate-600 font-semibold font-mono";
                     tr.innerHTML = `
                         <td class="p-3 text-slate-500 text-[11px] font-sans whitespace-nowrap">${f.date} <br><span class="font-mono text-[10px] font-bold text-slate-400">${displayTime}</span></td>
                         <td class="p-3 font-sans text-slate-700 text-xs font-bold">${f.category}</td>
-                        <td class="p-3 text-slate-400 text-[11px]">${f.ref}</td>
+                        <td class="p-3 text-slate-400 text-[11px] truncate max-w-[120px]" title="${f.ref}">${displayRef}</td>
                         <td class="p-3 text-right text-xs ${f.type === 'INFLOW' ? 'text-emerald-600 font-bold' : 'text-rose-600 font-bold'}">${f.type === 'INFLOW' ? '+' : '-'}₹${Number(f.amount).toFixed(2)}</td>
                         <td class="p-3 text-right font-sans"><button onclick="UI.deleteFinanceLine(${index})" class="text-rose-400 hover:text-rose-600 transition-colors cursor-pointer text-xs"><i class="fa-solid fa-trash-can"></i></button></td>
                     `;
@@ -2604,19 +2610,37 @@
                 const visitTag = visitId ? ` [Visit: ${visitId}]` : '';
                 const catStr = `Billing [${modeSelect.value}] - ${targetPatient.name}${visitTag}`;
 
+                // --- NEW CONSOLIDATED CREDIT LOGIC ---
                 if(modeSelect.value === 'Credit') {
                     if(!db.credits) db.credits = [];
-                    db.credits.push({
-                        id: UI.generateUniqueRef('CRD-'),
-                        patientId: targetPatient.id,
-                        patientName: targetPatient.name,
-                        ref: invCode,
-                        totalAmount: amt,
-                        paidAmount: 0,
-                        date: ts.date,
-                        time: ts.time,
-                        timestamp: ts.timestamp
-                    });
+                    // Find an active credit for this exact patient ID
+                    let existingCredit = db.credits.find(c => c.patientId === targetPatient.id && c.paidAmount < c.totalAmount);
+                    
+                    if (existingCredit) {
+                        // Consolidate the new bill into the existing active credit
+                        existingCredit.pastAmount = existingCredit.totalAmount;
+                        existingCredit.newAmount = amt;
+                        existingCredit.totalAmount += amt;
+                        existingCredit.ref = existingCredit.ref + ", " + invCode; // Merge reference codes
+                        existingCredit.timestamp = ts.timestamp; // Bring to front chronologically
+                        existingCredit.date = ts.date;
+                        existingCredit.time = ts.time;
+                    } else {
+                        // Create a fresh credit entity if none exist
+                        db.credits.push({
+                            id: UI.generateUniqueRef('CRD-'),
+                            patientId: targetPatient.id,
+                            patientName: targetPatient.name,
+                            ref: invCode,
+                            totalAmount: amt,
+                            paidAmount: 0,
+                            pastAmount: 0,
+                            newAmount: amt,
+                            date: ts.date,
+                            time: ts.time,
+                            timestamp: ts.timestamp
+                        });
+                    }
                 } else {
                     db.finance.push({
                         type: "INFLOW",
@@ -3088,7 +3112,7 @@
                 let index = db.finance.findIndex(f => f.ref === refCode);
                 if (index !== -1) sale = db.finance[index];
                 else {
-                    index = db.credits.findIndex(c => c.ref === refCode);
+                    index = db.credits.findIndex(c => c.ref === refCode || (c.ref && c.ref.includes(refCode)));
                     if (index !== -1) { sale = db.credits[index]; isCredit = true; }
                 }
 
@@ -3118,7 +3142,7 @@
                 this.editingOTCDate = sale.date;
                 this.editingOTCTime = sale.time;
                 this.editingOTCTimestamp = sale.timestamp;
-                this.editingOTCRef = sale.ref;
+                this.editingOTCRef = refCode; 
 
                 if (isCredit) db.credits.splice(index, 1);
                 else db.finance.splice(index, 1);
@@ -3138,7 +3162,7 @@
                 let index = db.finance.findIndex(f => f.ref === refCode);
                 if (index !== -1) sale = db.finance[index];
                 else {
-                    index = db.credits.findIndex(c => c.ref === refCode);
+                    index = db.credits.findIndex(c => c.ref === refCode || (c.ref && c.ref.includes(refCode)));
                     if (index !== -1) { sale = db.credits[index]; isCredit = true; }
                 }
 
@@ -3156,9 +3180,10 @@
                 SystemStorage.write(db);
                 this.renderOTCSummary();
                 this.triggerInventoryFilter(); 
-                alert(`OTC Sale (${refCode}) deleted successfully.`);
+                alert(`OTC Sale deleted successfully.`);
             }
 
+            // --- NEW CONSOLIDATED CREDIT RENDERING ---
             static renderCreditsList() {
                 const db = SystemStorage.read();
                 const container = document.getElementById('credits-list');
@@ -3171,19 +3196,30 @@
 
                 container.innerHTML = activeCredits.map(c => {
                     const remaining = c.totalAmount - c.paidAmount;
+                    
+                    // Conditionally show the exact math equation if there are consolidated entries
+                    let mathDisplay = "";
+                    if (c.pastAmount > 0 && c.newAmount > 0) {
+                        mathDisplay = `<div class="text-[11px] text-indigo-700 bg-indigo-50 p-2 rounded-lg mt-1.5 inline-block border border-indigo-100 font-bold shadow-xs"><i class="fa-solid fa-calculator mr-1"></i> Past Credit (₹${c.pastAmount.toFixed(2)}) + New Credit (₹${c.newAmount.toFixed(2)}) = Sum Total (₹${c.totalAmount.toFixed(2)})</div>`;
+                    }
+
+                    // Format multi-refs cleanly if needed
+                    const refDisplay = c.ref.includes(",") ? `<span title="${c.ref}">${c.ref.split(", ")[0]} (+ multiple)</span>` : c.ref;
+
                     return `
                     <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-xs flex flex-col md:flex-row justify-between items-center gap-4">
-                        <div class="flex-1 w-full text-left">
-                            <div class="text-[10px] font-black uppercase tracking-wide text-blue-600">${c.ref} • ${c.date} ${c.time ? c.time : ''}</div>
+                        <div class="flex-1 w-full text-left overflow-hidden">
+                            <div class="text-[10px] font-black uppercase tracking-wide text-blue-600 truncate">${refDisplay} • ${c.date} ${c.time ? c.time : ''}</div>
                             <div class="text-sm font-bold text-slate-800 mt-0.5">${c.patientName}</div>
-                            <div class="text-xs text-slate-500 mt-1 font-medium">Total: ₹${c.totalAmount.toFixed(2)} | Paid: ₹${c.paidAmount.toFixed(2)} | <span class="text-rose-600 font-bold">Remaining: ₹${remaining.toFixed(2)}</span></div>
+                            ${mathDisplay}
+                            <div class="text-xs text-slate-500 mt-2 font-medium">Total: ₹${c.totalAmount.toFixed(2)} | Paid: ₹${c.paidAmount.toFixed(2)} | <span class="text-rose-600 font-bold ml-1">Remaining: ₹${remaining.toFixed(2)}</span></div>
                         </div>
-                        <div class="flex items-center gap-2 self-start md:self-auto w-full md:w-auto">
-                            <select id="pay-mode-${c.id}" class="p-2 border border-slate-200 rounded-lg text-xs font-bold text-slate-700 focus:outline-none">
+                        <div class="flex items-center gap-2 self-start md:self-auto w-full md:w-auto mt-2 md:mt-0">
+                            <select id="pay-mode-${c.id}" class="p-2 border border-slate-200 rounded-lg text-xs font-bold text-slate-700 focus:outline-none bg-slate-50">
                                 <option value="Cash">Cash</option>
                                 <option value="UPI">UPI</option>
                             </select>
-                            <input type="number" id="pay-input-${c.id}" max="${remaining}" placeholder="Enter amount" class="w-full md:w-32 p-2 border border-slate-200 rounded-lg text-sm font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20">
+                            <input type="number" id="pay-input-${c.id}" max="${remaining}" placeholder="Enter amount" class="w-full md:w-32 p-2 border border-slate-200 rounded-lg text-sm font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 bg-slate-50">
                             <button onclick="UI.receiveCreditPayment('${c.id}')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg transition-all shadow-xs cursor-pointer active:scale-[0.96] whitespace-nowrap">Receive</button>
                         </div>
                     </div>`;
@@ -3204,11 +3240,16 @@
                 if(amount > remaining) { alert(`Amount cannot exceed the remaining balance of ₹${remaining.toFixed(2)}`); return; }
                 
                 credit.paidAmount += amount;
+                
+                // Clear the temporary math attributes upon partial or full payment so the equation resets beautifully
+                credit.pastAmount = 0;
+                credit.newAmount = 0;
+                
                 const ts = this.getTimestampData();
                 db.finance.push({
                     type: "INFLOW",
                     category: `Credit Settlement [${payMode}] - ${credit.patientName}`,
-                    ref: credit.ref,
+                    ref: credit.ref, // Stores all the aggregated refs
                     amount: amount,
                     date: ts.date,
                     time: ts.time,
@@ -3336,21 +3377,43 @@
                 const saleTimestamp = this.editingOTCTimestamp || ts.timestamp;
                 const cartCopy = JSON.parse(JSON.stringify(this.otcCart));
 
+                // --- NEW CONSOLIDATED CREDIT LOGIC ---
                 if (mode === 'Credit') {
                     if(!db.credits) db.credits = [];
                     const targetPatient = db.patients.find(p => p.name.toLowerCase() === otcPat.toLowerCase()) || { id: 'WALK-IN', name: otcPat };
-                    db.credits.push({
-                        id: UI.generateUniqueRef('CRD-'),
-                        patientId: targetPatient.id,
-                        patientName: targetPatient.name,
-                        ref: refCode,
-                        totalAmount: manualAmount,
-                        paidAmount: 0,
-                        date: saleDate,
-                        time: saleTime,
-                        timestamp: saleTimestamp,
-                        cartItems: cartCopy
-                    });
+                    
+                    // Find an active credit by Patient Name
+                    let existingCredit = db.credits.find(c => c.patientName.toLowerCase() === targetPatient.name.toLowerCase() && c.paidAmount < c.totalAmount);
+                    
+                    if (existingCredit) {
+                        existingCredit.pastAmount = existingCredit.totalAmount;
+                        existingCredit.newAmount = manualAmount;
+                        existingCredit.totalAmount += manualAmount;
+                        // Avoid appending same ref when editing
+                        if (!existingCredit.ref.includes(refCode)) {
+                            existingCredit.ref = existingCredit.ref + ", " + refCode;
+                        }
+                        existingCredit.timestamp = saleTimestamp;
+                        existingCredit.date = saleDate;
+                        existingCredit.time = saleTime;
+                        if (!existingCredit.cartItems) existingCredit.cartItems = [];
+                        existingCredit.cartItems.push(...cartCopy);
+                    } else {
+                        db.credits.push({
+                            id: UI.generateUniqueRef('CRD-'),
+                            patientId: targetPatient.id,
+                            patientName: targetPatient.name,
+                            ref: refCode,
+                            totalAmount: manualAmount,
+                            paidAmount: 0,
+                            pastAmount: 0,
+                            newAmount: manualAmount,
+                            date: saleDate,
+                            time: saleTime,
+                            timestamp: saleTimestamp,
+                            cartItems: cartCopy
+                        });
+                    }
                 } else {
                     db.finance.push({
                         type: "INFLOW",
@@ -3378,7 +3441,6 @@
                 alert(`OTC sale recorded successfully (Ref: ${refCode}).`);
                 this.routeToTab('dashboard');
             }
-
             static openRevisitModal() {
                 document.getElementById('revisit-search').value = "";
                 this.renderRevisitGrid("");
