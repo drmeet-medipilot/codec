@@ -431,14 +431,13 @@
                             <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Select Medicine</label>
                             <select id="otc-medicine-select" onchange="UI.handleOTCMedicineChange()" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium"></select>
                         </div>
-                        <div class="w-24">
+                        <div id="otc-qty-container" class="w-24 transition-all">
                             <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Qty</label>
                             <input id="otc-qty" type="number" min="1" value="1" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-black text-center focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-800">
                         </div>
                         <button onclick="UI.addOTCToCart()" class="px-5 bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-800 hover:to-blue-900 text-white font-bold rounded-xl transition-all shadow-md shadow-blue-700/10 h-12 cursor-pointer active:scale-[0.96] text-xs uppercase tracking-wide">Add</button>
                     </div>
 
-                    <!-- NEW: OTC Treatment Options Container -->
                     <div id="otc-treatment-container" class="hidden flex items-end gap-3 flex-wrap mt-3 bg-blue-50/50 p-4 rounded-xl border border-blue-100 shadow-inner w-full">
                         <div class="w-48">
                             <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Treatment Type</label>
@@ -450,9 +449,22 @@
                                 <option value="Other">Other</option>
                             </select>
                         </div>
+                        
+                        <div id="otc-treatment-bp-container" class="hidden flex-1 relative">
+                            <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">BP Reading</label>
+                            <input id="otc-treatment-bp" type="text" placeholder="e.g. 120/80" class="w-full p-3 pr-16 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-800 font-bold">
+                            <span class="absolute right-4 top-[38px] text-xs font-bold text-slate-400">mmHg</span>
+                        </div>
+
+                        <div id="otc-treatment-sugar-container" class="hidden flex-1 relative">
+                            <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Sugar Reading</label>
+                            <input id="otc-treatment-sugar" type="number" placeholder="e.g. 140" class="w-full p-3 pr-16 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-800 font-bold">
+                            <span class="absolute right-4 top-[38px] text-xs font-bold text-slate-400">mg/dL</span>
+                        </div>
+
                         <div id="otc-treatment-specify-container" class="hidden flex-1">
                             <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Specify Treatment</label>
-                            <input id="otc-treatment-specify" type="text" placeholder="Enter treatment details..." class="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-800">
+                            <input id="otc-treatment-specify" type="text" placeholder="Enter treatment details..." class="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-800 font-bold">
                         </div>
                     </div>
 
@@ -1363,7 +1375,7 @@
     </div>
 
     <div id="print-area" class="hidden font-mono text-sm bg-white text-slate-900 w-full max-w-full"></div>
-    <script>
+<script>
         // =========================================================================
         // 1. SUPABASE CLOUD ENGINE
         // =========================================================================
@@ -2392,7 +2404,7 @@
                 alert("Bill deleted successfully.");
             }
 
-            // MODIFIED: Inject Special Option for OTC Treatment
+            // MODIFIED: Inject Treatment to TOP of list
             static filterOTCMedicineOptions() {
                 const db = SystemStorage.read();
                 const typeFilter = document.getElementById('otc-medicine-type-filter')?.value || 'ALL';
@@ -2406,10 +2418,9 @@
                         availableMeds = availableMeds.filter(i => !standardTypes.includes(i.type));
                         availableMeds.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
                         
-                        // Inject Treatment Option here
                         select.innerHTML = '<option value="" disabled selected>-- Select Medicine / Treatment --</option>' + 
-                            availableMeds.map(i => `<option value="${i.id}">${i.name} (Stock: ${parseFloat(Number(i.qty).toFixed(2))})</option>`).join('') +
-                            '<option value="OTC_TREATMENT" class="font-bold text-blue-700 bg-blue-50">➕ Other (Treatment / Service)</option>';
+                            '<option value="OTC_TREATMENT" class="font-bold text-blue-700 bg-blue-50">➕ Other (Treatment / Service)</option>' +
+                            availableMeds.map(i => `<option value="${i.id}">${i.name} (Stock: ${parseFloat(Number(i.qty).toFixed(2))})</option>`).join('');
                         this.handleOTCMedicineChange();
                         return;
                     } else {
@@ -2424,36 +2435,43 @@
                 this.handleOTCMedicineChange();
             }
 
-            // NEW: Handle dynamic UI toggling for treatment block in OTC
+            // MODIFIED: Hide Qty Container completely
             static handleOTCMedicineChange() {
                 const val = document.getElementById('otc-medicine-select')?.value;
                 const treatmentContainer = document.getElementById('otc-treatment-container');
+                const qtyContainer = document.getElementById('otc-qty-container');
                 const qtyInput = document.getElementById('otc-qty');
                 
-                if (treatmentContainer && qtyInput) {
+                if (treatmentContainer && qtyContainer) {
                     if (val === 'OTC_TREATMENT') {
                         treatmentContainer.classList.remove('hidden');
-                        qtyInput.value = 1;
-                        qtyInput.setAttribute('disabled', 'true');
-                        qtyInput.classList.add('bg-slate-100', 'text-slate-400');
+                        qtyContainer.classList.add('hidden');
+                        if(qtyInput) qtyInput.value = 1;
                     } else {
                         treatmentContainer.classList.add('hidden');
-                        qtyInput.removeAttribute('disabled');
-                        qtyInput.classList.remove('bg-slate-100', 'text-slate-400');
+                        qtyContainer.classList.remove('hidden');
                     }
                 }
             }
 
-            // NEW: Handle showing specification input for 'Other' treatment
+            // MODIFIED: Handle visibility of BP, Sugar, and Specific inputs
             static handleOTCTreatmentChange() {
                 const val = document.getElementById('otc-treatment-select')?.value;
                 const specifyContainer = document.getElementById('otc-treatment-specify-container');
-                if (specifyContainer) {
+                const bpContainer = document.getElementById('otc-treatment-bp-container');
+                const sugarContainer = document.getElementById('otc-treatment-sugar-container');
+                
+                if (specifyContainer && bpContainer && sugarContainer) {
+                    specifyContainer.classList.add('hidden');
+                    bpContainer.classList.add('hidden');
+                    sugarContainer.classList.add('hidden');
+                    
                     if (val === 'Other') {
                         specifyContainer.classList.remove('hidden');
-                    } else {
-                        specifyContainer.classList.add('hidden');
-                        document.getElementById('otc-treatment-specify').value = "";
+                    } else if (val === 'BP Measure') {
+                        bpContainer.classList.remove('hidden');
+                    } else if (val === 'Sugar Check') {
+                        sugarContainer.classList.remove('hidden');
                     }
                 }
             }
@@ -3344,7 +3362,79 @@
                 alert(`Payment of ₹${amount.toFixed(2)} received successfully.`);
             }
 
-            // MODIFIED: Updated to handle custom treatment logic
+            // MODIFIED: Inject Treatment to TOP of list
+            static filterOTCMedicineOptions() {
+                const db = SystemStorage.read();
+                const typeFilter = document.getElementById('otc-medicine-type-filter')?.value || 'ALL';
+                const select = document.getElementById('otc-medicine-select');
+                if (!select) return;
+
+                let availableMeds = db.inventory.filter(i => i.qty > 0);
+                if (typeFilter !== 'ALL') {
+                    if (typeFilter === 'Other') {
+                        const standardTypes = ['Tablet', 'Capsule', 'Syrup', 'Ointment', 'Drop', 'Vial', 'Ampule', 'SN', 'Lotion', 'Sachet', 'Nab'];
+                        availableMeds = availableMeds.filter(i => !standardTypes.includes(i.type));
+                        availableMeds.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+                        
+                        select.innerHTML = '<option value="" disabled selected>-- Select Medicine / Treatment --</option>' + 
+                            '<option value="OTC_TREATMENT" class="font-bold text-blue-700 bg-blue-50">➕ Other (Treatment / Service)</option>' +
+                            availableMeds.map(i => `<option value="${i.id}">${i.name} (Stock: ${parseFloat(Number(i.qty).toFixed(2))})</option>`).join('');
+                        this.handleOTCMedicineChange();
+                        return;
+                    } else {
+                        availableMeds = availableMeds.filter(i => i.type === typeFilter);
+                    }
+                }
+                
+                availableMeds.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+                select.innerHTML = '<option value="" disabled selected>-- Select Medicine --</option>' + 
+                    availableMeds.map(i => `<option value="${i.id}">${i.name} (Stock: ${parseFloat(Number(i.qty).toFixed(2))})</option>`).join('');
+                
+                this.handleOTCMedicineChange();
+            }
+
+            // MODIFIED: Hide Qty Container completely
+            static handleOTCMedicineChange() {
+                const val = document.getElementById('otc-medicine-select')?.value;
+                const treatmentContainer = document.getElementById('otc-treatment-container');
+                const qtyContainer = document.getElementById('otc-qty-container');
+                const qtyInput = document.getElementById('otc-qty');
+                
+                if (treatmentContainer && qtyContainer) {
+                    if (val === 'OTC_TREATMENT') {
+                        treatmentContainer.classList.remove('hidden');
+                        qtyContainer.classList.add('hidden');
+                        if(qtyInput) qtyInput.value = 1;
+                    } else {
+                        treatmentContainer.classList.add('hidden');
+                        qtyContainer.classList.remove('hidden');
+                    }
+                }
+            }
+
+            // MODIFIED: Handle visibility of BP, Sugar, and Specific inputs
+            static handleOTCTreatmentChange() {
+                const val = document.getElementById('otc-treatment-select')?.value;
+                const specifyContainer = document.getElementById('otc-treatment-specify-container');
+                const bpContainer = document.getElementById('otc-treatment-bp-container');
+                const sugarContainer = document.getElementById('otc-treatment-sugar-container');
+                
+                if (specifyContainer && bpContainer && sugarContainer) {
+                    specifyContainer.classList.add('hidden');
+                    bpContainer.classList.add('hidden');
+                    sugarContainer.classList.add('hidden');
+                    
+                    if (val === 'Other') {
+                        specifyContainer.classList.remove('hidden');
+                    } else if (val === 'BP Measure') {
+                        bpContainer.classList.remove('hidden');
+                    } else if (val === 'Sugar Check') {
+                        sugarContainer.classList.remove('hidden');
+                    }
+                }
+            }
+
+            // MODIFIED: Capture BP and Sugar values for Cart
             static addOTCToCart() {
                 const medId = document.getElementById('otc-medicine-select').value;
                 const qty = parseInt(document.getElementById('otc-qty').value) || 1;
@@ -3358,13 +3448,26 @@
                         const specify = document.getElementById('otc-treatment-specify').value.trim();
                         if (!specify) { alert("Please specify the exact treatment/service details."); return; }
                         treatName = specify;
+                    } else if (treatType === 'BP Measure') {
+                        const bpVal = document.getElementById('otc-treatment-bp').value.trim();
+                        if (!bpVal) { alert("Please enter the BP reading."); return; }
+                        treatName = `BP Measure (${bpVal} mmHg)`;
+                    } else if (treatType === 'Sugar Check') {
+                        const sugarVal = document.getElementById('otc-treatment-sugar').value.trim();
+                        if (!sugarVal) { alert("Please enter the Sugar reading."); return; }
+                        treatName = `Sugar Check (${sugarVal} mg/dL)`;
                     }
                     
                     const specialId = 'TRT-' + new Date().getTime();
                     this.otcCart.push({ id: specialId, name: `[Treatment] ${treatName}`, qty: 1, isTreatment: true });
                     
+                    // Reset fields
                     document.getElementById('otc-medicine-select').selectedIndex = 0;
                     document.getElementById('otc-treatment-select').selectedIndex = 0;
+                    document.getElementById('otc-treatment-specify').value = "";
+                    document.getElementById('otc-treatment-bp').value = "";
+                    document.getElementById('otc-treatment-sugar').value = "";
+                    
                     this.handleOTCMedicineChange();
                     this.handleOTCTreatmentChange();
                     this.renderOTCCart();
@@ -4431,5 +4534,3 @@
             UI.initializeApplicationRuntime();
         });
     </script>
-</body>
-</html>
