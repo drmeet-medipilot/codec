@@ -97,7 +97,7 @@
                     <a href="#pricing" class="bg-white border-2 border-brand text-brand hover:bg-brand hover:text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-sm active:scale-95 inline-block cursor-pointer">Buy Subscription</a>
 
                     <!-- Doctor's Login Link Highlighted as Button -->
-                    <a href="/cms" class="bg-brand hover:bg-brand-dark text-white px-5 lg:px-6 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-brand/30 hover:shadow-brand/50 active:scale-95 inline-block cursor-pointer">Doctor's Login</a>
+                    <button onclick="openModal('login')" class="bg-brand hover:bg-brand-dark text-white px-5 lg:px-6 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-brand/30 hover:shadow-brand/50 active:scale-95 inline-block cursor-pointer">Doctor's Login</button>
                     
                     <button onclick="openModal('demo')" class="bg-brand hover:bg-brand-dark text-white px-5 lg:px-6 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-brand/30 hover:shadow-brand/50 active:scale-95 inline-block cursor-pointer">
                         Book Free Demo
@@ -122,7 +122,7 @@
                 
                 <a href="#pricing" class="block w-full mt-4 text-center bg-white border-2 border-brand text-brand px-6 py-3 rounded-xl font-bold transition-all shadow-md cursor-pointer">Buy Subscription</a>
 
-                <a href="/cms" class="block w-full mt-4 text-center bg-brand text-white px-6 py-3 rounded-xl font-bold transition-all shadow-md cursor-pointer">Doctor's Login</a>
+                <button onclick="openModal('login')" class="block w-full mt-4 text-center bg-brand text-white px-6 py-3 rounded-xl font-bold transition-all shadow-md cursor-pointer">Doctor's Login</button>
                 
                 <button onclick="openModal('demo')" class="block w-full mt-4 text-center bg-brand text-white px-6 py-3 rounded-xl font-bold transition-all shadow-md cursor-pointer">Book Free Demo</button>
             </div>
@@ -420,6 +420,47 @@
         </div>
     </footer>
 
+    <!-- Doctor Login Selection Modal (New) -->
+    <div id="login-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="closeModal()"></div>
+        
+        <!-- Modal Content -->
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden relative z-10 animate-zoom-in border border-slate-200">
+            <div class="bg-brand p-5 text-white flex justify-between items-center">
+                <div>
+                    <h3 class="font-black text-lg">Select Portal</h3>
+                    <p class="text-brand-light text-xs mt-0.5">Choose which system to log into.</p>
+                </div>
+                <button onclick="closeModal()" class="text-white/80 hover:text-white text-2xl transition-colors cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-6 space-y-4">
+                <a href="https://www.medipilot.in/cms" class="block w-full py-4 px-4 bg-slate-50 hover:bg-brand-light border border-slate-200 hover:border-brand rounded-xl transition-all group cursor-pointer">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center text-brand text-xl shadow-sm group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-laptop-medical"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-900 text-base">CMS Portal</h4>
+                            <p class="text-xs text-slate-500 font-medium mt-0.5">Clinic Management System</p>
+                        </div>
+                    </div>
+                </a>
+                <a href="https://www.medipilot.in/cpr" class="block w-full py-4 px-4 bg-slate-50 hover:bg-brand-light border border-slate-200 hover:border-brand rounded-xl transition-all group cursor-pointer">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center text-brand text-xl shadow-sm group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-clipboard-user"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-900 text-base">CPR Portal</h4>
+                            <p class="text-xs text-slate-500 font-medium mt-0.5">Clinic Patient Register</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
     <!-- Lead Capture Modal (Popup) -->
     <div id="lead-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
         <!-- Backdrop -->
@@ -440,7 +481,6 @@
                     <div class="space-y-4">
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5">Doctor / Clinic Name *</label>
-                            <!-- Personal touch applied to the placeholder -->
                             <input type="text" id="lead-doc-name" required class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand transition-all text-sm font-semibold text-slate-800" placeholder="e.g. Astha Clinic">
                         </div>
                         <div>
@@ -467,7 +507,6 @@
     <!-- JavaScript Logic -->
     <script>
         // Supabase Client Initialization
-        // !!! YOU MUST REPLACE THESE STRINGS WITH YOUR REAL CREDENTIALS !!!
         const SUPABASE_URL = 'https://mhquthxfsjnakymtaizp.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_S_GEAd5Y35gqI0Dgz0XNEQ_VNKimiUY';
         
@@ -491,8 +530,15 @@
             });
         });
 
-        // Open Modal
+        // Open Modal Function (Updated to handle login modal)
         function openModal(type) {
+            // Direct system login modal trigger
+            if (type === 'login') {
+                document.getElementById('login-modal').classList.remove('hidden');
+                return;
+            }
+
+            // Lead generation modal trigger
             const modal = document.getElementById('lead-modal');
             const title = document.getElementById('modal-title');
             const desc = document.getElementById('modal-desc');
@@ -519,9 +565,10 @@
             modal.classList.remove('hidden');
         }
 
-        // Close Modal
+        // Close Modal (Updated to close both modal types)
         function closeModal() {
             document.getElementById('lead-modal').classList.add('hidden');
+            document.getElementById('login-modal').classList.add('hidden');
         }
 
         // Sales Call Logic
@@ -543,13 +590,11 @@
             submitBtn.disabled = true;
 
             try {
-                // Now fetching strictly by ID instead of guessing by placeholders
                 const reqType = document.getElementById('request-type').value;
                 const docName = document.getElementById('lead-doc-name').value.trim();
                 const mobile = document.getElementById('lead-mobile').value.trim();
                 const email = document.getElementById('lead-email').value.trim();
 
-                // Check if supabase client initialized properly
                 if (!supabaseClient) {
                     throw new Error("Supabase is not connected. Check your URL and Anon Key.");
                 }
@@ -571,14 +616,13 @@
                 } else {
                     alert(`Thank you! Your ${reqType} has been submitted successfully.`);
                     closeModal();
-                    event.target.reset(); // Reset form fields
+                    event.target.reset();
                 }
 
             } catch (err) {
                 console.error("Script Error:", err);
                 alert("An unexpected error occurred: " + err.message + "\n\nPlease check the console for details.");
             } finally {
-                // The 'finally' block GUARANTEES the button un-sticks no matter what happens
                 submitBtn.innerText = "Submit Request";
                 submitBtn.disabled = false;
             }
