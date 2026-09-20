@@ -831,7 +831,7 @@
                     </div>
                     <div id="p-weight-container" class="hidden">
                         <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Weight Value (kg) *</label>
-                        <input type="number" step="0.1" id="p-weight" placeholder="Mandatory for age <= 15" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-bold">
+                        <input type="number" step="0.1" id="p-weight" placeholder="Mandatory for age <= 84 months (15 years)" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-bold">
                     </div>
                     <div>
                         <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Address</label>
@@ -3989,23 +3989,29 @@
                 this.openModal('modal-patient');
             }
 
-            static handleAgeChange() {
-                const ageInput = document.getElementById('p-age-val');
-                const weightContainer = document.getElementById('p-weight-container');
-                const weightInput = document.getElementById('p-weight');
-                if(!ageInput || !weightContainer) return;
-                
-                const ageVal = parseInt(ageInput.value) || 0;
-                if (ageVal > 0 && ageVal <= 15) {
-                    weightContainer.classList.remove('hidden');
-                    weightInput.setAttribute('required', 'true');
-                } else {
-                    weightContainer.classList.add('hidden');
-                    weightInput.removeAttribute('required');
-                    weightInput.value = '';
-                }
-            }
+          UI.handleAgeChange = function() {
+    const ageVal = parseFloat(document.getElementById('p-age-val').value) || 0;
+    const ageUnit = document.getElementById('p-age-unit').value;
+    const weightContainer = document.getElementById('p-weight-container');
+    const weightInput = document.getElementById('p-weight');
 
+    // Trigger weight requirement if <= 84 Months OR <= 7 Years
+    let requiresWeight = false;
+    if (ageUnit === 'Months' && ageVal <= 84) {
+        requiresWeight = true;
+    } else if (ageUnit === 'Years' && ageVal <= 7) {
+        requiresWeight = true;
+    }
+
+    if (requiresWeight) {
+        weightContainer.classList.remove('hidden');
+        weightInput.setAttribute('required', 'true');
+    } else {
+        weightContainer.classList.add('hidden');
+        weightInput.removeAttribute('required');
+        weightInput.value = ''; // Clean up redundant data
+    }
+};
             static openPatientModal() {
                 document.getElementById('form-patient').reset();
                 document.getElementById('p-edit-id').value = "";
