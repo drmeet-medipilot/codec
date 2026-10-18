@@ -163,12 +163,6 @@
     <main class="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-8 w-full">
         
         <section id="mod-dashboard" class="erp-section space-y-6">
-            
-            <div id="near-expiry-marquee-container" class="hidden bg-amber-50 text-amber-800 p-3 text-xs font-black rounded-2xl flex items-center shadow-sm border border-amber-200 uppercase tracking-wider cursor-default">
-                <i class="fa-solid fa-triangle-exclamation mr-3 animate-pulse text-amber-600 text-lg"></i>
-                <marquee id="near-expiry-marquee" class="flex-1 text-sm font-bold" scrollamount="6" onmouseover="this.stop();" onmouseout="this.start();"></marquee>
-            </div>
-
             <div class="flex flex-col sm:flex-row items-center justify-between bg-white p-4 rounded-2xl border border-slate-200 shadow-sm no-print">
                 <div class="flex items-center text-sm font-black tracking-tight text-slate-700">
                     <i class="fa-solid fa-calendar-day text-blue-600 mr-2 text-lg"></i> Global Operations Filter
@@ -429,43 +423,13 @@
                         </div>
                         <div class="flex-1">
                             <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Select Medicine</label>
-                            <select id="otc-medicine-select" onchange="UI.handleOTCMedicineChange()" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium"></select>
+                            <select id="otc-medicine-select" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium"></select>
                         </div>
-                        <div id="otc-qty-container" class="w-24 transition-all">
+                        <div class="w-24">
                             <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Qty</label>
                             <input id="otc-qty" type="number" min="1" value="1" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-black text-center focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-800">
                         </div>
                         <button onclick="UI.addOTCToCart()" class="px-5 bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-800 hover:to-blue-900 text-white font-bold rounded-xl transition-all shadow-md shadow-blue-700/10 h-12 cursor-pointer active:scale-[0.96] text-xs uppercase tracking-wide">Add</button>
-                    </div>
-
-                    <div id="otc-treatment-container" class="hidden flex items-end gap-3 flex-wrap mt-3 bg-blue-50/50 p-4 rounded-xl border border-blue-100 shadow-inner w-full">
-                        <div class="w-48">
-                            <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Treatment Type</label>
-                            <select id="otc-treatment-select" onchange="UI.handleOTCTreatmentChange()" class="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-medium text-slate-700">
-                                <option value="" disabled selected>Select Treatment</option>
-                                <option value="BP Measure">BP Measure</option>
-                                <option value="Sugar Check">Sugar Check</option>
-                                <option value="Dressing">Dressing</option>
-                                <option value="Other">Other</option>
-                            </select>
-                        </div>
-                        
-                        <div id="otc-treatment-bp-container" class="hidden flex-1 relative">
-                            <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">BP Reading</label>
-                            <input id="otc-treatment-bp" type="text" placeholder="e.g. 120/80" class="w-full p-3 pr-16 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-800 font-bold">
-                            <span class="absolute right-4 top-[38px] text-xs font-bold text-slate-400">mmHg</span>
-                        </div>
-
-                        <div id="otc-treatment-sugar-container" class="hidden flex-1 relative">
-                            <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Sugar Reading</label>
-                            <input id="otc-treatment-sugar" type="number" placeholder="e.g. 140" class="w-full p-3 pr-16 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-800 font-bold">
-                            <span class="absolute right-4 top-[38px] text-xs font-bold text-slate-400">mg/dL</span>
-                        </div>
-
-                        <div id="otc-treatment-specify-container" class="hidden flex-1">
-                            <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Specify Treatment</label>
-                            <input id="otc-treatment-specify" type="text" placeholder="Enter treatment details..." class="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-800 font-bold">
-                        </div>
                     </div>
 
                     <div class="border border-slate-200 rounded-xl overflow-hidden mt-4">
@@ -540,6 +504,7 @@
                 </div>
             </div>
         </section>
+
         <section id="mod-inventory" class="erp-section hidden space-y-6">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-5 gap-4">
                 <div>
@@ -637,6 +602,7 @@
                 </div>
             </div>
         </section>
+
         <section id="mod-finance" class="erp-section hidden space-y-6">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-5 gap-4">
                 <div>
@@ -848,6 +814,7 @@
             </div>
         </div>
     </div>
+
     <div id="modal-visit" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print">
         <div class="w-full max-w-3xl bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border border-slate-200 animate-zoom-in">
             <div class="bg-gradient-to-r from-blue-800 to-blue-950 p-4 text-white flex justify-between items-center">
@@ -1230,14 +1197,6 @@
                         <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Total Calculated Units</label>
                         <input type="number" id="m-total-qty" readonly class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-100 focus:outline-none font-black text-blue-700">
                     </div>
-                    
-                    <div>
-                        <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Low Stock Threshold *</label>
-                        <input type="number" id="m-low-threshold" value="15" required min="1" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 font-bold text-slate-800">
-                    </div>
-                    
-                    <div></div> <!-- Empty div for grid alignment -->
-
                     <div>
                         <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">PTR (₹) *</label>
                         <input type="number" step="0.01" id="m-purchase" required class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none font-bold text-slate-800">
@@ -1375,7 +1334,7 @@
     </div>
 
     <div id="print-area" class="hidden font-mono text-sm bg-white text-slate-900 w-full max-w-full"></div>
-<script>
+    <script>
         // =========================================================================
         // 1. SUPABASE CLOUD ENGINE
         // =========================================================================
@@ -1528,6 +1487,7 @@
                         if(localStr) localData = JSON.parse(localStr);
                     } catch(e) {}
 
+                    // Smart Merge: Compare Timestamps
                     let cloudTime = cloudData?.metadata?.lastUpdated || 0;
                     let localTime = localData?.metadata?.lastUpdated || 0;
 
@@ -1556,7 +1516,6 @@
                 }
             }
         }
-
         /**
          * INTERFACE AND VIEW STATE LOGIC CONTROLLER MATRIX
          */
@@ -2236,6 +2195,7 @@
                 this.openModal('modal-credits');
             }
 
+            // DAY-WISE COUNTER MODAL IMPLEMENTATION
             static openDayWiseModal() {
                 this.renderDayWiseList();
                 this.openModal('modal-daywise');
@@ -2298,15 +2258,13 @@
 
                 let stockAssetValue = db.inventory.reduce((a,c) => a + ((c.qty / (c.unitQty || 1)) * c.selling), 0);
                 let totalStockValuePTR = db.inventory.reduce((a, c) => a + ((c.qty / (c.unitQty || 1)) * c.purchase), 0);
-                
-                let lowStockCount = db.inventory.filter(i => i.qty <= (i.lowStockThreshold !== undefined ? i.lowStockThreshold : 15)).length;
+                let lowStockCount = db.inventory.filter(i => i.qty <= 15).length;
                 let today = new Date();
-                let sixtyDaysHence = new Date(today.getTime() + (60 * 24 * 60 * 60 * 1000));
-                
-                let nearExpiryList = db.inventory.filter(i => {
+                let sixMonthsHence = new Date(today.getTime() + (180 * 24 * 60 * 60 * 1000));
+                let nearExpiryCount = db.inventory.filter(i => {
                     let expDate = new Date(i.expiry + "-01");
-                    return expDate >= today && expDate <= sixtyDaysHence;
-                });
+                    return expDate >= today && expDate <= sixMonthsHence;
+                }).length;
 
                 document.getElementById('stat-total-patients').innerText = totalOPD;
                 document.getElementById('stat-total-revenue').innerText = `₹${totalRevenue.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
@@ -2314,16 +2272,7 @@
 
                 document.getElementById('inv-ptr-val').innerText = `₹${totalStockValuePTR.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
                 document.getElementById('inv-low-count').innerText = lowStockCount;
-                document.getElementById('inv-expiry-count').innerText = nearExpiryList.length;
-
-                const marqueeContainer = document.getElementById('near-expiry-marquee-container');
-                const marquee = document.getElementById('near-expiry-marquee');
-                if (nearExpiryList.length > 0 && marqueeContainer && marquee) {
-                    marquee.innerText = "NEAR EXPIRY ALERT: " + nearExpiryList.map(i => `${i.name} (${i.expiry})`).join('  |  ');
-                    marqueeContainer.classList.remove('hidden');
-                } else if (marqueeContainer) {
-                    marqueeContainer.classList.add('hidden');
-                }
+                document.getElementById('inv-expiry-count').innerText = nearExpiryCount;
 
                 this.renderPatientsGrid();
                 this.renderInventoryGrid(db, this.currentInventoryFilter);
@@ -2395,6 +2344,7 @@
                 
                 const credIdx = db.credits.findIndex(c => c.ref === refCode || (c.ref && c.ref.includes(refCode)));
                 if(credIdx !== -1) {
+                    // Note: If deleting a consolidated credit bill, this entirely removes the credit profile.
                     db.credits.splice(credIdx, 1); 
                 }
                 
@@ -2404,7 +2354,6 @@
                 alert("Bill deleted successfully.");
             }
 
-            // MODIFIED: Inject Treatment to TOP of list
             static filterOTCMedicineOptions() {
                 const db = SystemStorage.read();
                 const typeFilter = document.getElementById('otc-medicine-type-filter')?.value || 'ALL';
@@ -2416,64 +2365,13 @@
                     if (typeFilter === 'Other') {
                         const standardTypes = ['Tablet', 'Capsule', 'Syrup', 'Ointment', 'Drop', 'Vial', 'Ampule', 'SN', 'Lotion', 'Sachet', 'Nab'];
                         availableMeds = availableMeds.filter(i => !standardTypes.includes(i.type));
-                        availableMeds.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-                        
-                        select.innerHTML = '<option value="" disabled selected>-- Select Medicine / Treatment --</option>' + 
-                            '<option value="OTC_TREATMENT" class="font-bold text-blue-700 bg-blue-50">➕ Other (Treatment / Service)</option>' +
-                            availableMeds.map(i => `<option value="${i.id}">${i.name} (Stock: ${parseFloat(Number(i.qty).toFixed(2))})</option>`).join('');
-                        this.handleOTCMedicineChange();
-                        return;
                     } else {
                         availableMeds = availableMeds.filter(i => i.type === typeFilter);
                     }
                 }
-                
                 availableMeds.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
                 select.innerHTML = '<option value="" disabled selected>-- Select Medicine --</option>' + 
                     availableMeds.map(i => `<option value="${i.id}">${i.name} (Stock: ${parseFloat(Number(i.qty).toFixed(2))})</option>`).join('');
-                
-                this.handleOTCMedicineChange();
-            }
-
-            // MODIFIED: Hide Qty Container completely
-            static handleOTCMedicineChange() {
-                const val = document.getElementById('otc-medicine-select')?.value;
-                const treatmentContainer = document.getElementById('otc-treatment-container');
-                const qtyContainer = document.getElementById('otc-qty-container');
-                const qtyInput = document.getElementById('otc-qty');
-                
-                if (treatmentContainer && qtyContainer) {
-                    if (val === 'OTC_TREATMENT') {
-                        treatmentContainer.classList.remove('hidden');
-                        qtyContainer.classList.add('hidden');
-                        if(qtyInput) qtyInput.value = 1;
-                    } else {
-                        treatmentContainer.classList.add('hidden');
-                        qtyContainer.classList.remove('hidden');
-                    }
-                }
-            }
-
-            // MODIFIED: Handle visibility of BP, Sugar, and Specific inputs
-            static handleOTCTreatmentChange() {
-                const val = document.getElementById('otc-treatment-select')?.value;
-                const specifyContainer = document.getElementById('otc-treatment-specify-container');
-                const bpContainer = document.getElementById('otc-treatment-bp-container');
-                const sugarContainer = document.getElementById('otc-treatment-sugar-container');
-                
-                if (specifyContainer && bpContainer && sugarContainer) {
-                    specifyContainer.classList.add('hidden');
-                    bpContainer.classList.add('hidden');
-                    sugarContainer.classList.add('hidden');
-                    
-                    if (val === 'Other') {
-                        specifyContainer.classList.remove('hidden');
-                    } else if (val === 'BP Measure') {
-                        bpContainer.classList.remove('hidden');
-                    } else if (val === 'Sugar Check') {
-                        sugarContainer.classList.remove('hidden');
-                    }
-                }
             }
 
             static syncOTCDropdowns(db) {
@@ -2519,6 +2417,7 @@
                     const patient = patParts.length > 1 ? patParts[1] : 'Walk-in';
                     const displayTime = sale.time || '--:--:--';
                     
+                    // Display only the primary ref in the summary if it's a consolidated log
                     const displayRef = sale.ref.split(", ")[0] + (sale.ref.includes(",") ? " (+)" : "");
 
                     return `
@@ -2649,6 +2548,7 @@
                 document.getElementById('bill-visit-id').value = document.getElementById('bill-visit-date').value;
             }
 
+            // AUTO QR GENERATOR FOR BILLING (USES SETTINGS UPI ID)
             static renderUPIQR() {
                 const mode = document.getElementById('bill-payment-mode').value;
                 const amt = parseFloat(document.getElementById('bill-amount').value) || 0;
@@ -2710,19 +2610,23 @@
                 const visitTag = visitId ? ` [Visit: ${visitId}]` : '';
                 const catStr = `Billing [${modeSelect.value}] - ${targetPatient.name}${visitTag}`;
 
+                // --- NEW CONSOLIDATED CREDIT LOGIC ---
                 if(modeSelect.value === 'Credit') {
                     if(!db.credits) db.credits = [];
+                    // Find an active credit for this exact patient ID
                     let existingCredit = db.credits.find(c => c.patientId === targetPatient.id && c.paidAmount < c.totalAmount);
                     
                     if (existingCredit) {
+                        // Consolidate the new bill into the existing active credit
                         existingCredit.pastAmount = existingCredit.totalAmount;
                         existingCredit.newAmount = amt;
                         existingCredit.totalAmount += amt;
-                        existingCredit.ref = existingCredit.ref + ", " + invCode;
-                        existingCredit.timestamp = ts.timestamp; 
+                        existingCredit.ref = existingCredit.ref + ", " + invCode; // Merge reference codes
+                        existingCredit.timestamp = ts.timestamp; // Bring to front chronologically
                         existingCredit.date = ts.date;
                         existingCredit.time = ts.time;
                     } else {
+                        // Create a fresh credit entity if none exist
                         db.credits.push({
                             id: UI.generateUniqueRef('CRD-'),
                             patientId: targetPatient.id,
@@ -3042,12 +2946,9 @@
                 const durMatch = finalDuration.match(/\d+/);
                 const days = durMatch ? (parseInt(durMatch[0]) || 1) : 1;
                 
-                let dailyCount = 0;
-                const doseParts = doseSelect.value.split('-');
-                doseParts.forEach(part => {
-                    if (part === '1/2') dailyCount += 0.5;
-                    else dailyCount += parseFloat(part) || 0;
-                });
+                let dailyCount = 2;
+                if(doseSelect.value === '1-1-1') dailyCount = 3;
+                if(['1-0-0','0-1-0','0-0-1'].includes(doseSelect.value)) dailyCount = 1;
 
                 const directQtyTypes = ['Syrup', 'Ointment', 'Drop', 'Lotion', 'Sachet', 'Nab', 'Other'];
                 let lineContent = "";
@@ -3223,12 +3124,9 @@
 
                 if (!confirm("Editing will reverse this sale temporarily and load it back into cart. Continue?")) return;
 
-                // Mod: don't restock treatments
                 sale.cartItems.forEach(cartItem => {
-                    if(!cartItem.isTreatment) {
-                        const invItem = db.inventory.find(i => i.id === cartItem.id);
-                        if (invItem) invItem.qty += cartItem.qty;
-                    }
+                    const invItem = db.inventory.find(i => i.id === cartItem.id);
+                    if (invItem) invItem.qty += cartItem.qty;
                 });
 
                 this.otcCart = JSON.parse(JSON.stringify(sale.cartItems));
@@ -3271,10 +3169,8 @@
                 if (!sale) return;
                 if (sale.cartItems && sale.cartItems.length > 0) {
                     sale.cartItems.forEach(cartItem => {
-                        if(!cartItem.isTreatment) {
-                            const invItem = db.inventory.find(i => i.id === cartItem.id);
-                            if (invItem) invItem.qty += cartItem.qty;
-                        }
+                        const invItem = db.inventory.find(i => i.id === cartItem.id);
+                        if (invItem) invItem.qty += cartItem.qty;
                     });
                 }
 
@@ -3287,6 +3183,7 @@
                 alert(`OTC Sale deleted successfully.`);
             }
 
+            // --- NEW CONSOLIDATED CREDIT RENDERING ---
             static renderCreditsList() {
                 const db = SystemStorage.read();
                 const container = document.getElementById('credits-list');
@@ -3300,11 +3197,13 @@
                 container.innerHTML = activeCredits.map(c => {
                     const remaining = c.totalAmount - c.paidAmount;
                     
+                    // Conditionally show the exact math equation if there are consolidated entries
                     let mathDisplay = "";
                     if (c.pastAmount > 0 && c.newAmount > 0) {
                         mathDisplay = `<div class="text-[11px] text-indigo-700 bg-indigo-50 p-2 rounded-lg mt-1.5 inline-block border border-indigo-100 font-bold shadow-xs"><i class="fa-solid fa-calculator mr-1"></i> Past Credit (₹${c.pastAmount.toFixed(2)}) + New Credit (₹${c.newAmount.toFixed(2)}) = Sum Total (₹${c.totalAmount.toFixed(2)})</div>`;
                     }
 
+                    // Format multi-refs cleanly if needed
                     const refDisplay = c.ref.includes(",") ? `<span title="${c.ref}">${c.ref.split(", ")[0]} (+ multiple)</span>` : c.ref;
 
                     return `
@@ -3342,6 +3241,7 @@
                 
                 credit.paidAmount += amount;
                 
+                // Clear the temporary math attributes upon partial or full payment so the equation resets beautifully
                 credit.pastAmount = 0;
                 credit.newAmount = 0;
                 
@@ -3349,7 +3249,7 @@
                 db.finance.push({
                     type: "INFLOW",
                     category: `Credit Settlement [${payMode}] - ${credit.patientName}`,
-                    ref: credit.ref,
+                    ref: credit.ref, // Stores all the aggregated refs
                     amount: amount,
                     date: ts.date,
                     time: ts.time,
@@ -3362,118 +3262,9 @@
                 alert(`Payment of ₹${amount.toFixed(2)} received successfully.`);
             }
 
-            // MODIFIED: Inject Treatment to TOP of list
-            static filterOTCMedicineOptions() {
-                const db = SystemStorage.read();
-                const typeFilter = document.getElementById('otc-medicine-type-filter')?.value || 'ALL';
-                const select = document.getElementById('otc-medicine-select');
-                if (!select) return;
-
-                let availableMeds = db.inventory.filter(i => i.qty > 0);
-                if (typeFilter !== 'ALL') {
-                    if (typeFilter === 'Other') {
-                        const standardTypes = ['Tablet', 'Capsule', 'Syrup', 'Ointment', 'Drop', 'Vial', 'Ampule', 'SN', 'Lotion', 'Sachet', 'Nab'];
-                        availableMeds = availableMeds.filter(i => !standardTypes.includes(i.type));
-                        availableMeds.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-                        
-                        select.innerHTML = '<option value="" disabled selected>-- Select Medicine / Treatment --</option>' + 
-                            '<option value="OTC_TREATMENT" class="font-bold text-blue-700 bg-blue-50">➕ Other (Treatment / Service)</option>' +
-                            availableMeds.map(i => `<option value="${i.id}">${i.name} (Stock: ${parseFloat(Number(i.qty).toFixed(2))})</option>`).join('');
-                        this.handleOTCMedicineChange();
-                        return;
-                    } else {
-                        availableMeds = availableMeds.filter(i => i.type === typeFilter);
-                    }
-                }
-                
-                availableMeds.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-                select.innerHTML = '<option value="" disabled selected>-- Select Medicine --</option>' + 
-                    availableMeds.map(i => `<option value="${i.id}">${i.name} (Stock: ${parseFloat(Number(i.qty).toFixed(2))})</option>`).join('');
-                
-                this.handleOTCMedicineChange();
-            }
-
-            // MODIFIED: Hide Qty Container completely
-            static handleOTCMedicineChange() {
-                const val = document.getElementById('otc-medicine-select')?.value;
-                const treatmentContainer = document.getElementById('otc-treatment-container');
-                const qtyContainer = document.getElementById('otc-qty-container');
-                const qtyInput = document.getElementById('otc-qty');
-                
-                if (treatmentContainer && qtyContainer) {
-                    if (val === 'OTC_TREATMENT') {
-                        treatmentContainer.classList.remove('hidden');
-                        qtyContainer.classList.add('hidden');
-                        if(qtyInput) qtyInput.value = 1;
-                    } else {
-                        treatmentContainer.classList.add('hidden');
-                        qtyContainer.classList.remove('hidden');
-                    }
-                }
-            }
-
-            // MODIFIED: Handle visibility of BP, Sugar, and Specific inputs
-            static handleOTCTreatmentChange() {
-                const val = document.getElementById('otc-treatment-select')?.value;
-                const specifyContainer = document.getElementById('otc-treatment-specify-container');
-                const bpContainer = document.getElementById('otc-treatment-bp-container');
-                const sugarContainer = document.getElementById('otc-treatment-sugar-container');
-                
-                if (specifyContainer && bpContainer && sugarContainer) {
-                    specifyContainer.classList.add('hidden');
-                    bpContainer.classList.add('hidden');
-                    sugarContainer.classList.add('hidden');
-                    
-                    if (val === 'Other') {
-                        specifyContainer.classList.remove('hidden');
-                    } else if (val === 'BP Measure') {
-                        bpContainer.classList.remove('hidden');
-                    } else if (val === 'Sugar Check') {
-                        sugarContainer.classList.remove('hidden');
-                    }
-                }
-            }
-
-            // MODIFIED: Capture BP and Sugar values for Cart
             static addOTCToCart() {
                 const medId = document.getElementById('otc-medicine-select').value;
-                const qty = parseInt(document.getElementById('otc-qty').value) || 1;
-                
-                if (medId === 'OTC_TREATMENT') {
-                    const treatType = document.getElementById('otc-treatment-select').value;
-                    if (!treatType) { alert("Please select a treatment type."); return; }
-                    
-                    let treatName = treatType;
-                    if (treatType === 'Other') {
-                        const specify = document.getElementById('otc-treatment-specify').value.trim();
-                        if (!specify) { alert("Please specify the exact treatment/service details."); return; }
-                        treatName = specify;
-                    } else if (treatType === 'BP Measure') {
-                        const bpVal = document.getElementById('otc-treatment-bp').value.trim();
-                        if (!bpVal) { alert("Please enter the BP reading."); return; }
-                        treatName = `BP Measure (${bpVal} mmHg)`;
-                    } else if (treatType === 'Sugar Check') {
-                        const sugarVal = document.getElementById('otc-treatment-sugar').value.trim();
-                        if (!sugarVal) { alert("Please enter the Sugar reading."); return; }
-                        treatName = `Sugar Check (${sugarVal} mg/dL)`;
-                    }
-                    
-                    const specialId = 'TRT-' + new Date().getTime();
-                    this.otcCart.push({ id: specialId, name: `[Treatment] ${treatName}`, qty: 1, isTreatment: true });
-                    
-                    // Reset fields
-                    document.getElementById('otc-medicine-select').selectedIndex = 0;
-                    document.getElementById('otc-treatment-select').selectedIndex = 0;
-                    document.getElementById('otc-treatment-specify').value = "";
-                    document.getElementById('otc-treatment-bp').value = "";
-                    document.getElementById('otc-treatment-sugar').value = "";
-                    
-                    this.handleOTCMedicineChange();
-                    this.handleOTCTreatmentChange();
-                    this.renderOTCCart();
-                    return;
-                }
-
+                const qty = parseInt(document.getElementById('otc-qty').value);
                 if (!medId || isNaN(qty) || qty <= 0) { alert("Please select a medicine and quantity."); return; }
                 
                 const db = SystemStorage.read();
@@ -3489,7 +3280,7 @@
                 }
                 
                 if (existing) existing.qty += qty;
-                else this.otcCart.push({ id: med.id, name: med.name, qty: qty, isTreatment: false });
+                else this.otcCart.push({ id: med.id, name: med.name, qty: qty });
                 
                 document.getElementById('otc-qty').value = 1;
                 document.getElementById('otc-medicine-select').selectedIndex = 0;
@@ -3509,21 +3300,19 @@
                     return;
                 }
                 
-                tbody.innerHTML = this.otcCart.map((item, index) => {
-                    const itemNameDisplay = item.isTreatment ? `<span class="text-blue-700 font-bold">${item.name}</span>` : item.name;
-                    return `
+                tbody.innerHTML = this.otcCart.map((item, index) => `
                     <tr class="border-b border-slate-100 hover:bg-slate-50 font-medium text-xs">
-                        <td class="p-3 font-bold text-slate-700">${itemNameDisplay}</td>
+                        <td class="p-3 font-bold text-slate-700">${item.name}</td>
                         <td class="p-3 text-center text-slate-600 font-bold">${item.qty}</td>
                         <td class="p-3 text-center">
                             <button onclick="UI.removeOTCFromCart(${index})" class="text-rose-500 hover:text-rose-700 transition-colors cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
                         </td>
-                    </tr>`;
-                }).join('');
+                    </tr>`).join('');
                 
                 this.renderOTCUPIQR(); 
             }
 
+            // AUTO QR GENERATOR FOR OTC (USES SETTINGS UPI ID)
             static renderOTCUPIQR() {
                 const mode = document.getElementById('otc-payment-mode').value;
                 const manualAmount = parseFloat(document.getElementById('otc-receive-amount').value) || 0;
@@ -3576,12 +3365,9 @@
                 const db = SystemStorage.read();
                 const patTag = otcPat ? ` - ${otcPat}` : ' - Walk-in';
                 
-                // Mod: Ensure we only deduct stock if item is not a treatment
                 this.otcCart.forEach(cartItem => {
-                    if (!cartItem.isTreatment) {
-                        const invItem = db.inventory.find(i => i.id === cartItem.id);
-                        if (invItem) invItem.qty = Math.max(0, invItem.qty - cartItem.qty);
-                    }
+                    const invItem = db.inventory.find(i => i.id === cartItem.id);
+                    if (invItem) invItem.qty = Math.max(0, invItem.qty - cartItem.qty);
                 });
                 
                 const ts = this.getTimestampData();
@@ -3591,16 +3377,19 @@
                 const saleTimestamp = this.editingOTCTimestamp || ts.timestamp;
                 const cartCopy = JSON.parse(JSON.stringify(this.otcCart));
 
+                // --- NEW CONSOLIDATED CREDIT LOGIC ---
                 if (mode === 'Credit') {
                     if(!db.credits) db.credits = [];
                     const targetPatient = db.patients.find(p => p.name.toLowerCase() === otcPat.toLowerCase()) || { id: 'WALK-IN', name: otcPat };
                     
+                    // Find an active credit by Patient Name
                     let existingCredit = db.credits.find(c => c.patientName.toLowerCase() === targetPatient.name.toLowerCase() && c.paidAmount < c.totalAmount);
                     
                     if (existingCredit) {
                         existingCredit.pastAmount = existingCredit.totalAmount;
                         existingCredit.newAmount = manualAmount;
                         existingCredit.totalAmount += manualAmount;
+                        // Avoid appending same ref when editing
                         if (!existingCredit.ref.includes(refCode)) {
                             existingCredit.ref = existingCredit.ref + ", " + refCode;
                         }
@@ -3646,7 +3435,6 @@
                 this.editingOTCRef = null;
                 document.getElementById('otc-receive-amount').value = "";
                 document.getElementById('otc-patient-name').value = "";
-                this.handleOTCMedicineChange(); // hide treatment box if open
                 this.renderOTCCart();
                 this.renderOTCSummary();
                 
@@ -4030,16 +3818,16 @@
 
             static printInventoryStock() {
                 const db = SystemStorage.read();
-                let datasets = [...db.inventory].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+                let datasets = db.inventory;
                 
                 if (this.currentInventoryFilter === 'LOW_STOCK') {
-                    datasets = datasets.filter(i => i.qty <= (i.lowStockThreshold !== undefined ? i.lowStockThreshold : 15));
+                    datasets = datasets.filter(i => i.qty <= 15);
                 } else if (this.currentInventoryFilter === 'NEAR_EXPIRY') {
                     let today = new Date();
-                    let sixtyDaysHence = new Date(today.getTime() + (60 * 24 * 60 * 60 * 1000));
+                    let sixMonthsHence = new Date(today.getTime() + (180 * 24 * 60 * 60 * 1000));
                     datasets = datasets.filter(i => {
                         let expDate = new Date(i.expiry + "-01");
-                        return expDate >= today && expDate <= sixtyDaysHence;
+                        return expDate >= today && expDate <= sixMonthsHence;
                     });
                 }
 
@@ -4069,7 +3857,7 @@
                         <div style="text-align:center; margin-bottom: 20px; border-bottom: 2px solid #1d4ed8; padding-bottom: 10px;">
                             <h2 style="margin:0; font-size: 24px; color: #1d4ed8; text-transform: uppercase; font-weight:800;">${clinic.name || 'Clinic Stock Report'}</h2>
                             <p style="margin:5px 0 0; font-size: 13px; color: #475569;">${clinic.address || ''}</p>
-                            <p style="margin:8px 0 0; font-size: 15px; font-weight: bold; color:#0f172a;">Current Stock Inventory Ledger (A-Z)</p>
+                            <p style="margin:8px 0 0; font-size: 15px; font-weight: bold; color:#0f172a;">Current Stock Inventory Ledger</p>
                             <p style="margin:4px 0 0; font-size: 11px; color: #64748b;">Generated on: ${printDate}</p>
                         </div>
                         <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">
@@ -4092,8 +3880,7 @@
                     html += `<tr><td colspan="9" style="padding: 12px; text-align: center; border: 1px solid #e2e8f0; color:#64748b; font-style: italic;">No stock records found for current filters.</td></tr>`;
                 } else {
                     datasets.forEach((i, idx) => {
-                        let threshold = i.lowStockThreshold !== undefined ? i.lowStockThreshold : 15;
-                        let qtyStyle = i.qty <= 0 ? 'color:#e11d48;font-weight:bold;' : (i.qty <= threshold ? 'color:#ea580c;font-weight:bold;' : 'font-weight:bold;');
+                        let qtyStyle = i.qty <= 0 ? 'color:#e11d48;font-weight:bold;' : (i.qty <= 15 ? 'color:#ea580c;font-weight:bold;' : 'font-weight:bold;');
                         html += `
                             <tr style="border-bottom: 1px solid #e2e8f0;">
                                 <td style="padding: 8px; border: 1px solid #e2e8f0;">${idx + 1}</td>
@@ -4122,14 +3909,12 @@
 
             static exportInventoryCSV() {
                 const db = SystemStorage.read();
-                let datasets = [...db.inventory].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
                 let csvContent = "data:text/csv;charset=utf-8,";
-                csvContent += "Medicine Type,Medicine Name,Supplier,Expiry Date,Total Inventory Qty,Unit Type,Units per Pkg,PTR (Purchase per Pkg),MRP (Selling per Pkg),Total Value (PTR),Stock Status,Low Stock Threshold\n";
-                datasets.forEach(i => {
-                    let threshold = i.lowStockThreshold !== undefined ? i.lowStockThreshold : 15;
-                    let status = (i.qty <= 0) ? "Depleted" : (i.qty <= threshold ? "Low Level" : "In Stock");
+                csvContent += "Medicine Type,Medicine Name,Supplier,Expiry Date,Total Inventory Qty,Unit Type,Units per Pkg,PTR (Purchase per Pkg),MRP (Selling per Pkg),Total Value (PTR),Stock Status\n";
+                db.inventory.forEach(i => {
+                    let status = (i.qty <= 0) ? "Depleted" : (i.qty <= 15 ? "Low Level" : "In Stock");
                     let totalVal = ((i.qty / (i.unitQty || 1)) * i.purchase).toFixed(2);
-                    let row = `"${i.type || ''}","${i.name}","${i.supplier || ''}","${i.expiry}","${i.qty}","${i.unitType || 'Piece'}","${i.unitQty || 1}","${i.purchase}","${i.selling}","${totalVal}","${status}","${threshold}"`;
+                    let row = `"${i.type || ''}","${i.name}","${i.supplier || ''}","${i.expiry}","${i.qty}","${i.unitType || 'Piece'}","${i.unitQty || 1}","${i.purchase}","${i.selling}","${totalVal}","${status}"`;
                     csvContent += row + "\r\n";
                 });
                 const encodedUri = encodeURI(csvContent);
@@ -4156,21 +3941,19 @@
                         const cols = this.parseCSVRow(rows[i]);
                         if(cols.length < 7) continue; 
                         
-                        let qty, unitType, unitQty, purchase, selling, threshold;
+                        let qty, unitType, unitQty, purchase, selling;
                         if (cols.length >= 11) {
                             qty = parseFloat(cols[4]) || 0;
                             unitType = cols[5] || 'Piece';
                             unitQty = parseFloat(cols[6]) || 1;
                             purchase = parseFloat(cols[7]) || 0;
                             selling = parseFloat(cols[8]) || 0;
-                            threshold = parseFloat(cols[11]) || 15;
                         } else {
                             qty = parseFloat(cols[4]) || 0;
                             unitType = 'Piece';
                             unitQty = 1;
                             purchase = parseFloat(cols[5]) || 0;
                             selling = parseFloat(cols[6]) || 0;
-                            threshold = 15;
                         }
                         
                         db.inventory.push({
@@ -4183,8 +3966,7 @@
                             unitType: unitType, 
                             unitQty: unitQty, 
                             purchase: purchase,
-                            selling: selling,
-                            lowStockThreshold: threshold
+                            selling: selling
                         });
                         importedCount++;
                     }
@@ -4204,17 +3986,15 @@
                 if(!container) return;
                 container.innerHTML = "";
 
-                // A-Z Sort Alphabetical
-                let datasets = [...db.inventory].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-
+                let datasets = db.inventory;
                 if (filter === 'LOW_STOCK') {
-                    datasets = datasets.filter(i => i.qty <= (i.lowStockThreshold !== undefined ? i.lowStockThreshold : 15));
+                    datasets = datasets.filter(i => i.qty <= 15);
                 } else if (filter === 'NEAR_EXPIRY') {
                     let today = new Date();
-                    let sixtyDaysHence = new Date(today.getTime() + (60 * 24 * 60 * 60 * 1000));
+                    let sixMonthsHence = new Date(today.getTime() + (180 * 24 * 60 * 60 * 1000));
                     datasets = datasets.filter(i => {
                         let expDate = new Date(i.expiry + "-01");
-                        return expDate >= today && expDate <= sixtyDaysHence;
+                        return expDate >= today && expDate <= sixMonthsHence;
                     });
                 }
 
@@ -4242,9 +4022,8 @@
                 }
 
                 datasets.forEach(i => {
-                    let threshold = i.lowStockThreshold !== undefined ? i.lowStockThreshold : 15;
                     let statusBadge = `<span class="bg-emerald-50 text-emerald-700 text-xs px-2.5 py-1 rounded-xl font-bold">In Stock</span>`;
-                    if (i.qty <= threshold) statusBadge = `<span class="bg-rose-50 text-rose-700 text-xs px-2.5 py-1 rounded-xl font-bold">Low Level</span>`;
+                    if (i.qty <= 15) statusBadge = `<span class="bg-rose-50 text-rose-700 text-xs px-2.5 py-1 rounded-xl font-bold">Low Level</span>`;
                     if (i.qty <= 0) statusBadge = `<span class="bg-slate-200 text-slate-700 text-xs px-2.5 py-1 rounded-xl font-bold">Depleted</span>`;
                     
                     const totalPTRValue = (i.qty / (i.unitQty || 1)) * i.purchase;
@@ -4316,9 +4095,6 @@
                 document.getElementById('m-type-other').removeAttribute('required');
                 this.populateExpiryYears(); 
 
-                const thresholdInput = document.getElementById('m-low-threshold');
-                if (thresholdInput) thresholdInput.value = 15;
-
                 document.getElementById('medicine-modal-title').innerHTML = '<i class="fa-solid fa-pills mr-2 text-emerald-400"></i>Register New Medicine';
                 document.getElementById('medicine-submit-btn').innerText = "Save & Add Medicine";
                 
@@ -4371,11 +4147,6 @@
                 document.getElementById('m-purchase').value = item.purchase;
                 document.getElementById('m-selling').value = item.selling;
 
-                const thresholdInput = document.getElementById('m-low-threshold');
-                if (thresholdInput) {
-                    thresholdInput.value = item.lowStockThreshold !== undefined ? item.lowStockThreshold : 15;
-                }
-
                 document.getElementById('medicine-modal-title').innerHTML = '<i class="fa-solid fa-pen-to-square mr-2 text-amber-500"></i>Update Medicine Properties';
                 document.getElementById('medicine-submit-btn').innerText = "Update Structural Stock Parameters";
             }
@@ -4391,9 +4162,6 @@
                 const monthVal = document.getElementById('m-expiry-month').value;
                 const expiryVal = `${yearVal}-${monthVal}`;
 
-                const thresholdInput = document.getElementById('m-low-threshold');
-                const thresholdVal = thresholdInput ? (parseInt(thresholdInput.value) || 15) : 15;
-
                 const payload = {
                     id: editId || UI.generateUniqueRef('MED-'),
                     type: actualType,
@@ -4404,8 +4172,7 @@
                     unitQty: parseFloat(document.getElementById('m-unit-qty').value) || 1,
                     qty: parseFloat(document.getElementById('m-total-qty').value) || 0,
                     purchase: parseFloat(document.getElementById('m-purchase').value) || 0,
-                    selling: parseFloat(document.getElementById('m-selling').value) || 0,
-                    lowStockThreshold: thresholdVal
+                    selling: parseFloat(document.getElementById('m-selling').value) || 0
                 };
 
                 if(editId) {
@@ -4501,35 +4268,10 @@
                 this.viewVendorNetwork();
                 alert("Supplier pipeline synchronized successfully.");
             }
-
-            static injectDynamicElements() {
-                const dashFilter = document.querySelector('#mod-dashboard .flex.flex-col.sm\\:flex-row.items-center.justify-between.bg-white');
-                if (dashFilter && !document.getElementById('near-expiry-marquee-container')) {
-                    const marqueeHTML = `
-                    <div id="near-expiry-marquee-container" class="hidden bg-amber-50 text-amber-800 p-2 text-xs font-black rounded-2xl mb-4 flex items-center shadow-sm border border-amber-200 uppercase tracking-wider cursor-default">
-                        <i class="fa-solid fa-triangle-exclamation mr-3 animate-pulse text-amber-600 text-sm"></i>
-                        <marquee id="near-expiry-marquee" class="flex-1" scrollamount="6" onmouseover="this.stop();" onmouseout="this.start();"></marquee>
-                    </div>`;
-                    dashFilter.insertAdjacentHTML('beforebegin', marqueeHTML);
-                }
-
-                const medForm = document.getElementById('form-medicine');
-                if (medForm && !document.getElementById('m-low-threshold')) {
-                    const thresholdHTML = `
-                    <div>
-                        <label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1.5 tracking-wider">Low Stock Notification Threshold *</label>
-                        <input type="number" id="m-low-threshold" value="15" required placeholder="e.g. 10" min="1" class="w-full p-2.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 font-bold text-slate-800">
-                    </div>`;
-                    
-                    const totalQtyDiv = document.getElementById('m-total-qty').parentElement;
-                    if(totalQtyDiv) totalQtyDiv.insertAdjacentHTML('afterend', thresholdHTML);
-                }
-            }
         }
 
         // Initialize Runtime Sequence on View Ready State
         window.addEventListener('DOMContentLoaded', () => {
-            UI.injectDynamicElements(); 
             checkActiveSession();
             UI.initializeApplicationRuntime();
         });
