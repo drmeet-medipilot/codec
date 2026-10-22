@@ -146,6 +146,9 @@
             <button data-target="finance" class="nav-link w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-600 rounded-xl hover:bg-slate-50 transition-all cursor-pointer">
                 <i class="fa-solid fa-wallet w-5 text-center text-base"></i> <span>Accounts & Ledger</span>
             </button>
+            <button data-target="profit" class="nav-link w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-600 rounded-xl hover:bg-slate-50 transition-all cursor-pointer">
+                <i class="fa-solid fa-chart-line w-5 text-center text-base"></i> <span>Profit Margin</span>
+            </button>
             <button data-target="settings" class="nav-link w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-600 rounded-xl hover:bg-slate-50 transition-all cursor-pointer">
                 <i class="fa-solid fa-gear w-5 text-center text-base"></i> <span>Clinic Settings</span>
             </button>
@@ -305,7 +308,7 @@
                 </div>
             </div>
         </section>
-        <section id="mod-billing" class="erp-section hidden space-y-6">
+<section id="mod-billing" class="erp-section hidden space-y-6">
             <div class="border-b border-slate-200 pb-5">
                 <h2 class="text-3xl font-black animated-heading pb-1">Clinic Billing</h2>
             </div>
@@ -423,13 +426,31 @@
                         </div>
                         <div class="flex-1">
                             <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Select Medicine</label>
-                            <select id="otc-medicine-select" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium"></select>
+                            <!-- UPDATED to trigger handleOTCMedSelectChange -->
+                            <select id="otc-medicine-select" onchange="UI.handleOTCMedSelectChange()" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium"></select>
                         </div>
                         <div class="w-24">
                             <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Qty</label>
                             <input id="otc-qty" type="number" min="1" value="1" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-black text-center focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-800">
                         </div>
                         <button onclick="UI.addOTCToCart()" class="px-5 bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-800 hover:to-blue-900 text-white font-bold rounded-xl transition-all shadow-md shadow-blue-700/10 h-12 cursor-pointer active:scale-[0.96] text-xs uppercase tracking-wide">Add</button>
+                    </div>
+
+                    <!-- NEW CUSTOM SERVICE OPTIONS FOR BP/RBS/DRESSING -->
+                    <div id="otc-custom-service-container" class="hidden flex items-end gap-3 flex-wrap mt-3 p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                        <div class="flex-1">
+                            <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Service Option</label>
+                            <select id="otc-custom-type" onchange="UI.handleOTCCustomTypeChange()" class="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-medium">
+                                <option value="BP">BP (Blood Pressure)</option>
+                                <option value="RBS">RBS (Random Blood Sugar)</option>
+                                <option value="Dressing">Dressing</option>
+                                <option value="Other">Other Description</option>
+                            </select>
+                        </div>
+                        <div class="flex-1" id="otc-custom-val-container">
+                            <label id="otc-custom-val-label" class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">BP Value</label>
+                            <input type="text" id="otc-custom-val" placeholder="e.g. 120/80" class="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-bold text-slate-800">
+                        </div>
                     </div>
 
                     <div class="border border-slate-200 rounded-xl overflow-hidden mt-4">
@@ -602,7 +623,6 @@
                 </div>
             </div>
         </section>
-
         <section id="mod-finance" class="erp-section hidden space-y-6">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-5 gap-4">
                 <div>
@@ -659,6 +679,69 @@
             </div>
         </section>
         
+        <!-- NEW PROFIT MARGIN MODULE -->
+        <section id="mod-profit" class="erp-section hidden space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-5 gap-4">
+                <div>
+                    <h2 class="text-3xl font-black animated-heading pb-1">Profit Margin Analytics</h2>
+                </div>
+                <div class="flex gap-2 items-center self-start">
+                    <select id="profit-timeframe" onchange="UI.renderProfitMarginGrid()" class="w-full sm:w-auto text-xs font-bold bg-slate-50 px-4 py-2.5 border border-slate-200 rounded-xl text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer shadow-inner">
+                        <option value="TODAY" selected>Today</option>
+                        <option value="YESTERDAY">Yesterday</option>
+                        <option value="THIS_WEEK">This Week</option>
+                        <option value="THIS_MONTH">This Month</option>
+                        <option value="THIS_YEAR">This Year</option>
+                        <option value="ALL_TIME">All Time</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between transition-all hover:shadow-md">
+                    <div>
+                        <p class="text-[11px] font-extrabold tracking-wider uppercase text-slate-400">Total Pharmacy Profit</p>
+                        <h3 id="stat-total-profit" class="text-3xl font-black text-emerald-600 mt-1">₹0.00</h3>
+                    </div>
+                    <div class="h-14 w-14 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-2xl shadow-inner"><i class="fa-solid fa-arrow-trend-up"></i></div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between transition-all hover:shadow-md">
+                    <div>
+                        <p class="text-[11px] font-extrabold tracking-wider uppercase text-slate-400">Rx Dispensing Profit</p>
+                        <h3 id="stat-rx-profit" class="text-2xl font-black text-blue-700 mt-1">₹0.00</h3>
+                    </div>
+                    <div class="h-12 w-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-xl shadow-inner"><i class="fa-solid fa-notes-medical"></i></div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between transition-all hover:shadow-md">
+                    <div>
+                        <p class="text-[11px] font-extrabold tracking-wider uppercase text-slate-400">OTC Sales Profit</p>
+                        <h3 id="stat-otc-profit" class="text-2xl font-black text-amber-700 mt-1">₹0.00</h3>
+                    </div>
+                    <div class="h-12 w-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center text-xl shadow-inner"><i class="fa-solid fa-shop"></i></div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-start">
+                    <i class="fa-solid fa-circle-info text-blue-600 mr-2 mt-0.5 text-sm"></i>
+                    <p class="text-xs text-slate-600 font-medium leading-relaxed">Profit is dynamically calculated based on <b>(MRP - PTR) × Quantity Dispensed</b>. For Vials/Liquids, stock is calculated efficiently down to the exact ML/Unit given to the patient.</p>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-white text-slate-500 uppercase font-bold text-[11px] tracking-wider border-b border-slate-200">
+                                <th class="p-4">Date & Time</th>
+                                <th class="p-4">Source Record</th>
+                                <th class="p-4">Items Dispensed & Margin</th>
+                                <th class="p-4 text-right">Net Profit (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="profit-margin-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
         <section id="mod-settings" class="erp-section hidden space-y-6">
             <div class="border-b border-slate-200 pb-5">
                 <h2 class="text-3xl font-black animated-heading pb-1">Clinic Settings</h2>
@@ -742,6 +825,7 @@
             </div>
         </section>
     </main>
+
     <div id="modal-revisit" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh] animate-zoom-in">
             <div class="bg-gradient-to-r from-blue-800 to-blue-950 p-4 text-white flex justify-between items-center">
@@ -1353,8 +1437,7 @@
                 await SystemStorage.syncFromCloud();
             }
         }
-
-        // LOGIN LOGIC
+      // LOGIN LOGIC
         async function processLogin() {
             const u = document.getElementById('login-user').value.trim();
             const p = document.getElementById('login-pass').value.trim();
@@ -1517,6 +1600,7 @@
                 }
             }
         }
+
         /**
          * INTERFACE AND VIEW STATE LOGIC CONTROLLER MATRIX
          */
@@ -1795,7 +1879,7 @@
                 }
                 
                 const optionsHtml = '<option value="" data-type="" data-unitqty="" data-unittype="">Select medicine from stock</option>' + 
-                    filtered.map(item => `<option value="${item.name}" data-type="${item.type || ''}" data-unitqty="${item.unitQty || 1}" data-unittype="${item.unitType || 'Piece'}">${item.name}</option>`).join('');
+                    filtered.map(item => `<option value="${item.name}" data-type="${item.type \vert{}\vert{} ''}" data-unitqty="${item.unitQty || 1}" data-unittype="${item.unitType \vert{}\vert{} 'Piece'}">${item.name}</option>`).join('');
                 
                 select.innerHTML = optionsHtml;
                 if (selectId === 'v-medicine') this.handlePrescriptionMedicineChange();
@@ -2133,6 +2217,11 @@
                         
                         document.getElementById('sidebar').classList.add('hidden');
                         document.getElementById('sidebar').classList.remove('flex');
+                        
+                        // Force refresh for Profit Margin Grid if navigating there
+                        if (target === 'profit') {
+                            UI.renderProfitMarginGrid();
+                        }
                     });
                 });
 
@@ -2244,6 +2333,118 @@
                 this.renderInventoryGrid(SystemStorage.read(), this.currentInventoryFilter);
             }
 
+            // NEW PROFIT MARGIN CALCULATOR LOGIC
+            static renderProfitMarginGrid() {
+                const db = SystemStorage.read();
+                const timeframe = document.getElementById('profit-timeframe')?.value || 'TODAY';
+                const tbody = document.getElementById('profit-margin-body');
+                if (!tbody) return;
+
+                let totalRxProfit = 0;
+                let totalOtcProfit = 0;
+                let profitRows = [];
+
+                // Helper to cleanly calculate cost, revenue, and margins per unit/ml
+                const getMargins = (itemName, dispensedQty) => {
+                    const inv = db.inventory.find(i => i.name === itemName || i.id === itemName);
+                    if (!inv) return { cost: 0, revenue: 0, margin: 0, valid: false };
+                    
+                    const unitQty = parseFloat(inv.unitQty) || 1;
+                    const unitPTR = parseFloat(inv.purchase) / unitQty;
+                    const unitMRP = parseFloat(inv.selling) / unitQty;
+                    
+                    const cost = unitPTR * dispensedQty;
+                    const revenue = unitMRP * dispensedQty;
+                    return { cost, revenue, margin: revenue - cost, valid: true, itemName: inv.name };
+                };
+
+                // Processing Prescriptions (Rx)
+                const filteredVisits = db.visits.filter(v => this.isDateInTimeframe(v.date, timeframe));
+                filteredVisits.forEach(v => {
+                    if (v.deductions && v.deductions.length > 0) {
+                        let visitMargin = 0;
+                        let itemDetails = [];
+                        v.deductions.forEach(d => {
+                            const m = getMargins(d.name, d.qty);
+                            if (m.valid) {
+                                visitMargin += m.margin;
+                                itemDetails.push(`<span class="text-blue-600 font-bold">${m.itemName}</span> (${d.qty} units) &nbsp;&rarr;&nbsp; Margin: <span class="text-emerald-600 font-bold">+₹${m.margin.toFixed(2)}</span>`);
+                            }
+                        });
+                        
+                        if (visitMargin > 0) {
+                            totalRxProfit += visitMargin;
+                            profitRows.push({
+                                date: v.date,
+                                time: v.time || '--:--',
+                                timestamp: v.timestamp || 0,
+                                source: `Rx Prescribed <br><span class="text-[10px] font-normal text-slate-400">ID: ${v.id}</span>`,
+                                details: itemDetails.join('<br>'),
+                                net: visitMargin
+                            });
+                        }
+                    }
+                });
+
+                // Processing OTC Pharmacy Cart Items
+                const otcFinance = (db.finance || []).filter(f => f.category && f.category.includes("OTC Pharmacy") && this.isDateInTimeframe(f.date, timeframe));
+                const otcCredits = (db.credits || []).filter(c => c.ref && c.ref.includes("OTC-") && this.isDateInTimeframe(c.date, timeframe));
+                
+                const allOtc = [...otcFinance, ...otcCredits];
+                allOtc.forEach(sale => {
+                    if (sale.cartItems && sale.cartItems.length > 0) {
+                        let saleMargin = 0;
+                        let itemDetails = [];
+                        sale.cartItems.forEach(cartItem => {
+                            if (cartItem.isCustom) return; // Skip custom services like BP/RBS as they don't have PTR/MRP
+                            const m = getMargins(cartItem.id, cartItem.qty);
+                            if (m.valid) {
+                                saleMargin += m.margin;
+                                itemDetails.push(`<span class="text-amber-700 font-bold">${m.itemName}</span> (${cartItem.qty} units) &nbsp;&rarr;&nbsp; Margin: <span class="text-emerald-600 font-bold">+₹${m.margin.toFixed(2)}</span>`);
+                            }
+                        });
+                        
+                        if (saleMargin > 0) {
+                            totalOtcProfit += saleMargin;
+                            profitRows.push({
+                                date: sale.date,
+                                time: sale.time || '--:--',
+                                timestamp: sale.timestamp || 0,
+                                source: `OTC Sale <br><span class="text-[10px] font-normal text-slate-400">Ref: ${sale.ref.split(", ")[0]}</span>`,
+                                details: itemDetails.join('<br>'),
+                                net: saleMargin
+                            });
+                        }
+                    }
+                });
+
+                // Update Profit Summary Stats UI
+                const statRx = document.getElementById('stat-rx-profit');
+                const statOtc = document.getElementById('stat-otc-profit');
+                const statTotal = document.getElementById('stat-total-profit');
+                
+                if (statRx) statRx.innerText = `₹${totalRxProfit.toFixed(2)}`;
+                if (statOtc) statOtc.innerText = `₹${totalOtcProfit.toFixed(2)}`;
+                if (statTotal) statTotal.innerText = `₹${(totalRxProfit + totalOtcProfit).toFixed(2)}`;
+
+                // Render Table
+                profitRows.sort((a, b) => b.timestamp - a.timestamp);
+                
+                if (profitRows.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400 text-xs italic font-medium">No profitable inventory dispensing recorded in this timeframe.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = profitRows.map(row => `
+                    <tr class="border-b border-slate-100 hover:bg-slate-50 font-medium text-xs">
+                        <td class="p-4 text-slate-500 whitespace-nowrap">${row.date}<br><span class="text-[10px] font-mono text-slate-400 font-bold">${row.time}</span></td>
+                        <td class="p-4 font-bold text-slate-700">${row.source}</td>
+                        <td class="p-4 text-slate-600 leading-relaxed">${row.details}</td>
+                        <td class="p-4 text-right font-black text-emerald-600">₹${row.net.toFixed(2)}</td>
+                    </tr>
+                `).join('');
+            }
+
             static triggerGlobalAuditRefresh() {
                 const db = SystemStorage.read();
                 this.loadClinicProfile();
@@ -2283,6 +2484,7 @@
                 this.renderOTCSummary();
                 this.renderBillingSummary();
                 this.renderCreditsList();
+                this.renderProfitMarginGrid(); // Refresh Profit Margins
                 
                 this.renderAnalyticsMatrixCharts(totalRevenue, totalExpenses);
                 this.renderDashboardRecentPatients(db, filteredVisits);
@@ -2355,6 +2557,7 @@
                 alert("Bill deleted successfully.");
             }
 
+            // NEW OTC LOGIC FOR CUSTOM BP/RBS SERVICES
             static filterOTCMedicineOptions() {
                 const db = SystemStorage.read();
                 const typeFilter = document.getElementById('otc-medicine-type-filter')?.value || 'ALL';
@@ -2362,17 +2565,64 @@
                 if (!select) return;
 
                 let availableMeds = db.inventory.filter(i => i.qty > 0);
+                let customOptionHtml = '';
+
                 if (typeFilter !== 'ALL') {
                     if (typeFilter === 'Other') {
                         const standardTypes = ['Tablet', 'Capsule', 'Syrup', 'Ointment', 'Drop', 'Vial', 'Ampule', 'SN', 'Lotion', 'Sachet', 'Nab'];
                         availableMeds = availableMeds.filter(i => !standardTypes.includes(i.type));
+                        
+                        // Inject Custom Services only into the "Other" Filter Category as requested
+                        customOptionHtml = '<option value="CUSTOM_SERVICE" class="font-bold text-blue-700 bg-blue-50">-- Other (BP / RBS / Dressing / Services) --</option>';
                     } else {
                         availableMeds = availableMeds.filter(i => i.type === typeFilter);
                     }
                 }
                 availableMeds.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+                
                 select.innerHTML = '<option value="" disabled selected>-- Select Medicine --</option>' + 
+                    customOptionHtml +
                     availableMeds.map(i => `<option value="${i.id}">${i.name} (Stock: ${parseFloat(Number(i.qty).toFixed(2))})</option>`).join('');
+                
+                this.handleOTCMedSelectChange(); // Reset custom container state
+            }
+
+            static handleOTCMedSelectChange() {
+                const select = document.getElementById('otc-medicine-select');
+                const customContainer = document.getElementById('otc-custom-service-container');
+                if (!select || !customContainer) return;
+                
+                if (select.value === 'CUSTOM_SERVICE') {
+                    customContainer.classList.remove('hidden');
+                    this.handleOTCCustomTypeChange();
+                } else {
+                    customContainer.classList.add('hidden');
+                }
+            }
+
+            static handleOTCCustomTypeChange() {
+                const type = document.getElementById('otc-custom-type').value;
+                const valContainer = document.getElementById('otc-custom-val-container');
+                const valLabel = document.getElementById('otc-custom-val-label');
+                const valInput = document.getElementById('otc-custom-val');
+                
+                if (type === 'BP') {
+                    valContainer.classList.remove('hidden');
+                    valLabel.innerText = "BP Value (mmHg)";
+                    valInput.placeholder = "e.g. 120/80";
+                } else if (type === 'RBS') {
+                    valContainer.classList.remove('hidden');
+                    valLabel.innerText = "RBS Value (mg/dL)";
+                    valInput.placeholder = "e.g. 110";
+                } else if (type === 'Other') {
+                    valContainer.classList.remove('hidden');
+                    valLabel.innerText = "Service Description";
+                    valInput.placeholder = "e.g. Ear cleaning";
+                } else {
+                    // Hide for standard 'Dressing'
+                    valContainer.classList.add('hidden');
+                    valInput.value = "";
+                }
             }
 
             static syncOTCDropdowns(db) {
@@ -3126,6 +3376,7 @@
                 if (!confirm("Editing will reverse this sale temporarily and load it back into cart. Continue?")) return;
 
                 sale.cartItems.forEach(cartItem => {
+                    if (cartItem.isCustom) return; // Skip stock updates for custom clinic services
                     const invItem = db.inventory.find(i => i.id === cartItem.id);
                     if (invItem) invItem.qty += cartItem.qty;
                 });
@@ -3170,6 +3421,7 @@
                 if (!sale) return;
                 if (sale.cartItems && sale.cartItems.length > 0) {
                     sale.cartItems.forEach(cartItem => {
+                        if (cartItem.isCustom) return; // Skip custom services
                         const invItem = db.inventory.find(i => i.id === cartItem.id);
                         if (invItem) invItem.qty += cartItem.qty;
                     });
@@ -3266,25 +3518,51 @@
             static addOTCToCart() {
                 const medId = document.getElementById('otc-medicine-select').value;
                 const qty = parseInt(document.getElementById('otc-qty').value);
-                if (!medId || isNaN(qty) || qty <= 0) { alert("Please select a medicine and quantity."); return; }
+                if (!medId || isNaN(qty) || qty <= 0) { alert("Please select a valid item and quantity."); return; }
                 
-                const db = SystemStorage.read();
-                const med = db.inventory.find(i => i.id === medId);
-                if (!med) return;
-                
-                const existing = this.otcCart.find(item => item.id === medId);
-                const currentCartQty = existing ? existing.qty : 0;
-                
-                if (currentCartQty + qty > med.qty) {
-                    alert(`Insufficient stock! You only have ${parseFloat(Number(med.qty).toFixed(2))} left.`);
-                    return;
+                // --- CUSTOM SERVICE LOGIC Bypassing Stock ---
+                if (medId === 'CUSTOM_SERVICE') {
+                    const type = document.getElementById('otc-custom-type').value;
+                    let desc = "";
+                    const valInput = document.getElementById('otc-custom-val').value.trim();
+
+                    if (type === 'Dressing') {
+                        desc = "Service - Dressing";
+                    } else if (type === 'BP') {
+                        desc = `Service - BP (${valInput || 'Checked'} mmHg)`;
+                    } else if (type === 'RBS') {
+                        desc = `Service - RBS (${valInput || 'Checked'} mg/dL)`;
+                    } else {
+                        desc = `Service - ${valInput || 'General Consultation'}`;
+                    }
+                    
+                    this.otcCart.push({ 
+                        id: 'CUSTOM_SERVICE_' + new Date().getTime(), 
+                        name: desc, 
+                        qty: qty, 
+                        isCustom: true 
+                    });
+                } else {
+                    const db = SystemStorage.read();
+                    const med = db.inventory.find(i => i.id === medId);
+                    if (!med) return;
+                    
+                    const existing = this.otcCart.find(item => item.id === medId);
+                    const currentCartQty = existing ? existing.qty : 0;
+                    
+                    if (currentCartQty + qty > med.qty) {
+                        alert(`Insufficient stock! You only have ${parseFloat(Number(med.qty).toFixed(2))} left.`);
+                        return;
+                    }
+                    
+                    if (existing) existing.qty += qty;
+                    else this.otcCart.push({ id: med.id, name: med.name, qty: qty });
                 }
-                
-                if (existing) existing.qty += qty;
-                else this.otcCart.push({ id: med.id, name: med.name, qty: qty });
                 
                 document.getElementById('otc-qty').value = 1;
                 document.getElementById('otc-medicine-select').selectedIndex = 0;
+                document.getElementById('otc-custom-val').value = '';
+                this.handleOTCMedSelectChange(); // hides the custom container
                 this.renderOTCCart();
             }
 
@@ -3301,14 +3579,17 @@
                     return;
                 }
                 
-                tbody.innerHTML = this.otcCart.map((item, index) => `
+                tbody.innerHTML = this.otcCart.map((item, index) => {
+                    const nameDisplay = item.isCustom ? `<span class="text-blue-700 font-bold">${item.name}</span>` : item.name;
+                    return `
                     <tr class="border-b border-slate-100 hover:bg-slate-50 font-medium text-xs">
-                        <td class="p-3 font-bold text-slate-700">${item.name}</td>
+                        <td class="p-3 font-bold text-slate-700">${nameDisplay}</td>
                         <td class="p-3 text-center text-slate-600 font-bold">${item.qty}</td>
                         <td class="p-3 text-center">
                             <button onclick="UI.removeOTCFromCart(${index})" class="text-rose-500 hover:text-rose-700 transition-colors cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
                         </td>
-                    </tr>`).join('');
+                    </tr>`;
+                }).join('');
                 
                 this.renderOTCUPIQR(); 
             }
@@ -3367,6 +3648,7 @@
                 const patTag = otcPat ? ` - ${otcPat}` : ' - Walk-in';
                 
                 this.otcCart.forEach(cartItem => {
+                    if (cartItem.isCustom) return; // Skip stock deduction for Custom Clinic Services
                     const invItem = db.inventory.find(i => i.id === cartItem.id);
                     if (invItem) invItem.qty = Math.max(0, invItem.qty - cartItem.qty);
                 });
@@ -4024,7 +4306,7 @@
 
                 datasets.forEach(i => {
                     let statusBadge = `<span class="bg-emerald-50 text-emerald-700 text-xs px-2.5 py-1 rounded-xl font-bold">In Stock</span>`;
-                    if (i.qty <= 15) statusBadge = `<span class="bg-rose-50 text-rose-700 text-xs px-2.5 py-1 rounded-xl font-bold">Low Level</span>`;
+                    if (i.qty <= 15) statusBadge= `<span class="bg-rose-50 text-rose-700 text-xs px-2.5 py-1 rounded-xl font-bold">Low Level</span>`;
                     if (i.qty <= 0) statusBadge = `<span class="bg-slate-200 text-slate-700 text-xs px-2.5 py-1 rounded-xl font-bold">Depleted</span>`;
                     
                     const totalPTRValue = (i.qty / (i.unitQty || 1)) * i.purchase;
