@@ -146,9 +146,6 @@
             <button data-target="finance" class="nav-link w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-600 rounded-xl hover:bg-slate-50 transition-all cursor-pointer">
                 <i class="fa-solid fa-wallet w-5 text-center text-base"></i> <span>Accounts & Ledger</span>
             </button>
-            <button data-target="profit" class="nav-link w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-600 rounded-xl hover:bg-slate-50 transition-all cursor-pointer">
-                <i class="fa-solid fa-chart-line w-5 text-center text-base"></i> <span>Profit Margin</span>
-            </button>
             <button data-target="settings" class="nav-link w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold text-slate-600 rounded-xl hover:bg-slate-50 transition-all cursor-pointer">
                 <i class="fa-solid fa-gear w-5 text-center text-base"></i> <span>Clinic Settings</span>
             </button>
@@ -308,7 +305,7 @@
                 </div>
             </div>
         </section>
-<section id="mod-billing" class="erp-section hidden space-y-6">
+        <section id="mod-billing" class="erp-section hidden space-y-6">
             <div class="border-b border-slate-200 pb-5">
                 <h2 class="text-3xl font-black animated-heading pb-1">Clinic Billing</h2>
             </div>
@@ -426,31 +423,13 @@
                         </div>
                         <div class="flex-1">
                             <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Select Medicine</label>
-                            <!-- UPDATED to trigger handleOTCMedSelectChange -->
-                            <select id="otc-medicine-select" onchange="UI.handleOTCMedSelectChange()" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium"></select>
+                            <select id="otc-medicine-select" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium"></select>
                         </div>
                         <div class="w-24">
                             <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Qty</label>
                             <input id="otc-qty" type="number" min="1" value="1" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-black text-center focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-800">
                         </div>
                         <button onclick="UI.addOTCToCart()" class="px-5 bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-800 hover:to-blue-900 text-white font-bold rounded-xl transition-all shadow-md shadow-blue-700/10 h-12 cursor-pointer active:scale-[0.96] text-xs uppercase tracking-wide">Add</button>
-                    </div>
-
-                    <!-- NEW CUSTOM SERVICE OPTIONS FOR BP/RBS/DRESSING -->
-                    <div id="otc-custom-service-container" class="hidden flex items-end gap-3 flex-wrap mt-3 p-3 bg-slate-50 border border-slate-200 rounded-xl">
-                        <div class="flex-1">
-                            <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Service Option</label>
-                            <select id="otc-custom-type" onchange="UI.handleOTCCustomTypeChange()" class="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-medium">
-                                <option value="BP">BP (Blood Pressure)</option>
-                                <option value="RBS">RBS (Random Blood Sugar)</option>
-                                <option value="Dressing">Dressing</option>
-                                <option value="Other">Other Description</option>
-                            </select>
-                        </div>
-                        <div class="flex-1" id="otc-custom-val-container">
-                            <label id="otc-custom-val-label" class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">BP Value</label>
-                            <input type="text" id="otc-custom-val" placeholder="e.g. 120/80" class="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-bold text-slate-800">
-                        </div>
                     </div>
 
                     <div class="border border-slate-200 rounded-xl overflow-hidden mt-4">
@@ -623,6 +602,7 @@
                 </div>
             </div>
         </section>
+
         <section id="mod-finance" class="erp-section hidden space-y-6">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-5 gap-4">
                 <div>
@@ -679,69 +659,6 @@
             </div>
         </section>
         
-        <!-- NEW PROFIT MARGIN MODULE -->
-        <section id="mod-profit" class="erp-section hidden space-y-6">
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-5 gap-4">
-                <div>
-                    <h2 class="text-3xl font-black animated-heading pb-1">Profit Margin Analytics</h2>
-                </div>
-                <div class="flex gap-2 items-center self-start">
-                    <select id="profit-timeframe" onchange="UI.renderProfitMarginGrid()" class="w-full sm:w-auto text-xs font-bold bg-slate-50 px-4 py-2.5 border border-slate-200 rounded-xl text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer shadow-inner">
-                        <option value="TODAY" selected>Today</option>
-                        <option value="YESTERDAY">Yesterday</option>
-                        <option value="THIS_WEEK">This Week</option>
-                        <option value="THIS_MONTH">This Month</option>
-                        <option value="THIS_YEAR">This Year</option>
-                        <option value="ALL_TIME">All Time</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between transition-all hover:shadow-md">
-                    <div>
-                        <p class="text-[11px] font-extrabold tracking-wider uppercase text-slate-400">Total Pharmacy Profit</p>
-                        <h3 id="stat-total-profit" class="text-3xl font-black text-emerald-600 mt-1">₹0.00</h3>
-                    </div>
-                    <div class="h-14 w-14 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-2xl shadow-inner"><i class="fa-solid fa-arrow-trend-up"></i></div>
-                </div>
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between transition-all hover:shadow-md">
-                    <div>
-                        <p class="text-[11px] font-extrabold tracking-wider uppercase text-slate-400">Rx Dispensing Profit</p>
-                        <h3 id="stat-rx-profit" class="text-2xl font-black text-blue-700 mt-1">₹0.00</h3>
-                    </div>
-                    <div class="h-12 w-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-xl shadow-inner"><i class="fa-solid fa-notes-medical"></i></div>
-                </div>
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between transition-all hover:shadow-md">
-                    <div>
-                        <p class="text-[11px] font-extrabold tracking-wider uppercase text-slate-400">OTC Sales Profit</p>
-                        <h3 id="stat-otc-profit" class="text-2xl font-black text-amber-700 mt-1">₹0.00</h3>
-                    </div>
-                    <div class="h-12 w-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center text-xl shadow-inner"><i class="fa-solid fa-shop"></i></div>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-start">
-                    <i class="fa-solid fa-circle-info text-blue-600 mr-2 mt-0.5 text-sm"></i>
-                    <p class="text-xs text-slate-600 font-medium leading-relaxed">Profit is dynamically calculated based on <b>(MRP - PTR) × Quantity Dispensed</b>. For Vials/Liquids, stock is calculated efficiently down to the exact ML/Unit given to the patient.</p>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-sm">
-                        <thead>
-                            <tr class="bg-white text-slate-500 uppercase font-bold text-[11px] tracking-wider border-b border-slate-200">
-                                <th class="p-4">Date & Time</th>
-                                <th class="p-4">Source Record</th>
-                                <th class="p-4">Items Dispensed & Margin</th>
-                                <th class="p-4 text-right">Net Profit (₹)</th>
-                            </tr>
-                        </thead>
-                        <tbody id="profit-margin-body"></tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
         <section id="mod-settings" class="erp-section hidden space-y-6">
             <div class="border-b border-slate-200 pb-5">
                 <h2 class="text-3xl font-black animated-heading pb-1">Clinic Settings</h2>
@@ -825,7 +742,6 @@
             </div>
         </section>
     </main>
-
     <div id="modal-revisit" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh] animate-zoom-in">
             <div class="bg-gradient-to-r from-blue-800 to-blue-950 p-4 text-white flex justify-between items-center">
@@ -1420,7 +1336,7 @@
 
     <div id="print-area" class="hidden font-mono text-sm bg-white text-slate-900 w-full max-w-full"></div>
     <script>
-      // =========================================================================
+        // =========================================================================
         // 1. SUPABASE CLOUD ENGINE
         // =========================================================================
         const supabaseUrl = 'https://mhquthxfsjnakymtaizp.supabase.co'; 
@@ -1428,6 +1344,7 @@
         const supabaseApp = window.supabase.createClient(supabaseUrl, supabaseKey);
         let currentUser = null;
 
+        // AUTO-LOGIN CHECK ON REFRESH
         async function checkActiveSession() {
             const { data: { session } } = await supabaseApp.auth.getSession();
             if (session) {
@@ -1437,6 +1354,7 @@
             }
         }
 
+        // LOGIN LOGIC
         async function processLogin() {
             const u = document.getElementById('login-user').value.trim();
             const p = document.getElementById('login-pass').value.trim();
@@ -1452,6 +1370,7 @@
             }
         }
 
+        // REGISTER LOGIC
         async function processRegister() {
             const u = document.getElementById('login-user').value.trim();
             const p = document.getElementById('login-pass').value.trim();
@@ -1468,6 +1387,7 @@
             }
         }
         
+        // LOGOUT LOGIC
         async function processLogout() {
             if (currentUser) {
                 localStorage.removeItem(`medipilot_vault_${currentUser.id}`);
@@ -1478,6 +1398,9 @@
             window.location.reload(); 
         }
 
+        /**
+         * CLOUD VAULT SYSTEM (JSONB ENGINE)
+         */
         class SystemStorage {
             static cache = null;
 
@@ -1490,51 +1413,85 @@
                     credits: [],
                     suppliers: [],
                     clinicProfile: { name: '', address: '', mobile: '', regno: '', doctor: '', degree: '', esignBase64: '', estampBase64: '', esignPin: '', upiId: '' },
-                    metadata: { lastUpdated: new Date().getTime(), softwareVersion: "2026.8.1" }
+                    metadata: { lastUpdated: new Date().getTime(), softwareVersion: "2026.8.1 (YYMMDD Sequential Core)" }
                 };
             }
 
             static read() {
                 if (!this.cache) {
                     if (!currentUser) return this.initializeEmptySchema(); 
+                    
                     const storageKey = `medipilot_vault_${currentUser.id}`;
                     const localData = localStorage.getItem(storageKey);
+                    
                     if (localData) {
                         try {
                             const parsed = JSON.parse(localData);
                             const empty = this.initializeEmptySchema();
                             this.cache = { ...empty, ...parsed };
                             this.cache.clinicProfile = { ...empty.clinicProfile, ...(parsed.clinicProfile || {}) };
-                        } catch(e) { this.cache = this.initializeEmptySchema(); }
-                    } else { this.cache = this.initializeEmptySchema(); }
+                            this.cache.metadata = { ...empty.metadata, ...(parsed.metadata || {}) };
+                        } catch(e) {
+                            this.cache = this.initializeEmptySchema();
+                        }
+                    } else {
+                        this.cache = this.initializeEmptySchema();
+                    }
                 }
                 return this.cache;
             }
 
             static write(payload) {
-                if (!currentUser) return; 
+                if (!currentUser) {
+                    console.warn("Write blocked: No active user session.");
+                    return; 
+                }
+                
                 if(!payload.metadata) payload.metadata = {};
                 payload.metadata.lastUpdated = new Date().getTime(); 
+                
                 this.cache = payload;
-                try { localStorage.setItem(`medipilot_vault_${currentUser.id}`, JSON.stringify(payload)); } catch(e) { }
+                
+                try {
+                    const storageKey = `medipilot_vault_${currentUser.id}`;
+                    localStorage.setItem(storageKey, JSON.stringify(payload));
+                } catch(e) {
+                    console.error("Local storage save failed:", e);
+                    if (e.name === 'QuotaExceededError') {
+                        alert("Storage limits exceeded! Please reduce the size of your E-Sign/E-Stamp images or clear some data.");
+                    }
+                }
+
                 UI.triggerGlobalAuditRefresh();
-                supabaseApp.from('clinic_vault').upsert({ clinic_id: currentUser.id, data: payload }, { onConflict: 'clinic_id' }).then(({error}) => {});
+                
+                supabaseApp.from('clinic_vault').upsert({
+                    clinic_id: currentUser.id,
+                    data: payload
+                }, { onConflict: 'clinic_id' }).then(({error}) => {
+                    if(error) console.error("Cloud Sync Error:", error);
+                });
             }
 
             static async syncFromCloud() {
                 if(!currentUser) return;
                 const storageKey = `medipilot_vault_${currentUser.id}`;
+                
                 try {
-                    const { data } = await supabaseApp.from('clinic_vault').select('data').eq('clinic_id', currentUser.id).single();
+                    const { data, error } = await supabaseApp.from('clinic_vault')
+                        .select('data').eq('clinic_id', currentUser.id).single();
+                    
                     let cloudData = data?.data;
                     let localData = null;
+                    
                     try {
                         const localStr = localStorage.getItem(storageKey);
                         if(localStr) localData = JSON.parse(localStr);
                     } catch(e) {}
 
+                    // Smart Merge: Compare Timestamps
                     let cloudTime = cloudData?.metadata?.lastUpdated || 0;
                     let localTime = localData?.metadata?.lastUpdated || 0;
+
                     const empty = this.initializeEmptySchema();
 
                     if (cloudData && cloudTime >= localTime) {
@@ -1549,16 +1506,20 @@
                         this.cache = empty;
                         await supabaseApp.from('clinic_vault').insert([{ clinic_id: currentUser.id, data: this.cache }]);
                     }
+                    
                     UI.loadClinicProfile();
                     UI.triggerGlobalAuditRefresh();
                 } catch (e) {
+                    console.error("Cloud Fetch Failed - Using Local", e);
                     this.cache = this.read();
                     UI.loadClinicProfile();
                     UI.triggerGlobalAuditRefresh();
                 }
             }
         }
-
+        /**
+         * INTERFACE AND VIEW STATE LOGIC CONTROLLER MATRIX
+         */
         class UI {
             static activeCharts = {};
             static qrCodeInstance = null;
@@ -1580,13 +1541,24 @@
                 };
             }
 
+            // CORE ID GENERATOR
             static generateUniqueRef(prefix = "") {
                 const now = new Date();
-                return `${prefix}${String(now.getFullYear()).slice(-2)}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}${String(now.getSeconds()).padStart(2, '0')}${String(now.getMilliseconds()).padStart(3, '0')}${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
+                const yy = String(now.getFullYear()).slice(-2);
+                const mm = String(now.getMonth() + 1).padStart(2, '0');
+                const dd = String(now.getDate()).padStart(2, '0');
+                const hh = String(now.getHours()).padStart(2, '0');
+                const min = String(now.getMinutes()).padStart(2, '0');
+                const ss = String(now.getSeconds()).padStart(2, '0');
+                const ms = String(now.getMilliseconds()).padStart(3, '0');
+                const rnd = Math.floor(Math.random() * 1000).toString().padStart(3, '0'); 
+                
+                return `${prefix}${yy}${mm}${dd}${hh}${min}${ss}${ms}${rnd}`;
             }
 
             static migrateTodaysIDs() {
-                if(!confirm("Are you sure you want to re-sequence today's records?")) return;
+                if(!confirm("Are you sure you want to re-sequence today's records? This will update randomly generated IDs from today into the secure chronological format and relink all histories.")) return;
+                
                 const db = SystemStorage.read();
                 const ts = UI.getTimestampData();
                 const todayDate = ts.date;
@@ -1620,7 +1592,9 @@
                 db.finance.forEach(f => {
                     if(f.category.includes("[Visit: ")) {
                         for (let oldId in visitMap) {
-                            if (f.category.includes(oldId)) f.category = f.category.replace(oldId, visitMap[oldId]);
+                            if (f.category.includes(oldId)) {
+                                f.category = f.category.replace(oldId, visitMap[oldId]);
+                            }
                         }
                     }
                 });
@@ -1628,15 +1602,21 @@
                 const todaysFinance = db.finance.filter(f => f.date === todayDate).sort((a,b) => a.timestamp - b.timestamp);
                 todaysFinance.forEach(f => {
                     const oldRef = f.ref;
-                    if(oldRef.startsWith("INV-") && oldRef.length < 11) f.ref = UI.generateUniqueRef('INV-');
-                    else if (oldRef.startsWith("OTC-") && oldRef.length < 11) f.ref = UI.generateUniqueRef('OTC-');
+                    if(oldRef.startsWith("INV-") && oldRef.length < 11) {
+                        f.ref = UI.generateUniqueRef('INV-');
+                    } else if (oldRef.startsWith("OTC-") && oldRef.length < 11) {
+                        f.ref = UI.generateUniqueRef('OTC-');
+                    }
                 });
 
                 const todaysCredits = db.credits.filter(c => c.date === todayDate).sort((a,b) => a.timestamp - b.timestamp);
                 todaysCredits.forEach(c => {
                     const oldRef = c.ref;
-                    if(oldRef.startsWith("INV-") && oldRef.length < 11) c.ref = UI.generateUniqueRef('INV-');
-                    else if (oldRef.startsWith("OTC-") && oldRef.length < 11) c.ref = UI.generateUniqueRef('OTC-');
+                    if(oldRef.startsWith("INV-") && oldRef.length < 11) {
+                        c.ref = UI.generateUniqueRef('INV-');
+                    } else if (oldRef.startsWith("OTC-") && oldRef.length < 11) {
+                        c.ref = UI.generateUniqueRef('OTC-');
+                    }
                 });
 
                 db.inventory.forEach(i => {
@@ -1644,8 +1624,12 @@
                     if(oldId.startsWith("MED-") && oldId.length < 11) {
                         const newId = UI.generateUniqueRef('MED-');
                         i.id = newId;
-                        db.finance.forEach(f => { if (f.cartItems) f.cartItems.forEach(cartItem => { if(cartItem.id === oldId) cartItem.id = newId; }); });
-                        db.credits.forEach(c => { if (c.cartItems) c.cartItems.forEach(cartItem => { if(cartItem.id === oldId) cartItem.id = newId; }); });
+                        db.finance.forEach(f => {
+                            if (f.cartItems) f.cartItems.forEach(cartItem => { if(cartItem.id === oldId) cartItem.id = newId; });
+                        });
+                        db.credits.forEach(c => {
+                            if (c.cartItems) c.cartItems.forEach(cartItem => { if(cartItem.id === oldId) cartItem.id = newId; });
+                        });
                     }
                 });
 
@@ -1657,7 +1641,10 @@
             static startClock() {
                 const clockEl = document.getElementById('dash-time');
                 if(!clockEl) return;
-                setInterval(() => { clockEl.innerText = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }); }, 1000);
+                setInterval(() => {
+                    const now = new Date();
+                    clockEl.innerText = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                }, 1000);
             }
 
             static compressImage(file, callback) {
@@ -1669,10 +1656,22 @@
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
                         const ctx = canvas.getContext('2d');
+                        const MAX_WIDTH = 800;
+                        const MAX_HEIGHT = 800;
                         let width = img.width;
                         let height = img.height;
-                        if (width > height) { if (width > 800) { height *= 800 / width; width = 800; } } 
-                        else { if (height > 800) { width *= 800 / height; height = 800; } }
+                        
+                        if (width > height) {
+                            if (width > MAX_WIDTH) {
+                                height *= MAX_WIDTH / width;
+                                width = MAX_WIDTH;
+                            }
+                        } else {
+                            if (height > MAX_HEIGHT) {
+                                width *= MAX_HEIGHT / height;
+                                height = MAX_HEIGHT;
+                            }
+                        }
                         canvas.width = width;
                         canvas.height = height;
                         ctx.drawImage(img, 0, 0, width, height);
@@ -1684,16 +1683,25 @@
             static parseIndianDate(dateStr) {
                 if(!dateStr) return new Date(0);
                 const parts = dateStr.split(/[-/]/);
-                if (parts.length === 3 && parts[2].length === 4) return new Date(parts[2], parts[1] - 1, parts[0]);
+                if (parts.length === 3 && parts[2].length === 4) {
+                    return new Date(parts[2], parts[1] - 1, parts[0]);
+                }
                 return new Date(dateStr);
             }
 
             static parseCSVRow(row) {
-                let insideQuote = false, entries = [], entry = '';
+                let insideQuote = false;
+                let entries = [];
+                let entry = '';
                 for (let i = 0; i < row.length; i++) {
-                    if (row[i] === '"') insideQuote = !insideQuote;
-                    else if (row[i] === ',' && !insideQuote) { entries.push(entry.trim()); entry = ''; } 
-                    else entry += row[i];
+                    if (row[i] === '"') {
+                        insideQuote = !insideQuote;
+                    } else if (row[i] === ',' && !insideQuote) {
+                        entries.push(entry.trim());
+                        entry = '';
+                    } else {
+                        entry += row[i];
+                    }
                 }
                 entries.push(entry.trim());
                 return entries;
@@ -1701,7 +1709,7 @@
 
             static async factoryResetData() {
                 if(!currentUser) return;
-                if(confirm("CRITICAL WARNING: This will permanently wipe ALL Patients, Inventory, Finance, and Settings. Type 'YES' to confirm.")) {
+                if(confirm("CRITICAL WARNING: This will permanently wipe ALL Patients, Inventory, Finance, and Settings for this account. Type 'YES' to confirm.")) {
                     const verification = prompt("Type 'YES' to confirm data wipe:");
                     if(verification === 'YES') {
                         const empty = SystemStorage.initializeEmptySchema();
@@ -1710,6 +1718,8 @@
                         await supabaseApp.from('clinic_vault').upsert({ clinic_id: currentUser.id, data: empty }, { onConflict: 'clinic_id' });
                         UI.triggerGlobalAuditRefresh();
                         alert("Account data has been completely wiped.");
+                    } else {
+                        alert("Reset cancelled.");
                     }
                 }
             }
@@ -1722,8 +1732,11 @@
             static handleTimeframeChange() {
                 const timeframe = document.getElementById('dashboard-timeframe').value;
                 const customDiv = document.getElementById('custom-date-range');
-                if (timeframe === 'CUSTOM') customDiv.classList.remove('hidden');
-                else customDiv.classList.add('hidden');
+                if (timeframe === 'CUSTOM') {
+                    customDiv.classList.remove('hidden');
+                } else {
+                    customDiv.classList.add('hidden');
+                }
                 this.triggerGlobalAuditRefresh();
             }
 
@@ -1733,7 +1746,9 @@
                 const now = new Date();
                 const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
                 
-                if (timeframe === 'TODAY') return targetDate.getTime() === today.getTime();
+                if (timeframe === 'TODAY') {
+                    return targetDate.getTime() === today.getTime();
+                }
                 if (timeframe === 'YESTERDAY') {
                     const yesterday = new Date(today.getTime() - (24 * 60 * 60 * 1000));
                     return targetDate.getTime() >= yesterday.getTime() && targetDate.getTime() < today.getTime();
@@ -1743,15 +1758,22 @@
                     const startOfWeek = new Date(today.getTime() - (day - 1) * 24 * 60 * 60 * 1000);
                     return targetDate.getTime() >= startOfWeek.getTime();
                 }
-                if (timeframe === 'THIS_MONTH') return targetDate.getMonth() === today.getMonth() && targetDate.getFullYear() === today.getFullYear();
-                if (timeframe === 'THIS_YEAR') return targetDate.getFullYear() === today.getFullYear();
+                if (timeframe === 'THIS_MONTH') {
+                    return targetDate.getMonth() === today.getMonth() && targetDate.getFullYear() === today.getFullYear();
+                }
+                if (timeframe === 'THIS_YEAR') {
+                    return targetDate.getFullYear() === today.getFullYear();
+                }
                 if (timeframe === 'CUSTOM') {
                     const startStr = document.getElementById('dash-start-date').value;
                     const endStr = document.getElementById('dash-end-date').value;
                     if(!startStr || !endStr) return true; 
-                    const startDt = new Date(startStr); startDt.setHours(0,0,0,0);
-                    const endDt = new Date(endStr); endDt.setHours(23,59,59,999);
-                    return targetDate.getTime() >= startDt.getTime() && targetDate.getTime() <= endDt.getTime();
+                    const startDt = new Date(startStr);
+                    startDt.setHours(0,0,0,0);
+                    const endDt = new Date(endStr);
+                    endDt.setHours(23,59,59,999);
+                    const targetTime = targetDate.getTime();
+                    return targetTime >= startDt.getTime() && targetTime <= endDt.getTime();
                 }
                 return true;
             }
@@ -1765,13 +1787,17 @@
                 
                 let filtered = inventory;
                 if (filterType !== 'ALL') {
-                    if (filterType === 'Other') filtered = inventory.filter(i => !standardTypes.includes(i.type));
-                    else filtered = inventory.filter(i => i.type === filterType);
+                    if (filterType === 'Other') {
+                        filtered = inventory.filter(i => !standardTypes.includes(i.type));
+                    } else {
+                        filtered = inventory.filter(i => i.type === filterType);
+                    }
                 }
                 
-                select.innerHTML = '<option value="" data-type="" data-unitqty="" data-unittype="">Select medicine from stock</option>' + 
-                    filtered.map(item => `<option value="${item.name}" data-type="${item.type \vert{}\vert{} ''}" data-unitqty="${item.unitQty || 1}" data-unittype="${item.unitType \vert{}\vert{} 'Piece'}">${item.name}</option>`).join('');
+                const optionsHtml = '<option value="" data-type="" data-unitqty="" data-unittype="">Select medicine from stock</option>' + 
+                    filtered.map(item => `<option value="${item.name}" data-type="${item.type || ''}" data-unitqty="${item.unitQty || 1}" data-unittype="${item.unitType || 'Piece'}">${item.name}</option>`).join('');
                 
+                select.innerHTML = optionsHtml;
                 if (selectId === 'v-medicine') this.handlePrescriptionMedicineChange();
             }
 
@@ -1787,6 +1813,7 @@
                 
                 const mlLabel = document.querySelector('#v-ml-container label');
                 if(mlLabel) mlLabel.innerText = `Dose (${unitType})`;
+
                 const directQtyLabel = document.querySelector('#v-direct-qty-container label');
                 if(directQtyLabel) directQtyLabel.innerText = `Qty Given (${unitType})`;
 
@@ -1805,9 +1832,15 @@
                 const db = SystemStorage.read();
                 const clinic = db.clinicProfile || {};
                 const map = {
-                    'clinic-name': clinic.name || '', 'clinic-address': clinic.address || '', 'clinic-mobile': clinic.mobile || '',
-                    'clinic-regno': clinic.regno || '', 'clinic-doctor': clinic.doctor || '', 'clinic-degree': clinic.degree || '',
-                    'clinic-upi-id': clinic.upiId || '', 'clinic-esign-base64': clinic.esignBase64 || '', 'clinic-estamp-base64': clinic.estampBase64 || '',
+                    'clinic-name': clinic.name || '',
+                    'clinic-address': clinic.address || '',
+                    'clinic-mobile': clinic.mobile || '',
+                    'clinic-regno': clinic.regno || '',
+                    'clinic-doctor': clinic.doctor || '',
+                    'clinic-degree': clinic.degree || '',
+                    'clinic-upi-id': clinic.upiId || '',
+                    'clinic-esign-base64': clinic.esignBase64 || '',
+                    'clinic-estamp-base64': clinic.estampBase64 || '',
                     'clinic-esign-pin': clinic.esignPin || ''
                 };
                 Object.entries(map).forEach(([id, value]) => {
@@ -1820,25 +1853,44 @@
 
                 const previewSign = document.getElementById('esign-preview');
                 if (previewSign) {
-                    if (clinic.esignBase64) { previewSign.src = clinic.esignBase64; previewSign.classList.remove('hidden'); } 
-                    else { previewSign.src = ''; previewSign.classList.add('hidden'); }
+                    if (clinic.esignBase64) {
+                        previewSign.src = clinic.esignBase64;
+                        previewSign.classList.remove('hidden');
+                    } else {
+                        previewSign.src = '';
+                        previewSign.classList.add('hidden');
+                    }
                 }
 
                 const previewStamp = document.getElementById('estamp-preview');
                 if (previewStamp) {
-                    if (clinic.estampBase64) { previewStamp.src = clinic.estampBase64; previewStamp.classList.remove('hidden'); } 
-                    else { previewStamp.src = ''; previewStamp.classList.add('hidden'); }
+                    if (clinic.estampBase64) {
+                        previewStamp.src = clinic.estampBase64;
+                        previewStamp.classList.remove('hidden');
+                    } else {
+                        previewStamp.src = '';
+                        previewStamp.classList.add('hidden');
+                    }
                 }
             }
 
             static saveClinicProfile() {
                 const db = SystemStorage.read();
-                const safeVal = (id) => { const el = document.getElementById(id); return el && el.value ? el.value.trim() : ''; };
+                const safeVal = (id) => {
+                    const el = document.getElementById(id);
+                    return el && el.value ? el.value.trim() : '';
+                };
                 db.clinicProfile = {
-                    name: safeVal('clinic-name'), address: safeVal('clinic-address'), mobile: safeVal('clinic-mobile'),
-                    regno: safeVal('clinic-regno'), doctor: safeVal('clinic-doctor'), degree: safeVal('clinic-degree'),
-                    upiId: safeVal('clinic-upi-id'), esignBase64: safeVal('clinic-esign-base64'),
-                    estampBase64: safeVal('clinic-estamp-base64'), esignPin: safeVal('clinic-esign-pin')
+                    name: safeVal('clinic-name'),
+                    address: safeVal('clinic-address'),
+                    mobile: safeVal('clinic-mobile'),
+                    regno: safeVal('clinic-regno'),
+                    doctor: safeVal('clinic-doctor'),
+                    degree: safeVal('clinic-degree'),
+                    upiId: safeVal('clinic-upi-id'),
+                    esignBase64: safeVal('clinic-esign-base64'),
+                    estampBase64: safeVal('clinic-estamp-base64'),
+                    esignPin: safeVal('clinic-esign-pin')
                 };
                 SystemStorage.write(db);
                 alert('Clinic settings and Default UPI ID securely saved to Cloud Vault.');
@@ -1935,9 +1987,12 @@
                                         <div style="min-height:220px;border:1.5px solid #94a3b8;border-radius:10px;padding:14px 14px 16px;font-size:15px;line-height:1.9;white-space:pre-wrap;background:#ffffff;">℞\n${rxText}</div>
                                     </div>
                                 </div>
+                                
                                 <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-top:35px;">
                                     <div style="font-size:11px;color:#64748b;max-width:30%;">This prescription is generated from clinic records via MediPilot. This is not for medico-legal purpose.</div>
-                                    <div style="flex:1;text-align:center; display:flex; justify-content:center; align-items:flex-end;">${stampHtml}</div>
+                                    <div style="flex:1;text-align:center; display:flex; justify-content:center; align-items:flex-end;">
+                                        ${stampHtml}
+                                    </div>
                                     <div style="min-width:210px;text-align:center;">
                                         ${signatureHtml}
                                         <div style="border-top:1px solid #334155;padding-top:8px;font-size:13px;font-weight:700;color:#0f172a;">${docName}</div>
@@ -1954,6 +2009,7 @@
                 const db = SystemStorage.read();
                 const clinic = db.clinicProfile || {};
                 let useEsign = false;
+                
                 if ((clinic.esignBase64 || clinic.estampBase64) && clinic.esignPin) {
                     const pin = prompt("Enter Security Passcode to attach E-Sign & Stamp (Leave blank to print normally):");
                     if (pin !== null && pin !== "") {
@@ -1961,6 +2017,7 @@
                         else alert("Incorrect Passcode! Printing without signature/stamp.");
                     }
                 }
+
                 const html = this.buildPatientPrescriptionHTML(patientId, useEsign, visitId);
                 if (!html) return;
                 const printArea = document.getElementById('print-area');
@@ -1971,12 +2028,14 @@
             static printPatientPrescription(patientId) {
                 this.printSpecificPrescription(patientId, null);
             }
-  static exportPatientPrescriptionPDF(patientId) {
+
+            static exportPatientPrescriptionPDF(patientId) {
                 const { patient } = this.getPatientExportData(patientId);
                 if (!patient) return;
                 const db = SystemStorage.read();
                 const clinic = db.clinicProfile || {};
                 let useEsign = false;
+                
                 if ((clinic.esignBase64 || clinic.estampBase64) && clinic.esignPin) {
                     const pin = prompt("Enter Security Passcode to attach E-Sign & Stamp (Leave blank to generate normally):");
                     if (pin !== null && pin !== "") {
@@ -1991,8 +2050,10 @@
                 const node = wrapper.firstElementChild;
                 document.body.appendChild(node);
                 const opt = {
-                    margin: 0.3, filename: `${patient.name.replace(/\s+/g, '_')}_prescription_history.pdf`,
-                    image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true },
+                    margin: 0.3,
+                    filename: `${patient.name.replace(/\s+/g, '_')}_prescription_history.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true },
                     jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
                 };
                 html2pdf().set(opt).from(node).save().then(() => node.remove()).catch(() => node.remove());
@@ -2002,6 +2063,7 @@
                 const db = SystemStorage.read();
                 const { clinic, patient } = this.getPatientExportData(patientId);
                 if (!patient) return;
+                
                 let useEsign = false;
                 if ((clinic.esignBase64 || clinic.estampBase64) && clinic.esignPin) {
                     const pin = prompt("Enter Security Passcode to attach E-Sign & Stamp for WhatsApp PDF (Leave blank for normal PDF):");
@@ -2019,8 +2081,11 @@
                 
                 const fileName = `${patient.name.replace(/\s+/g, '_')}_prescription.pdf`;
                 const opt = {
-                    margin: 0.3, filename: fileName, image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+                    margin: 0.3,
+                    filename: fileName,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true },
+                    jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
                 };
 
                 const msgText = `Hello ${patient.name},\nHere is your prescription from ${clinic.name || 'our clinic'}. Please find the attached PDF document.`;
@@ -2037,35 +2102,49 @@
                     } else {
                         alert("Direct PDF sharing to WhatsApp is supported mainly on mobile devices. The file will now be downloaded.");
                         const url = URL.createObjectURL(pdfBlob);
-                        const a = document.createElement('a'); a.href = url; a.download = fileName;
-                        document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = fileName;
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+                        URL.revokeObjectURL(url);
                         
                         const waUrl = mobileNum ? `https://wa.me/${mobileNum}?text=${encodeURIComponent(msgText)}` : `https://wa.me/?text=${encodeURIComponent(msgText)}`;
                         window.open(waUrl, '_blank');
                     }
-                }).catch(err => { console.error('PDF Generation Error:', err); if(node) node.remove(); });
+                }).catch(err => {
+                    console.error('PDF Generation Error:', err);
+                    if(node) node.remove();
+                });
             }
 
             static initializeApplicationRuntime() {
                 UI.startClock();
+                
                 document.querySelectorAll('.nav-link').forEach(btn => {
                     btn.addEventListener('click', () => {
                         document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active-tab'));
                         btn.classList.add('active-tab');
+                        
                         const target = btn.getAttribute('data-target');
                         document.querySelectorAll('.erp-section').forEach(sec => sec.classList.add('hidden'));
                         document.getElementById(`mod-${target}`).classList.remove('hidden');
+                        
                         document.getElementById('sidebar').classList.add('hidden');
                         document.getElementById('sidebar').classList.remove('flex');
-                        
-                        if (target === 'profit') { UI.renderProfitMarginGrid(); }
                     });
                 });
 
                 document.getElementById('mobile-menu-btn').addEventListener('click', () => {
                     const sb = document.getElementById('sidebar');
-                    if(sb.classList.contains('hidden')) { sb.classList.remove('hidden'); sb.classList.add('flex'); } 
-                    else { sb.classList.add('hidden'); sb.classList.remove('flex'); }
+                    if(sb.classList.contains('hidden')) {
+                        sb.classList.remove('hidden');
+                        sb.classList.add('flex');
+                    } else {
+                        sb.classList.add('hidden');
+                        sb.classList.remove('flex');
+                    }
                 });
 
                 document.getElementById('dash-date').innerText = new Date().toLocaleDateString('en-IN', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
@@ -2079,7 +2158,8 @@
                             UI.compressImage(file, function(compressedBase64) {
                                 document.getElementById('clinic-esign-base64').value = compressedBase64;
                                 const preview = document.getElementById('esign-preview');
-                                preview.src = compressedBase64; preview.classList.remove('hidden');
+                                preview.src = compressedBase64;
+                                preview.classList.remove('hidden');
                             });
                         }
                     });
@@ -2093,11 +2173,13 @@
                             UI.compressImage(file, function(compressedBase64) {
                                 document.getElementById('clinic-estamp-base64').value = compressedBase64;
                                 const preview = document.getElementById('estamp-preview');
-                                preview.src = compressedBase64; preview.classList.remove('hidden');
+                                preview.src = compressedBase64;
+                                preview.classList.remove('hidden');
                             });
                         }
                     });
                 }
+
                 this.triggerGlobalAuditRefresh();
             }
 
@@ -2114,6 +2196,7 @@
                 this.openModal('modal-credits');
             }
 
+            // DAY-WISE COUNTER MODAL IMPLEMENTATION
             static openDayWiseModal() {
                 this.renderDayWiseList();
                 this.openModal('modal-daywise');
@@ -2161,105 +2244,6 @@
                 this.renderInventoryGrid(SystemStorage.read(), this.currentInventoryFilter);
             }
 
-            // --- PROFIT MARGIN CALCULATOR LOGIC ---
-            static renderProfitMarginGrid() {
-                const db = SystemStorage.read();
-                const timeframe = document.getElementById('profit-timeframe')?.value || 'TODAY';
-                const tbody = document.getElementById('profit-margin-body');
-                if (!tbody) return;
-
-                let totalRxProfit = 0;
-                let totalOtcProfit = 0;
-                let profitRows = [];
-
-                const getMargins = (itemName, dispensedQty) => {
-                    const inv = db.inventory.find(i => i.name === itemName || i.id === itemName);
-                    if (!inv) return { cost: 0, revenue: 0, margin: 0, valid: false };
-                    
-                    const unitQty = parseFloat(inv.unitQty) || 1;
-                    const unitPTR = parseFloat(inv.purchase) / unitQty;
-                    const unitMRP = parseFloat(inv.selling) / unitQty;
-                    
-                    const cost = unitPTR * dispensedQty;
-                    const revenue = unitMRP * dispensedQty;
-                    return { cost, revenue, margin: revenue - cost, valid: true, itemName: inv.name };
-                };
-
-                const filteredVisits = db.visits.filter(v => this.isDateInTimeframe(v.date, timeframe));
-                filteredVisits.forEach(v => {
-                    if (v.deductions && v.deductions.length > 0) {
-                        let visitMargin = 0;
-                        let itemDetails = [];
-                        v.deductions.forEach(d => {
-                            const m = getMargins(d.name, d.qty);
-                            if (m.valid) {
-                                visitMargin += m.margin;
-                                itemDetails.push(`<span class="text-blue-600 font-bold">${m.itemName}</span> (${d.qty} units) &nbsp;&rarr;&nbsp; Margin: <span class="text-emerald-600 font-bold">+₹${m.margin.toFixed(2)}</span>`);
-                            }
-                        });
-                        
-                        if (visitMargin > 0) {
-                            totalRxProfit += visitMargin;
-                            profitRows.push({
-                                date: v.date, time: v.time || '--:--', timestamp: v.timestamp || 0,
-                                source: `Rx Prescribed <br><span class="text-[10px] font-normal text-slate-400">ID: ${v.id}</span>`,
-                                details: itemDetails.join('<br>'), net: visitMargin
-                            });
-                        }
-                    }
-                });
-
-                const otcFinance = (db.finance || []).filter(f => f.category && f.category.includes("OTC Pharmacy") && this.isDateInTimeframe(f.date, timeframe));
-                const otcCredits = (db.credits || []).filter(c => c.ref && c.ref.includes("OTC-") && this.isDateInTimeframe(c.date, timeframe));
-                
-                [...otcFinance, ...otcCredits].forEach(sale => {
-                    if (sale.cartItems && sale.cartItems.length > 0) {
-                        let saleMargin = 0;
-                        let itemDetails = [];
-                        sale.cartItems.forEach(cartItem => {
-                            if (cartItem.isCustom) return; 
-                            const m = getMargins(cartItem.id, cartItem.qty);
-                            if (m.valid) {
-                                saleMargin += m.margin;
-                                itemDetails.push(`<span class="text-amber-700 font-bold">${m.itemName}</span> (${cartItem.qty} units) &nbsp;&rarr;&nbsp; Margin: <span class="text-emerald-600 font-bold">+₹${m.margin.toFixed(2)}</span>`);
-                            }
-                        });
-                        
-                        if (saleMargin > 0) {
-                            totalOtcProfit += saleMargin;
-                            profitRows.push({
-                                date: sale.date, time: sale.time || '--:--', timestamp: sale.timestamp || 0,
-                                source: `OTC Sale <br><span class="text-[10px] font-normal text-slate-400">Ref: ${sale.ref.split(", ")[0]}</span>`,
-                                details: itemDetails.join('<br>'), net: saleMargin
-                            });
-                        }
-                    }
-                });
-
-                const statRx = document.getElementById('stat-rx-profit');
-                const statOtc = document.getElementById('stat-otc-profit');
-                const statTotal = document.getElementById('stat-total-profit');
-                
-                if (statRx) statRx.innerText = `₹${totalRxProfit.toFixed(2)}`;
-                if (statOtc) statOtc.innerText = `₹${totalOtcProfit.toFixed(2)}`;
-                if (statTotal) statTotal.innerText = `₹${(totalRxProfit + totalOtcProfit).toFixed(2)}`;
-
-                profitRows.sort((a, b) => b.timestamp - a.timestamp);
-                if (profitRows.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400 text-xs italic font-medium">No profitable inventory dispensing recorded in this timeframe.</td></tr>`;
-                    return;
-                }
-
-                tbody.innerHTML = profitRows.map(row => `
-                    <tr class="border-b border-slate-100 hover:bg-slate-50 font-medium text-xs">
-                        <td class="p-4 text-slate-500 whitespace-nowrap">${row.date}<br><span class="text-[10px] font-mono text-slate-400 font-bold">${row.time}</span></td>
-                        <td class="p-4 font-bold text-slate-700">${row.source}</td>
-                        <td class="p-4 text-slate-600 leading-relaxed">${row.details}</td>
-                        <td class="p-4 text-right font-black text-emerald-600">₹${row.net.toFixed(2)}</td>
-                    </tr>
-                `).join('');
-            }
-
             static triggerGlobalAuditRefresh() {
                 const db = SystemStorage.read();
                 this.loadClinicProfile();
@@ -2299,7 +2283,6 @@
                 this.renderOTCSummary();
                 this.renderBillingSummary();
                 this.renderCreditsList();
-                this.renderProfitMarginGrid(); 
                 
                 this.renderAnalyticsMatrixCharts(totalRevenue, totalExpenses);
                 this.renderDashboardRecentPatients(db, filteredVisits);
@@ -2313,7 +2296,13 @@
 
                 const billingFinance = (db.finance || []).filter(f => f.category && f.category.startsWith("Billing [") && this.isDateInTimeframe(f.date, timeframe));
                 const billingCredits = (db.credits || []).filter(c => c.ref && c.ref.startsWith("INV-") && this.isDateInTimeframe(c.date, timeframe)).map(c => ({
-                    date: c.date, time: c.time, timestamp: c.timestamp, ref: c.ref, category: `Billing [Credit] - ${c.patientName}`, amount: c.totalAmount, isCredit: true
+                    date: c.date,
+                    time: c.time,
+                    timestamp: c.timestamp,
+                    ref: c.ref,
+                    category: `Billing [Credit] - ${c.patientName}`,
+                    amount: c.totalAmount,
+                    isCredit: true
                 }));
 
                 const sortedBills = [...billingFinance, ...billingCredits].sort((a,b) => {
@@ -2355,7 +2344,10 @@
                 if(finIdx !== -1) db.finance.splice(finIdx, 1);
                 
                 const credIdx = db.credits.findIndex(c => c.ref === refCode || (c.ref && c.ref.includes(refCode)));
-                if(credIdx !== -1) db.credits.splice(credIdx, 1); 
+                if(credIdx !== -1) {
+                    // Note: If deleting a consolidated credit bill, this entirely removes the credit profile.
+                    db.credits.splice(credIdx, 1); 
+                }
                 
                 SystemStorage.write(db);
                 this.renderBillingSummary();
@@ -2363,7 +2355,6 @@
                 alert("Bill deleted successfully.");
             }
 
-            // --- CUSTOM OTC SERVICE LOGIC ---
             static filterOTCMedicineOptions() {
                 const db = SystemStorage.read();
                 const typeFilter = document.getElementById('otc-medicine-type-filter')?.value || 'ALL';
@@ -2371,61 +2362,17 @@
                 if (!select) return;
 
                 let availableMeds = db.inventory.filter(i => i.qty > 0);
-                let customOptionHtml = '';
-
                 if (typeFilter !== 'ALL') {
                     if (typeFilter === 'Other') {
                         const standardTypes = ['Tablet', 'Capsule', 'Syrup', 'Ointment', 'Drop', 'Vial', 'Ampule', 'SN', 'Lotion', 'Sachet', 'Nab'];
                         availableMeds = availableMeds.filter(i => !standardTypes.includes(i.type));
-                        customOptionHtml = '<option value="CUSTOM_SERVICE" class="font-bold text-blue-700 bg-blue-50">-- Other (BP / RBS / Dressing / Services) --</option>';
                     } else {
                         availableMeds = availableMeds.filter(i => i.type === typeFilter);
                     }
                 }
                 availableMeds.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-                
                 select.innerHTML = '<option value="" disabled selected>-- Select Medicine --</option>' + 
-                    customOptionHtml +
                     availableMeds.map(i => `<option value="${i.id}">${i.name} (Stock: ${parseFloat(Number(i.qty).toFixed(2))})</option>`).join('');
-                
-                this.handleOTCMedSelectChange(); 
-            }
-
-            static handleOTCMedSelectChange() {
-                const select = document.getElementById('otc-medicine-select');
-                const customContainer = document.getElementById('otc-custom-service-container');
-                if (!select || !customContainer) return;
-                
-                if (select.value === 'CUSTOM_SERVICE') {
-                    customContainer.classList.remove('hidden');
-                    this.handleOTCCustomTypeChange();
-                } else {
-                    customContainer.classList.add('hidden');
-                }
-            }
-
-            static handleOTCCustomTypeChange() {
-                const type = document.getElementById('otc-custom-type').value;
-                const valContainer = document.getElementById('otc-custom-val-container');
-                const valLabel = document.getElementById('otc-custom-val-label');
-                const valInput = document.getElementById('otc-custom-val');
-                
-                if (type === 'BP') {
-                    valContainer.classList.remove('hidden');
-                    valLabel.innerText = "BP Value (mmHg)";
-                    valInput.placeholder = "e.g. 120/80";
-                } else if (type === 'RBS') {
-                    valContainer.classList.remove('hidden');
-                    valLabel.innerText = "RBS Value (mg/dL)";
-                    valInput.placeholder = "e.g. 110";
-                } else if (type === 'Other') {
-                    valContainer.classList.remove('hidden');
-                    valLabel.innerText = "Service Description";
-                    valInput.placeholder = "e.g. Ear cleaning";
-                } else {
-                    valContainer.classList.add('hidden');
-                    valInput.value = "";
-                }
             }
 
             static syncOTCDropdowns(db) {
@@ -2444,7 +2391,14 @@
 
                 const otcFinance = (db.finance || []).filter(f => f.category && f.category.includes("OTC Pharmacy") && this.isDateInTimeframe(f.date, timeframe));
                 const otcCredits = (db.credits || []).filter(c => c.ref && c.ref.includes("OTC-") && this.isDateInTimeframe(c.date, timeframe)).map(c => ({
-                    date: c.date, time: c.time, timestamp: c.timestamp, ref: c.ref, category: `OTC Pharmacy [Credit] - ${c.patientName}`, amount: c.totalAmount, cartItems: c.cartItems, isCredit: true
+                    date: c.date,
+                    time: c.time,
+                    timestamp: c.timestamp,
+                    ref: c.ref,
+                    category: `OTC Pharmacy [Credit] - ${c.patientName}`,
+                    amount: c.totalAmount,
+                    cartItems: c.cartItems,
+                    isCredit: true
                 }));
 
                 const sortedSales = [...otcFinance, ...otcCredits].sort((a,b) => {
@@ -2463,6 +2417,8 @@
                     const patParts = sale.category.split('] - ');
                     const patient = patParts.length > 1 ? patParts[1] : 'Walk-in';
                     const displayTime = sale.time || '--:--:--';
+                    
+                    // Display only the primary ref in the summary if it's a consolidated log
                     const displayRef = sale.ref.split(", ")[0] + (sale.ref.includes(",") ? " (+)" : "");
 
                     return `
@@ -2534,10 +2490,13 @@
                 const ts = UI.getTimestampData();
 
                 db.finance.push({
-                    type: "OUTFLOW", category: document.getElementById('e-category').value,
+                    type: "OUTFLOW",
+                    category: document.getElementById('e-category').value,
                     ref: document.getElementById('e-notes').value.trim() || 'Internal Overhead Posting',
                     amount: parseFloat(document.getElementById('e-amount').value) || 0,
-                    date: ts.date, time: ts.time, timestamp: ts.timestamp
+                    date: ts.date,
+                    time: ts.time,
+                    timestamp: ts.timestamp
                 });
 
                 SystemStorage.write(db);
@@ -2552,12 +2511,14 @@
                 
                 if (select) {
                     let patientsToShow = [];
-                    if (timeframe === 'ALL_TIME') { patientsToShow = db.patients; } 
-                    else {
+                    if (timeframe === 'ALL_TIME') {
+                        patientsToShow = db.patients;
+                    } else {
                         const filteredVisits = db.visits.filter(v => this.isDateInTimeframe(v.date, timeframe));
                         const activePatientIds = new Set(filteredVisits.map(v => v.patientId));
                         patientsToShow = db.patients.filter(p => activePatientIds.has(p.id) || this.isDateInTimeframe(p.createdAt, timeframe));
                     }
+
                     select.innerHTML = '<option value="" disabled selected>-- Select a Patient --</option>' + 
                         patientsToShow.map(p => `<option value="${p.id}">${p.name} (${p.id})</option>`).join('');
                 }
@@ -2584,11 +2545,15 @@
                 document.getElementById('bill-visit-id').value = '';
             }
             
-            static handleBillingVisitChange() { document.getElementById('bill-visit-id').value = document.getElementById('bill-visit-date').value; }
+            static handleBillingVisitChange() {
+                document.getElementById('bill-visit-id').value = document.getElementById('bill-visit-date').value;
+            }
 
+            // AUTO QR GENERATOR FOR BILLING (USES SETTINGS UPI ID)
             static renderUPIQR() {
                 const mode = document.getElementById('bill-payment-mode').value;
                 const amt = parseFloat(document.getElementById('bill-amount').value) || 0;
+                
                 const db = SystemStorage.read();
                 const upiId = (db.clinicProfile?.upiId || '').trim();
                 
@@ -2599,17 +2564,31 @@
 
                 if(mode === 'UPI' && amt > 0) {
                     if(!upiId) {
-                        qrPlaceholder.classList.remove('hidden'); qrContainer.classList.add('hidden');
-                        alert("Default Clinic UPI ID is not configured! Please set it once in 'Clinic Settings'."); return;
+                        qrPlaceholder.classList.remove('hidden');
+                        qrContainer.classList.add('hidden');
+                        alert("Default Clinic UPI ID is not configured! Please set it once in 'Clinic Settings'.");
+                        return;
                     }
-                    qrPlaceholder.classList.add('hidden'); qrContainer.classList.remove('hidden');
-                    displayAmount.innerText = amt.toFixed(2); qrDiv.innerHTML = "";
+                    qrPlaceholder.classList.add('hidden');
+                    qrContainer.classList.remove('hidden');
+                    displayAmount.innerText = amt.toFixed(2);
+                    qrDiv.innerHTML = "";
                     
                     const upiString = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(db.clinicProfile?.name || 'Clinic')}&am=${amt.toFixed(2)}&cu=INR`;
                     if(typeof QRCode !== 'undefined') {
-                        this.qrCodeInstance = new QRCode(qrDiv, { text: upiString, width: 200, height: 200, colorDark : "#0f172a", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H });
+                        this.qrCodeInstance = new QRCode(qrDiv, {
+                            text: upiString,
+                            width: 200,
+                            height: 200,
+                            colorDark : "#0f172a",
+                            colorLight : "#ffffff",
+                            correctLevel : QRCode.CorrectLevel.H
+                        });
                     }
-                } else { qrContainer.classList.add('hidden'); qrPlaceholder.classList.remove('hidden'); }
+                } else {
+                    qrContainer.classList.add('hidden');
+                    qrPlaceholder.classList.remove('hidden');
+                }
             }
 
             static commitInvoiceTransaction() {
@@ -2620,7 +2599,10 @@
                 const visitId = document.getElementById('bill-visit-id').value;
 
                 const amt = parseFloat(amtInput.value);
-                if(!patientSelect.value || isNaN(amt) || amt <= 0) { alert("Please provide valid invoice parameter values before committing logs."); return; }
+                if(!patientSelect.value || isNaN(amt) || amt <= 0) {
+                    alert("Please provide valid invoice parameter values before committing logs.");
+                    return;
+                }
 
                 const db = SystemStorage.read();
                 const ts = UI.getTimestampData();
@@ -2629,27 +2611,47 @@
                 const visitTag = visitId ? ` [Visit: ${visitId}]` : '';
                 const catStr = `Billing [${modeSelect.value}] - ${targetPatient.name}${visitTag}`;
 
+                // --- NEW CONSOLIDATED CREDIT LOGIC ---
                 if(modeSelect.value === 'Credit') {
                     if(!db.credits) db.credits = [];
+                    // Find an active credit for this exact patient ID
                     let existingCredit = db.credits.find(c => c.patientId === targetPatient.id && c.paidAmount < c.totalAmount);
                     
                     if (existingCredit) {
+                        // Consolidate the new bill into the existing active credit
                         existingCredit.pastAmount = existingCredit.totalAmount;
                         existingCredit.newAmount = amt;
                         existingCredit.totalAmount += amt;
-                        existingCredit.ref = existingCredit.ref + ", " + invCode; 
-                        existingCredit.timestamp = ts.timestamp; 
+                        existingCredit.ref = existingCredit.ref + ", " + invCode; // Merge reference codes
+                        existingCredit.timestamp = ts.timestamp; // Bring to front chronologically
                         existingCredit.date = ts.date;
                         existingCredit.time = ts.time;
                     } else {
+                        // Create a fresh credit entity if none exist
                         db.credits.push({
-                            id: UI.generateUniqueRef('CRD-'), patientId: targetPatient.id, patientName: targetPatient.name,
-                            ref: invCode, totalAmount: amt, paidAmount: 0, pastAmount: 0, newAmount: amt,
-                            date: ts.date, time: ts.time, timestamp: ts.timestamp
+                            id: UI.generateUniqueRef('CRD-'),
+                            patientId: targetPatient.id,
+                            patientName: targetPatient.name,
+                            ref: invCode,
+                            totalAmount: amt,
+                            paidAmount: 0,
+                            pastAmount: 0,
+                            newAmount: amt,
+                            date: ts.date,
+                            time: ts.time,
+                            timestamp: ts.timestamp
                         });
                     }
                 } else {
-                    db.finance.push({ type: "INFLOW", category: catStr, ref: invCode, amount: amt, date: ts.date, time: ts.time, timestamp: ts.timestamp });
+                    db.finance.push({
+                        type: "INFLOW",
+                        category: catStr,
+                        ref: invCode,
+                        amount: amt,
+                        date: ts.date,
+                        time: ts.time,
+                        timestamp: ts.timestamp
+                    });
                 }
 
                 SystemStorage.write(db);
@@ -2672,7 +2674,9 @@
                 const existingPatient = editId ? db.patients.find(p => p.id === editId) : null;
 
                 const payload = {
-                    id: newId, name: pName, mobile: pMobile,
+                    id: newId,
+                    name: pName,
+                    mobile: pMobile,
                     ageVal: parseInt(document.getElementById('p-age-val').value) || 0,
                     ageUnit: document.getElementById('p-age-unit').value,
                     gender: document.getElementById('p-gender').value,
@@ -2687,46 +2691,73 @@
                 if (editId) {
                     const idx = db.patients.findIndex(p => p.id === editId);
                     if (idx !== -1) db.patients[idx] = payload;
-                } else { db.patients.push(payload); }
+                } else {
+                    db.patients.push(payload);
+                }
                 
                 SystemStorage.write(db);
-                this.closeModal('modal-patient'); document.getElementById('form-patient').reset(); document.getElementById('p-edit-id').value = "";
+                this.closeModal('modal-patient');
+                document.getElementById('form-patient').reset();
+                document.getElementById('p-edit-id').value = "";
+                
                 alert(`Patient profile ${editId ? 'updated' : 'registered'} safely.`);
 
                 if (!editId) {
                     const clinicName = db.clinicProfile?.name || 'our clinic';
                     const msgText = `Hello ${pName},\nWelcome to ${clinicName}!\nYour Patient Registration Number is: ${newId}\nPlease keep this number safe for future visits.`;
-                    let mobileNum = pMobile.replace(/\D/g, ''); if(mobileNum.length === 10) mobileNum = '91' + mobileNum; 
-                    if (mobileNum) { window.open(`https://wa.me/${mobileNum}?text=${encodeURIComponent(msgText)}`, '_blank'); }
+                    let mobileNum = pMobile.replace(/\D/g, '');
+                    if(mobileNum.length === 10) mobileNum = '91' + mobileNum; 
+                    if (mobileNum) {
+                        const waUrl = `https://wa.me/${mobileNum}?text=${encodeURIComponent(msgText)}`;
+                        window.open(waUrl, '_blank');
+                    }
                 }
             }
 
             static toggleInvestigation() {
-                const chk = document.getElementById('v-inv-check'); const container = document.getElementById('inv-container');
-                if(chk && container) { if(chk.checked) container.classList.remove('hidden'); else container.classList.add('hidden'); }
+                const chk = document.getElementById('v-inv-check');
+                const container = document.getElementById('inv-container');
+                if(chk && container) {
+                    if(chk.checked) container.classList.remove('hidden');
+                    else container.classList.add('hidden');
+                }
             }
 
             static handleInvTypeChange() {
                 const type = document.getElementById('v-inv-type').value;
-                const pathSec = document.getElementById('inv-path-section'); const radSec = document.getElementById('inv-rad-section');
-                if(type === 'Pathology & Microbiology') { pathSec.classList.remove('hidden'); radSec.classList.add('hidden'); } 
-                else if (type === 'Radiology') { radSec.classList.remove('hidden'); pathSec.classList.add('hidden'); } 
-                else { pathSec.classList.add('hidden'); radSec.classList.add('hidden'); }
+                const pathSec = document.getElementById('inv-path-section');
+                const radSec = document.getElementById('inv-rad-section');
+                
+                if(type === 'Pathology & Microbiology') {
+                    pathSec.classList.remove('hidden');
+                    radSec.classList.add('hidden');
+                } else if (type === 'Radiology') {
+                    radSec.classList.remove('hidden');
+                    pathSec.classList.add('hidden');
+                } else {
+                    pathSec.classList.add('hidden');
+                    radSec.classList.add('hidden');
+                }
             }
 
             static handlePathReportChange() {
-                const rep = document.getElementById('v-path-report').value; const other = document.getElementById('inv-path-other-container');
-                if(rep === 'Other') other.classList.remove('hidden'); else other.classList.add('hidden');
+                const rep = document.getElementById('v-path-report').value;
+                const other = document.getElementById('inv-path-other-container');
+                if(rep === 'Other') other.classList.remove('hidden');
+                else other.classList.add('hidden');
             }
 
             static handleRadReportChange() {
-                const rep = document.getElementById('v-rad-report').value; const other = document.getElementById('inv-rad-other-container');
-                if(rep === 'Other') other.classList.remove('hidden'); else other.classList.add('hidden');
+                const rep = document.getElementById('v-rad-report').value;
+                const other = document.getElementById('inv-rad-other-container');
+                if(rep === 'Other') other.classList.remove('hidden');
+                else other.classList.add('hidden');
             }
 
             static addInvestigationToPlan() {
                 const type = document.getElementById('v-inv-type').value;
-                let lineContent = ""; const planArea = document.getElementById('v-investigation-plan');
+                let lineContent = "";
+                const planArea = document.getElementById('v-investigation-plan');
                 if(!type) { alert("Select Investigation Type first."); return; }
 
                 if(type === 'Pathology & Microbiology') {
@@ -2738,8 +2769,10 @@
                     }
                     const remark = document.getElementById('v-path-remark').value;
                     lineContent = `Pathology: ${report}` + (remark ? ` - Values/Remark: ${remark}` : '');
-                    document.getElementById('v-path-report').selectedIndex = 0; document.getElementById('v-path-other').value = '';
-                    document.getElementById('v-path-remark').value = ''; this.handlePathReportChange();
+                    document.getElementById('v-path-report').selectedIndex = 0;
+                    document.getElementById('v-path-other').value = '';
+                    document.getElementById('v-path-remark').value = '';
+                    this.handlePathReportChange();
                 } else if(type === 'Radiology') {
                     let report = document.getElementById('v-rad-report').value;
                     if(!report) { alert("Select a report."); return; }
@@ -2750,100 +2783,173 @@
                     const part = document.getElementById('v-rad-part').value;
                     const remark = document.getElementById('v-rad-remark').value;
                     lineContent = `Radiology: ${report}` + (part ? ` (${part})` : '') + (remark ? ` - Findings: ${remark}` : '');
-                    document.getElementById('v-rad-report').selectedIndex = 0; document.getElementById('v-rad-other').value = '';
-                    document.getElementById('v-rad-part').value = ''; document.getElementById('v-rad-remark').value = ''; this.handleRadReportChange();
+                    document.getElementById('v-rad-report').selectedIndex = 0;
+                    document.getElementById('v-rad-other').value = '';
+                    document.getElementById('v-rad-part').value = '';
+                    document.getElementById('v-rad-remark').value = '';
+                    this.handleRadReportChange();
                 }
 
-                const currentText = planArea.value.trim(); const nextNum = currentText ? currentText.split('\n').length + 1 : 1;
-                planArea.value = currentText ? currentText + "\n" + `${nextNum}. ${lineContent}` : `${nextNum}. ${lineContent}`;
+                const currentText = planArea.value.trim();
+                const nextNum = currentText ? currentText.split('\n').length + 1 : 1;
+                const finalLine = `${nextNum}. ${lineContent}`;
+                planArea.value = currentText ? currentText + "\n" + finalLine : finalLine;
             }
 
             static initiateVisitModal(patientId) {
-                document.getElementById('form-visit').reset(); document.getElementById('v-patient-id').value = patientId;
-                document.getElementById('v-visit-id').value = ""; document.getElementById('v-prescription').value = "";
-                document.getElementById('v-treatment-plan').value = ""; document.getElementById('v-investigation-plan').value = "";
-                document.getElementById('v-treatment-qty').value = ""; document.getElementById('v-stitches-count').value = "";
+                document.getElementById('form-visit').reset();
+                document.getElementById('v-patient-id').value = patientId;
+                document.getElementById('v-visit-id').value = ""; 
+                document.getElementById('v-prescription').value = "";
+                document.getElementById('v-treatment-plan').value = "";
+                document.getElementById('v-investigation-plan').value = "";
+                document.getElementById('v-treatment-qty').value = "";
+                document.getElementById('v-stitches-count').value = "";
                 
-                this.toggleRBS(); this.toggleTreatment(); document.getElementById('v-inv-check').checked = false;
-                this.toggleInvestigation(); document.getElementById('v-inv-type').value = ""; this.handleInvTypeChange();
+                this.toggleRBS();
+                this.toggleTreatment();
+                document.getElementById('v-inv-check').checked = false;
+                this.toggleInvestigation();
+                document.getElementById('v-inv-type').value = "";
+                this.handleInvTypeChange();
                 
-                if(document.getElementById('v-treatment-med-type')) this.filterVisitMedicineOptions('v-treatment-medicine', document.getElementById('v-treatment-med-type').value);
-                if(document.getElementById('v-rx-med-type')) this.filterVisitMedicineOptions('v-medicine', document.getElementById('v-rx-med-type').value);
+                if(document.getElementById('v-treatment-med-type')) {
+                    this.filterVisitMedicineOptions('v-treatment-medicine', document.getElementById('v-treatment-med-type').value);
+                }
+                if(document.getElementById('v-rx-med-type')) {
+                    this.filterVisitMedicineOptions('v-medicine', document.getElementById('v-rx-med-type').value);
+                }
 
-                this.handlePrescriptionMedicineChange(); this.pendingStockDeductions = []; this.openModal('modal-visit');
+                this.handlePrescriptionMedicineChange(); 
+                this.pendingStockDeductions = [];
+                this.openModal('modal-visit');
             }
 
             static toggleRBS() {
-                const chk = document.getElementById('v-rbs-check'); const input = document.getElementById('v-rbs');
+                const chk = document.getElementById('v-rbs-check');
+                const input = document.getElementById('v-rbs');
                 if(!chk || !input) return;
-                if(chk.checked) { input.classList.remove('hidden'); input.setAttribute('required', 'true'); input.classList.remove('bg-slate-100'); input.classList.add('bg-white'); } 
-                else { input.classList.add('hidden'); input.removeAttribute('required'); input.value = ""; }
+                
+                if(chk.checked) {
+                    input.classList.remove('hidden');
+                    input.setAttribute('required', 'true');
+                    input.classList.remove('bg-slate-100');
+                    input.classList.add('bg-white');
+                } else {
+                    input.classList.add('hidden');
+                    input.removeAttribute('required');
+                    input.value = "";
+                }
             }
 
             static toggleTreatment() {
-                const type = document.getElementById('v-treatment-type').value; const container = document.getElementById('treatment-container');
-                const medControls = document.getElementById('treatment-med-controls'); const stitchesContainer = document.getElementById('stitches-container');
+                const type = document.getElementById('v-treatment-type').value;
+                const container = document.getElementById('treatment-container');
+                const medControls = document.getElementById('treatment-med-controls');
+                const stitchesContainer = document.getElementById('stitches-container');
+                
                 if(container) {
                     if(type !== 'None') {
                         container.classList.remove('hidden');
-                        if (type === 'Stitches') { if(medControls) medControls.classList.add('hidden'); if(stitchesContainer) stitchesContainer.classList.remove('hidden'); } 
-                        else if (type === 'Dressing') { if(medControls) medControls.classList.add('hidden'); if(stitchesContainer) stitchesContainer.classList.add('hidden'); } 
-                        else { if(medControls) medControls.classList.remove('hidden'); if(stitchesContainer) stitchesContainer.classList.add('hidden'); }
-                    } else { container.classList.add('hidden'); }
+                        if (type === 'Stitches') {
+                            if(medControls) medControls.classList.add('hidden');
+                            if(stitchesContainer) stitchesContainer.classList.remove('hidden');
+                        } else if (type === 'Dressing') {
+                            if(medControls) medControls.classList.add('hidden');
+                            if(stitchesContainer) stitchesContainer.classList.add('hidden');
+                        } else {
+                            if(medControls) medControls.classList.remove('hidden');
+                            if(stitchesContainer) stitchesContainer.classList.add('hidden');
+                        }
+                    } else {
+                        container.classList.add('hidden');
+                    }
                 }
             }
 
             static addTreatmentToPrescription() {
                 const type = document.getElementById('v-treatment-type').value;
-                let lineContent = ""; const planArea = document.getElementById('v-treatment-plan');
+                let lineContent = "";
+                const planArea = document.getElementById('v-treatment-plan');
 
                 if (type === 'Stitches') {
                     const count = document.getElementById('v-stitches-count').value;
                     if (!count) { alert("Please enter the number of stitches."); return; }
-                    lineContent = `Stitches -- Count: ${count}`; document.getElementById('v-stitches-count').value = "";
-                } else if (type === 'Dressing') { lineContent = `Dressing`; } 
-                else {
-                    const medSelect = document.getElementById('v-treatment-medicine'); const qtyInput = document.getElementById('v-treatment-qty');
-                    if(!medSelect.value || !qtyInput.value) { alert("Please map both target stock parameters and volume counts first."); return; }
-                    const db = SystemStorage.read(); const invItem = db.inventory.find(i => i.name === medSelect.value);
+                    lineContent = `Stitches -- Count: ${count}`;
+                    document.getElementById('v-stitches-count').value = "";
+                } else if (type === 'Dressing') {
+                    lineContent = `Dressing`;
+                } else {
+                    const medSelect = document.getElementById('v-treatment-medicine');
+                    const qtyInput = document.getElementById('v-treatment-qty');
+                    if(!medSelect.value || !qtyInput.value) {
+                        alert("Please map both target stock parameters and volume counts first.");
+                        return;
+                    }
+                    const db = SystemStorage.read();
+                    const invItem = db.inventory.find(i => i.name === medSelect.value);
                     const unitType = invItem ? (invItem.unitType || 'Piece') : 'Piece';
                     lineContent = `${medSelect.value} -- ${qtyInput.value} ${unitType}`;
                     let deductQty = parseFloat(qtyInput.value) || 1;
                     this.pendingStockDeductions.push({ name: medSelect.value, qty: deductQty });
-                    medSelect.selectedIndex = 0; qtyInput.value = "";
+                    medSelect.selectedIndex = 0;
+                    qtyInput.value = "";
                 }
-                const currentText = planArea.value.trim(); const nextNum = currentText ? currentText.split('\n').length + 1 : 1;
-                planArea.value = currentText ? currentText + "\n" + `${nextNum}. ${lineContent}` : `${nextNum}. ${lineContent}`;
+                
+                const currentText = planArea.value.trim();
+                const nextNum = currentText ? currentText.split('\n').length + 1 : 1;
+                const finalLine = `${nextNum}. ${lineContent}`;
+                planArea.value = currentText ? currentText + "\n" + finalLine : finalLine;
             }
 
             static addMedicineToPrescription() {
-                const medSelect = document.getElementById('v-medicine'); const doseSelect = document.getElementById('v-dose');
-                const mealSelect = document.getElementById('v-meal'); const durInput = document.getElementById('v-duration');
-                const rxArea = document.getElementById('v-prescription'); const mlInput = document.getElementById('v-ml-input');
+                const medSelect = document.getElementById('v-medicine');
+                const doseSelect = document.getElementById('v-dose');
+                const mealSelect = document.getElementById('v-meal');
+                const durInput = document.getElementById('v-duration');
+                const rxArea = document.getElementById('v-prescription');
+                const mlInput = document.getElementById('v-ml-input');
                 const directQtyInput = document.getElementById('v-direct-qty-input');
 
-                if(!medSelect.value) { alert("Please select a target compound parameter from stock selectors."); return; }
+                if(!medSelect.value) {
+                    alert("Please select a target compound parameter from stock selectors.");
+                    return;
+                }
 
-                const db = SystemStorage.read(); const inventoryItem = db.inventory.find(i => i.name === medSelect.value);
+                const db = SystemStorage.read();
+                const inventoryItem = db.inventory.find(i => i.name === medSelect.value);
                 const unitType = inventoryItem ? (inventoryItem.unitType || 'Piece') : 'Piece';
                 const medOption = medSelect.options[medSelect.selectedIndex];
-                const isVial = medOption.dataset.type === 'Vial'; const medType = medOption.dataset.type;
+                const isVial = medOption.dataset.type === 'Vial';
+                const medType = medOption.dataset.type;
 
                 let prefix = "";
                 switch(medType) {
-                    case 'Tablet': prefix = 'Tab. '; break; case 'Capsule': prefix = 'Cap. '; break; case 'Syrup': prefix = 'Sy. '; break;
-                    case 'Ointment': prefix = 'Oint. '; break; case 'Drop': prefix = 'Drop. '; break; case 'Lotion': prefix = 'Lotion. '; break;
-                    case 'Sachet': prefix = 'Sachet. '; break; case 'Vial': prefix = 'Vial. '; break; case 'Ampule': prefix = 'Amp. '; break;
-                    case 'SN': prefix = 'SN. '; break; case 'Nab': prefix = 'Nab. '; break; default: prefix = medType ? medType + '. ' : ''; break;
+                    case 'Tablet': prefix = 'Tab. '; break;
+                    case 'Capsule': prefix = 'Cap. '; break;
+                    case 'Syrup': prefix = 'Sy. '; break;
+                    case 'Ointment': prefix = 'Oint. '; break;
+                    case 'Drop': prefix = 'Drop. '; break;
+                    case 'Lotion': prefix = 'Lotion. '; break;
+                    case 'Sachet': prefix = 'Sachet. '; break;
+                    case 'Vial': prefix = 'Vial. '; break;
+                    case 'Ampule': prefix = 'Amp. '; break;
+                    case 'SN': prefix = 'SN. '; break;
+                    case 'Nab': prefix = 'Nab. '; break;
+                    default: prefix = medType ? medType + '. ' : ''; break;
                 }
                 const medNameWithPrefix = prefix + medSelect.value;
-                let calculatedUnits = 1; let durationStr = durInput.value.trim();
+                let calculatedUnits = 1;
+                let durationStr = durInput.value.trim();
                 
                 if (durationStr && /^\d+$/.test(durationStr)) durationStr += " days";
-                const finalDuration = durationStr || 'As directed'; const durMatch = finalDuration.match(/\d+/);
+                const finalDuration = durationStr || 'As directed';
+                const durMatch = finalDuration.match(/\d+/);
                 const days = durMatch ? (parseInt(durMatch[0]) || 1) : 1;
                 
-                let dailyCount = 2; if(doseSelect.value === '1-1-1') dailyCount = 3; if(['1-0-0','0-1-0','0-0-1'].includes(doseSelect.value)) dailyCount = 1;
+                let dailyCount = 2;
+                if(doseSelect.value === '1-1-1') dailyCount = 3;
+                if(['1-0-0','0-1-0','0-0-1'].includes(doseSelect.value)) dailyCount = 1;
 
                 const directQtyTypes = ['Syrup', 'Ointment', 'Drop', 'Lotion', 'Sachet', 'Nab', 'Other'];
                 let lineContent = "";
@@ -2863,37 +2969,63 @@
                     calculatedUnits = days * dailyCount;
                 }
 
-                const currentText = rxArea.value.trim(); const nextNum = currentText ? currentText.split('\n').length + 1 : 1;
-                rxArea.value = currentText ? currentText + "\n" + `${nextNum}. ${lineContent}` : `${nextNum}. ${lineContent}`;
+                const currentText = rxArea.value.trim();
+                const nextNum = currentText ? currentText.split('\n').length + 1 : 1;
+                const finalLine = `${nextNum}. ${lineContent}`;
+                rxArea.value = currentText ? currentText + "\n" + finalLine : finalLine;
                 
                 this.pendingStockDeductions.push({ name: medSelect.value, qty: calculatedUnits });
-                medSelect.selectedIndex = 0; durInput.value = ""; mlInput.value = ""; directQtyInput.value = "";
+                medSelect.selectedIndex = 0;
+                durInput.value = "";
+                mlInput.value = "";
+                directQtyInput.value = "";
                 this.handlePrescriptionMedicineChange(); 
             }
 
             static handleVisitSubmit(e) {
                 e.preventDefault();
-                const db = SystemStorage.read(); const ts = UI.getTimestampData();
-                const pId = document.getElementById('v-patient-id').value; const vId = document.getElementById('v-visit-id').value; 
+                const db = SystemStorage.read();
+                const ts = UI.getTimestampData();
+                const pId = document.getElementById('v-patient-id').value;
+                const vId = document.getElementById('v-visit-id').value; 
 
-                let visitDate = ts.date; let visitTime = ts.time; let visitTimestamp = ts.timestamp;
+                let visitDate = ts.date;
+                let visitTime = ts.time;
+                let visitTimestamp = ts.timestamp;
                 
                 if (vId) {
                     const existingVisit = db.visits.find(v => v.id === vId);
                     if (existingVisit) {
-                        visitDate = existingVisit.date; visitTime = existingVisit.time || ts.time; visitTimestamp = existingVisit.timestamp || ts.timestamp;
+                        visitDate = existingVisit.date;
+                        visitTime = existingVisit.time || ts.time;
+                        visitTimestamp = existingVisit.timestamp || ts.timestamp;
                         if (existingVisit.deductions) {
-                            existingVisit.deductions.forEach(oldDed => { const invItem = db.inventory.find(i => i.name === oldDed.name); if (invItem) invItem.qty += oldDed.qty; });
+                            existingVisit.deductions.forEach(oldDed => {
+                                const invItem = db.inventory.find(i => i.name === oldDed.name);
+                                if (invItem) invItem.qty += oldDed.qty;
+                            });
                         }
                     }
                 }
 
                 const visitPayload = {
-                    id: vId || UI.generateUniqueRef('VST-'), patientId: pId, date: visitDate, time: visitTime, timestamp: visitTimestamp,
-                    complaint: document.getElementById('v-complaint').value.trim(), diagnosis: document.getElementById('v-diagnosis').value.trim(),
-                    vitals: { bp: document.getElementById('v-bp').value.trim(), pulse: document.getElementById('v-pulse').value.trim(), spo2: document.getElementById('v-spo2').value.trim(), rbs: document.getElementById('v-rbs-check').checked ? document.getElementById('v-rbs').value.trim() : "" },
-                    investigations: document.getElementById('v-investigation-plan').value.trim(), treatmentType: document.getElementById('v-treatment-type').value,
-                    treatmentPlan: document.getElementById('v-treatment-plan').value.trim(), prescription: document.getElementById('v-prescription').value.trim(),
+                    id: vId || UI.generateUniqueRef('VST-'),
+                    patientId: pId,
+                    date: visitDate,
+                    time: visitTime,
+                    timestamp: visitTimestamp,
+                    complaint: document.getElementById('v-complaint').value.trim(),
+                    diagnosis: document.getElementById('v-diagnosis').value.trim(),
+                    vitals: {
+                        bp: document.getElementById('v-bp').value.trim(),
+                        pulse: document.getElementById('v-pulse').value.trim(),
+                        spo2: document.getElementById('v-spo2').value.trim(),
+                        rbs: document.getElementById('v-rbs-check').checked ? document.getElementById('v-rbs').value.trim() : ""
+                    },
+                    investigations: document.getElementById('v-investigation-plan').value.trim(),
+                    treatmentType: document.getElementById('v-treatment-type').value,
+                    treatmentPlan: document.getElementById('v-treatment-plan').value.trim(),
+                    prescription: document.getElementById('v-prescription').value.trim(),
                     deductions: [...this.pendingStockDeductions] 
                 };
 
@@ -2904,31 +3036,57 @@
 
                 if (vId) {
                     const idx = db.visits.findIndex(v => v.id === vId);
-                    if (idx !== -1) db.visits[idx] = visitPayload; else db.visits.push(visitPayload);
-                } else { db.visits.push(visitPayload); }
+                    if (idx !== -1) db.visits[idx] = visitPayload;
+                    else db.visits.push(visitPayload);
+                } else {
+                    db.visits.push(visitPayload);
+                }
 
                 SystemStorage.write(db);
-                this.closeModal('modal-visit'); alert("Clinical prescription block locked and recorded safely.");
+                this.closeModal('modal-visit');
+                alert("Clinical prescription block locked and recorded safely.");
             }
 
             static renderAnalyticsMatrixCharts(revenue, expenses) {
-                const ctx = document.getElementById('chart-revenue'); if(!ctx) return;
+                const ctx = document.getElementById('chart-revenue');
+                if(!ctx) return;
                 if (this.activeCharts['revenue']) this.activeCharts['revenue'].destroy();
+
                 this.activeCharts['revenue'] = new Chart(ctx, {
                     type: 'bar',
-                    data: { labels: ['Inbound Operational Fees', 'Overhead Expenses Drain'], datasets: [{ data: [revenue, expenses], backgroundColor: ['rgba(29, 78, 216, 0.85)', 'rgba(244, 63, 94, 0.85)'], borderColor: ['rgb(29, 78, 216)', 'rgb(244, 63, 94)'], borderWidth: 1.5, borderRadius: 8 }] },
-                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } } }
+                    data: {
+                        labels: ['Inbound Operational Fees', 'Overhead Expenses Drain'],
+                        datasets: [{
+                            data: [revenue, expenses],
+                            backgroundColor: ['rgba(29, 78, 216, 0.85)', 'rgba(244, 63, 94, 0.85)'],
+                            borderColor: ['rgb(29, 78, 216)', 'rgb(244, 63, 94)'],
+                            borderWidth: 1.5,
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } }
+                    }
                 });
             }
 
             static renderDashboardRecentPatients(db, filteredVisits) {
-                const container = document.getElementById('dash-recent-patients'); if(!container) return; container.innerHTML = "";
+                const container = document.getElementById('dash-recent-patients');
+                if(!container) return;
+                container.innerHTML = "";
+
                 const sortedVisits = [...filteredVisits].sort((a,b) => {
                     if (a.timestamp && b.timestamp) return b.timestamp - a.timestamp;
                     return this.parseIndianDate(b.date) - this.parseIndianDate(a.date);
                 }).slice(0, 5);
 
-                if(sortedVisits.length === 0) { container.innerHTML = `<div class="text-xs text-slate-400 italic py-4 font-medium text-center">No consultations found in this timeframe.</div>`; return; }
+                if(sortedVisits.length === 0) {
+                    container.innerHTML = `<div class="text-xs text-slate-400 italic py-4 font-medium text-center">No consultations found in this timeframe.</div>`;
+                    return;
+                }
 
                 sortedVisits.forEach(v => {
                     const patient = db.patients.find(p => p.id === v.patientId) || { name: "Unknown Case" };
@@ -2949,19 +3107,25 @@
             
             static editOTCSale(refCode) {
                 const db = SystemStorage.read();
-                let sale = null; let isCredit = false;
+                let sale = null;
+                let isCredit = false;
+                
                 let index = db.finance.findIndex(f => f.ref === refCode);
                 if (index !== -1) sale = db.finance[index];
                 else {
                     index = db.credits.findIndex(c => c.ref === refCode || (c.ref && c.ref.includes(refCode)));
                     if (index !== -1) { sale = db.credits[index]; isCredit = true; }
                 }
+
                 if (!sale) return;
-                if (!sale.cartItems || sale.cartItems.length === 0) { alert("Cannot edit legacy sale without cart logs. You can only delete it."); return; }
+                if (!sale.cartItems || sale.cartItems.length === 0) {
+                    alert("Cannot edit legacy sale without cart logs. You can only delete it.");
+                    return;
+                }
+
                 if (!confirm("Editing will reverse this sale temporarily and load it back into cart. Continue?")) return;
 
                 sale.cartItems.forEach(cartItem => {
-                    if (cartItem.isCustom) return; 
                     const invItem = db.inventory.find(i => i.id === cartItem.id);
                     if (invItem) invItem.qty += cartItem.qty;
                 });
@@ -2976,18 +3140,26 @@
                 const match = isCredit ? ['dummy', 'Credit'] : sale.category.match(/\[(.*?)\]/);
                 if (match) document.getElementById('otc-payment-mode').value = match[1];
 
-                this.editingOTCDate = sale.date; this.editingOTCTime = sale.time;
-                this.editingOTCTimestamp = sale.timestamp; this.editingOTCRef = refCode; 
+                this.editingOTCDate = sale.date;
+                this.editingOTCTime = sale.time;
+                this.editingOTCTimestamp = sale.timestamp;
+                this.editingOTCRef = refCode; 
 
-                if (isCredit) db.credits.splice(index, 1); else db.finance.splice(index, 1);
+                if (isCredit) db.credits.splice(index, 1);
+                else db.finance.splice(index, 1);
                 
-                SystemStorage.write(db); this.renderOTCCart(); this.renderOTCSummary(); window.scrollTo({ top: 0, behavior: 'smooth' });
+                SystemStorage.write(db);
+                this.renderOTCCart();
+                this.renderOTCSummary();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
 
             static deleteOTCSale(refCode) {
                 if (!confirm("Are you sure you want to delete this OTC Sale? Associated items will be restocked.")) return;
                 const db = SystemStorage.read();
-                let sale = null; let isCredit = false;
+                let sale = null;
+                let isCredit = false;
+                
                 let index = db.finance.findIndex(f => f.ref === refCode);
                 if (index !== -1) sale = db.finance[index];
                 else {
@@ -2998,25 +3170,41 @@
                 if (!sale) return;
                 if (sale.cartItems && sale.cartItems.length > 0) {
                     sale.cartItems.forEach(cartItem => {
-                        if (cartItem.isCustom) return; 
                         const invItem = db.inventory.find(i => i.id === cartItem.id);
                         if (invItem) invItem.qty += cartItem.qty;
                     });
                 }
 
-                if (isCredit) db.credits.splice(index, 1); else db.finance.splice(index, 1);
-                SystemStorage.write(db); this.renderOTCSummary(); this.triggerInventoryFilter(); alert(`OTC Sale deleted successfully.`);
+                if (isCredit) db.credits.splice(index, 1);
+                else db.finance.splice(index, 1);
+                
+                SystemStorage.write(db);
+                this.renderOTCSummary();
+                this.triggerInventoryFilter(); 
+                alert(`OTC Sale deleted successfully.`);
             }
 
+            // --- NEW CONSOLIDATED CREDIT RENDERING ---
             static renderCreditsList() {
-                const db = SystemStorage.read(); const container = document.getElementById('credits-list');
+                const db = SystemStorage.read();
+                const container = document.getElementById('credits-list');
                 const activeCredits = (db.credits || []).filter(c => c.paidAmount < c.totalAmount);
-                if (activeCredits.length === 0) { container.innerHTML = `<div class="bg-white border border-slate-200 rounded-xl p-5 text-sm text-slate-500 text-center font-medium">No active credit accounts found.</div>`; return; }
+                
+                if (activeCredits.length === 0) {
+                    container.innerHTML = `<div class="bg-white border border-slate-200 rounded-xl p-5 text-sm text-slate-500 text-center font-medium">No active credit accounts found.</div>`;
+                    return;
+                }
 
                 container.innerHTML = activeCredits.map(c => {
                     const remaining = c.totalAmount - c.paidAmount;
+                    
+                    // Conditionally show the exact math equation if there are consolidated entries
                     let mathDisplay = "";
-                    if (c.pastAmount > 0 && c.newAmount > 0) { mathDisplay = `<div class="text-[11px] text-indigo-700 bg-indigo-50 p-2 rounded-lg mt-1.5 inline-block border border-indigo-100 font-bold shadow-xs"><i class="fa-solid fa-calculator mr-1"></i> Past Credit (₹${c.pastAmount.toFixed(2)}) + New Credit (₹${c.newAmount.toFixed(2)}) = Sum Total (₹${c.totalAmount.toFixed(2)})</div>`; }
+                    if (c.pastAmount > 0 && c.newAmount > 0) {
+                        mathDisplay = `<div class="text-[11px] text-indigo-700 bg-indigo-50 p-2 rounded-lg mt-1.5 inline-block border border-indigo-100 font-bold shadow-xs"><i class="fa-solid fa-calculator mr-1"></i> Past Credit (₹${c.pastAmount.toFixed(2)}) + New Credit (₹${c.newAmount.toFixed(2)}) = Sum Total (₹${c.totalAmount.toFixed(2)})</div>`;
+                    }
+
+                    // Format multi-refs cleanly if needed
                     const refDisplay = c.ref.includes(",") ? `<span title="${c.ref}">${c.ref.split(", ")[0]} (+ multiple)</span>` : c.ref;
 
                     return `
@@ -3028,7 +3216,10 @@
                             <div class="text-xs text-slate-500 mt-2 font-medium">Total: ₹${c.totalAmount.toFixed(2)} | Paid: ₹${c.paidAmount.toFixed(2)} | <span class="text-rose-600 font-bold ml-1">Remaining: ₹${remaining.toFixed(2)}</span></div>
                         </div>
                         <div class="flex items-center gap-2 self-start md:self-auto w-full md:w-auto mt-2 md:mt-0">
-                            <select id="pay-mode-${c.id}" class="p-2 border border-slate-200 rounded-lg text-xs font-bold text-slate-700 focus:outline-none bg-slate-50"><option value="Cash">Cash</option><option value="UPI">UPI</option></select>
+                            <select id="pay-mode-${c.id}" class="p-2 border border-slate-200 rounded-lg text-xs font-bold text-slate-700 focus:outline-none bg-slate-50">
+                                <option value="Cash">Cash</option>
+                                <option value="UPI">UPI</option>
+                            </select>
                             <input type="number" id="pay-input-${c.id}" max="${remaining}" placeholder="Enter amount" class="w-full md:w-32 p-2 border border-slate-200 rounded-lg text-sm font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 bg-slate-50">
                             <button onclick="UI.receiveCreditPayment('${c.id}')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg transition-all shadow-xs cursor-pointer active:scale-[0.96] whitespace-nowrap">Receive</button>
                         </div>
@@ -3037,92 +3228,130 @@
             }
 
             static receiveCreditPayment(creditId) {
-                const input = document.getElementById(`pay-input-${creditId}`); const amount = parseFloat(input.value);
+                const input = document.getElementById(`pay-input-${creditId}`);
+                const amount = parseFloat(input.value);
                 const payMode = document.getElementById(`pay-mode-${creditId}`).value;
                 if(isNaN(amount) || amount <= 0) { alert("Please enter a valid payment amount."); return; }
-                const db = SystemStorage.read(); const credit = db.credits.find(c => c.id === creditId);
+                
+                const db = SystemStorage.read();
+                const credit = db.credits.find(c => c.id === creditId);
                 if(!credit) return;
                 
                 const remaining = credit.totalAmount - credit.paidAmount;
                 if(amount > remaining) { alert(`Amount cannot exceed the remaining balance of ₹${remaining.toFixed(2)}`); return; }
-                credit.paidAmount += amount; credit.pastAmount = 0; credit.newAmount = 0;
+                
+                credit.paidAmount += amount;
+                
+                // Clear the temporary math attributes upon partial or full payment so the equation resets beautifully
+                credit.pastAmount = 0;
+                credit.newAmount = 0;
                 
                 const ts = this.getTimestampData();
-                db.finance.push({ type: "INFLOW", category: `Credit Settlement [${payMode}] - ${credit.patientName}`, ref: credit.ref, amount: amount, date: ts.date, time: ts.time, timestamp: ts.timestamp });
+                db.finance.push({
+                    type: "INFLOW",
+                    category: `Credit Settlement [${payMode}] - ${credit.patientName}`,
+                    ref: credit.ref, // Stores all the aggregated refs
+                    amount: amount,
+                    date: ts.date,
+                    time: ts.time,
+                    timestamp: ts.timestamp
+                });
                 
-                SystemStorage.write(db); this.renderCreditsList(); this.triggerGlobalAuditRefresh(); alert(`Payment of ₹${amount.toFixed(2)} received successfully.`);
+                SystemStorage.write(db);
+                this.renderCreditsList();
+                this.triggerGlobalAuditRefresh(); 
+                alert(`Payment of ₹${amount.toFixed(2)} received successfully.`);
             }
 
             static addOTCToCart() {
                 const medId = document.getElementById('otc-medicine-select').value;
                 const qty = parseInt(document.getElementById('otc-qty').value);
-                if (!medId || isNaN(qty) || qty <= 0) { alert("Please select a valid item and quantity."); return; }
+                if (!medId || isNaN(qty) || qty <= 0) { alert("Please select a medicine and quantity."); return; }
                 
-                if (medId === 'CUSTOM_SERVICE') {
-                    const type = document.getElementById('otc-custom-type').value; let desc = "";
-                    const valInput = document.getElementById('otc-custom-val').value.trim();
-
-                    if (type === 'Dressing') { desc = "Service - Dressing"; } 
-                    else if (type === 'BP') { desc = `Service - BP (${valInput || 'Checked'} mmHg)`; } 
-                    else if (type === 'RBS') { desc = `Service - RBS (${valInput || 'Checked'} mg/dL)`; } 
-                    else { desc = `Service - ${valInput || 'General Consultation'}`; }
-                    
-                    this.otcCart.push({ id: 'CUSTOM_SERVICE_' + new Date().getTime(), name: desc, qty: qty, isCustom: true });
-                } else {
-                    const db = SystemStorage.read(); const med = db.inventory.find(i => i.id === medId);
-                    if (!med) return;
-                    const existing = this.otcCart.find(item => item.id === medId);
-                    const currentCartQty = existing ? existing.qty : 0;
-                    
-                    if (currentCartQty + qty > med.qty) { alert(`Insufficient stock! You only have ${parseFloat(Number(med.qty).toFixed(2))} left.`); return; }
-                    if (existing) existing.qty += qty; else this.otcCart.push({ id: med.id, name: med.name, qty: qty });
+                const db = SystemStorage.read();
+                const med = db.inventory.find(i => i.id === medId);
+                if (!med) return;
+                
+                const existing = this.otcCart.find(item => item.id === medId);
+                const currentCartQty = existing ? existing.qty : 0;
+                
+                if (currentCartQty + qty > med.qty) {
+                    alert(`Insufficient stock! You only have ${parseFloat(Number(med.qty).toFixed(2))} left.`);
+                    return;
                 }
                 
-                document.getElementById('otc-qty').value = 1; document.getElementById('otc-medicine-select').selectedIndex = 0;
-                document.getElementById('otc-custom-val').value = ''; this.handleOTCMedSelectChange(); this.renderOTCCart();
+                if (existing) existing.qty += qty;
+                else this.otcCart.push({ id: med.id, name: med.name, qty: qty });
+                
+                document.getElementById('otc-qty').value = 1;
+                document.getElementById('otc-medicine-select').selectedIndex = 0;
+                this.renderOTCCart();
             }
 
-            static removeOTCFromCart(index) { this.otcCart.splice(index, 1); this.renderOTCCart(); }
+            static removeOTCFromCart(index) {
+                this.otcCart.splice(index, 1);
+                this.renderOTCCart();
+            }
 
             static renderOTCCart() {
                 const tbody = document.getElementById('otc-cart-body');
                 if (this.otcCart.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-slate-400 text-xs italic font-medium">Cart allocations are currently blank.</td></tr>`;
-                    this.renderOTCUPIQR(); return;
+                    this.renderOTCUPIQR();
+                    return;
                 }
                 
-                tbody.innerHTML = this.otcCart.map((item, index) => {
-                    const nameDisplay = item.isCustom ? `<span class="text-blue-700 font-bold">${item.name}</span>` : item.name;
-                    return `
+                tbody.innerHTML = this.otcCart.map((item, index) => `
                     <tr class="border-b border-slate-100 hover:bg-slate-50 font-medium text-xs">
-                        <td class="p-3 font-bold text-slate-700">${nameDisplay}</td>
+                        <td class="p-3 font-bold text-slate-700">${item.name}</td>
                         <td class="p-3 text-center text-slate-600 font-bold">${item.qty}</td>
-                        <td class="p-3 text-center"><button onclick="UI.removeOTCFromCart(${index})" class="text-rose-500 hover:text-rose-700 transition-colors cursor-pointer"><i class="fa-solid fa-xmark"></i></button></td>
-                    </tr>`;
-                }).join('');
+                        <td class="p-3 text-center">
+                            <button onclick="UI.removeOTCFromCart(${index})" class="text-rose-500 hover:text-rose-700 transition-colors cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+                        </td>
+                    </tr>`).join('');
+                
                 this.renderOTCUPIQR(); 
             }
 
+            // AUTO QR GENERATOR FOR OTC (USES SETTINGS UPI ID)
             static renderOTCUPIQR() {
                 const mode = document.getElementById('otc-payment-mode').value;
                 const manualAmount = parseFloat(document.getElementById('otc-receive-amount').value) || 0;
-                const db = SystemStorage.read(); const upiId = (db.clinicProfile?.upiId || '').trim();
+                const db = SystemStorage.read();
+                const upiId = (db.clinicProfile?.upiId || '').trim();
                 
                 const qrContainer = document.getElementById('otc-upi-qr-container');
-                const qrDiv = document.getElementById('otc-qrcode'); const displayAmount = document.getElementById('otc-qr-amount-display');
+                const qrDiv = document.getElementById('otc-qrcode');
+                const displayAmount = document.getElementById('otc-qr-amount-display');
 
                 if (mode === 'UPI') {
                     if (manualAmount > 0) {
-                        if(!upiId) { qrContainer.classList.add('hidden'); alert("Default Clinic UPI ID is not configured! Please configure it in 'Clinic Settings'."); return; }
+                        if(!upiId) {
+                            qrContainer.classList.add('hidden');
+                            alert("Default Clinic UPI ID is not configured! Please configure it in 'Clinic Settings'.");
+                            return;
+                        }
                         qrContainer.classList.remove('hidden');
                         const upiString = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(db.clinicProfile?.name || 'Clinic')}&am=${manualAmount.toFixed(2)}&cu=INR`;
-                        displayAmount.innerText = manualAmount.toFixed(2); qrDiv.innerHTML = "";
+                        displayAmount.innerText = manualAmount.toFixed(2);
+                        qrDiv.innerHTML = "";
 
                         if(typeof QRCode !== 'undefined') {
-                            this.otcQrCodeInstance = new QRCode(qrDiv, { text: upiString, width: 200, height: 200, colorDark : "#0f172a", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H });
+                            this.otcQrCodeInstance = new QRCode(qrDiv, {
+                                text: upiString,
+                                width: 200,
+                                height: 200,
+                                colorDark : "#0f172a",
+                                colorLight : "#ffffff",
+                                correctLevel : QRCode.CorrectLevel.H
+                            });
                         }
-                    } else { qrContainer.classList.add('hidden'); }
-                } else { qrContainer.classList.add('hidden'); }
+                    } else {
+                        qrContainer.classList.add('hidden');
+                    }
+                } else {
+                    qrContainer.classList.add('hidden');
+                }
             }
 
             static commitOTCSale() {
@@ -3130,47 +3359,88 @@
                 const manualAmount = parseFloat(document.getElementById('otc-receive-amount').value);
                 if (isNaN(manualAmount) || manualAmount <= 0) { alert("Enter a valid Receive Amount."); return; }
                 
-                const mode = document.getElementById('otc-payment-mode').value; const otcPat = document.getElementById('otc-patient-name').value.trim();
+                const mode = document.getElementById('otc-payment-mode').value;
+                const otcPat = document.getElementById('otc-patient-name').value.trim();
                 if (mode === 'Credit' && !otcPat) { alert("Patient Name is required for Credit sales."); return; }
                 
-                const db = SystemStorage.read(); const patTag = otcPat ? ` - ${otcPat}` : ' - Walk-in';
+                const db = SystemStorage.read();
+                const patTag = otcPat ? ` - ${otcPat}` : ' - Walk-in';
                 
                 this.otcCart.forEach(cartItem => {
-                    if (cartItem.isCustom) return; 
                     const invItem = db.inventory.find(i => i.id === cartItem.id);
                     if (invItem) invItem.qty = Math.max(0, invItem.qty - cartItem.qty);
                 });
                 
-                const ts = this.getTimestampData(); const refCode = this.editingOTCRef || UI.generateUniqueRef('OTC-');
-                const saleDate = this.editingOTCDate || ts.date; const saleTime = this.editingOTCTime || ts.time;
-                const saleTimestamp = this.editingOTCTimestamp || ts.timestamp; const cartCopy = JSON.parse(JSON.stringify(this.otcCart));
+                const ts = this.getTimestampData();
+                const refCode = this.editingOTCRef || UI.generateUniqueRef('OTC-');
+                const saleDate = this.editingOTCDate || ts.date;
+                const saleTime = this.editingOTCTime || ts.time;
+                const saleTimestamp = this.editingOTCTimestamp || ts.timestamp;
+                const cartCopy = JSON.parse(JSON.stringify(this.otcCart));
 
+                // --- NEW CONSOLIDATED CREDIT LOGIC ---
                 if (mode === 'Credit') {
                     if(!db.credits) db.credits = [];
                     const targetPatient = db.patients.find(p => p.name.toLowerCase() === otcPat.toLowerCase()) || { id: 'WALK-IN', name: otcPat };
+                    
+                    // Find an active credit by Patient Name
                     let existingCredit = db.credits.find(c => c.patientName.toLowerCase() === targetPatient.name.toLowerCase() && c.paidAmount < c.totalAmount);
                     
                     if (existingCredit) {
-                        existingCredit.pastAmount = existingCredit.totalAmount; existingCredit.newAmount = manualAmount; existingCredit.totalAmount += manualAmount;
-                        if (!existingCredit.ref.includes(refCode)) existingCredit.ref = existingCredit.ref + ", " + refCode;
-                        existingCredit.timestamp = saleTimestamp; existingCredit.date = saleDate; existingCredit.time = saleTime;
-                        if (!existingCredit.cartItems) existingCredit.cartItems = []; existingCredit.cartItems.push(...cartCopy);
+                        existingCredit.pastAmount = existingCredit.totalAmount;
+                        existingCredit.newAmount = manualAmount;
+                        existingCredit.totalAmount += manualAmount;
+                        // Avoid appending same ref when editing
+                        if (!existingCredit.ref.includes(refCode)) {
+                            existingCredit.ref = existingCredit.ref + ", " + refCode;
+                        }
+                        existingCredit.timestamp = saleTimestamp;
+                        existingCredit.date = saleDate;
+                        existingCredit.time = saleTime;
+                        if (!existingCredit.cartItems) existingCredit.cartItems = [];
+                        existingCredit.cartItems.push(...cartCopy);
                     } else {
                         db.credits.push({
-                            id: UI.generateUniqueRef('CRD-'), patientId: targetPatient.id, patientName: targetPatient.name, ref: refCode,
-                            totalAmount: manualAmount, paidAmount: 0, pastAmount: 0, newAmount: manualAmount,
-                            date: saleDate, time: saleTime, timestamp: saleTimestamp, cartItems: cartCopy
+                            id: UI.generateUniqueRef('CRD-'),
+                            patientId: targetPatient.id,
+                            patientName: targetPatient.name,
+                            ref: refCode,
+                            totalAmount: manualAmount,
+                            paidAmount: 0,
+                            pastAmount: 0,
+                            newAmount: manualAmount,
+                            date: saleDate,
+                            time: saleTime,
+                            timestamp: saleTimestamp,
+                            cartItems: cartCopy
                         });
                     }
                 } else {
-                    db.finance.push({ type: "INFLOW", category: `OTC Pharmacy [${mode}]${patTag}`, ref: refCode, amount: manualAmount, date: saleDate, time: saleTime, timestamp: saleTimestamp, cartItems: cartCopy });
+                    db.finance.push({
+                        type: "INFLOW",
+                        category: `OTC Pharmacy [${mode}]${patTag}`,
+                        ref: refCode,
+                        amount: manualAmount,
+                        date: saleDate,
+                        time: saleTime,
+                        timestamp: saleTimestamp,
+                        cartItems: cartCopy 
+                    });
                 }
                 
-                SystemStorage.write(db); this.otcCart = []; this.editingOTCDate = null; this.editingOTCTime = null;
-                this.editingOTCTimestamp = null; this.editingOTCRef = null; document.getElementById('otc-receive-amount').value = "";
-                document.getElementById('otc-patient-name').value = ""; this.renderOTCCart(); this.renderOTCSummary();
+                SystemStorage.write(db);
+                this.otcCart = [];
+                this.editingOTCDate = null;
+                this.editingOTCTime = null;
+                this.editingOTCTimestamp = null;
+                this.editingOTCRef = null;
+                document.getElementById('otc-receive-amount').value = "";
+                document.getElementById('otc-patient-name').value = "";
+                this.renderOTCCart();
+                this.renderOTCSummary();
                 
-                alert(`OTC sale recorded successfully (Ref: ${refCode}).`); this.routeToTab('dashboard');
+                alert(`OTC sale recorded successfully (Ref: ${refCode}).`);
+                this.routeToTab('dashboard');
             }
             static openRevisitModal() {
                 document.getElementById('revisit-search').value = "";
@@ -3754,7 +4024,7 @@
 
                 datasets.forEach(i => {
                     let statusBadge = `<span class="bg-emerald-50 text-emerald-700 text-xs px-2.5 py-1 rounded-xl font-bold">In Stock</span>`;
-                    if (i.qty <= 15) statusBadge= `<span class="bg-rose-50 text-rose-700 text-xs px-2.5 py-1 rounded-xl font-bold">Low Level</span>`;
+                    if (i.qty <= 15) statusBadge = `<span class="bg-rose-50 text-rose-700 text-xs px-2.5 py-1 rounded-xl font-bold">Low Level</span>`;
                     if (i.qty <= 0) statusBadge = `<span class="bg-slate-200 text-slate-700 text-xs px-2.5 py-1 rounded-xl font-bold">Depleted</span>`;
                     
                     const totalPTRValue = (i.qty / (i.unitQty || 1)) * i.purchase;
