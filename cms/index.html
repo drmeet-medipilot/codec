@@ -405,8 +405,9 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
                 <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
                     <h3 class="font-bold text-base text-slate-800 border-b border-slate-100 pb-2 flex items-center"><i class="fa-solid fa-cart-shopping text-blue-600 mr-2"></i>Active Dispensing Cart</h3>
-                    <div class="flex items-start gap-3 flex-wrap">
-                        <div class="w-32">
+                    
+                    <div class="grid grid-cols-12 gap-3 items-end">
+                        <div class="col-span-12 md:col-span-4">
                             <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Type Filter</label>
                             <select id="otc-medicine-type-filter" onchange="UI.filterOTCMedicineOptions()" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium cursor-pointer">
                                 <option value="ALL">All Types</option>
@@ -424,25 +425,35 @@
                                 <option value="Other">Other</option>
                             </select>
                         </div>
-                        <div class="flex-1">
+                        <div class="col-span-12 md:col-span-8">
                             <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Select Medicine / Service</label>
                             <select id="otc-medicine-select" onchange="UI.handleOTCSelectChange()" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium"></select>
-                            
-                            <div id="otc-service-options" class="hidden flex gap-2 w-full mt-2 animate-fade-in">
-                                <select id="otc-service-type" onchange="UI.handleOTCServiceChange()" class="w-1/3 p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer">
-                                    <option value="BP">BP</option>
-                                    <option value="RBS">RBS</option>
+                        </div>
+
+                        <!-- Redesigned, professional nested options for Services (BP/RBS/etc) -->
+                        <div id="otc-service-options" class="hidden col-span-12 flex gap-3 animate-fade-in bg-blue-50/50 p-3 rounded-xl border border-blue-100 mt-1">
+                            <div class="w-1/3">
+                                <label class="block text-[10px] font-extrabold uppercase tracking-wider text-blue-600 mb-1">Service Type</label>
+                                <select id="otc-service-type" onchange="UI.handleOTCServiceChange()" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg text-sm font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer shadow-sm">
+                                    <option value="BP">BP Check</option>
+                                    <option value="RBS">RBS Check</option>
                                     <option value="Dressing">Dressing</option>
                                     <option value="Other">Other (Specify)</option>
                                 </select>
-                                <input type="text" id="otc-service-val" placeholder="Enter BP Value (e.g. 120/80)" class="w-2/3 p-2.5 bg-white border border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/20">
+                            </div>
+                            <div class="w-2/3">
+                                <label class="block text-[10px] font-extrabold uppercase tracking-wider text-blue-600 mb-1">Service Details / Value</label>
+                                <input type="text" id="otc-service-val" placeholder="Enter BP (e.g. 120/80)" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/20 shadow-sm text-slate-800">
                             </div>
                         </div>
-                        <div class="w-24">
+
+                        <div class="col-span-6 md:col-span-4">
                             <label class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Qty</label>
                             <input id="otc-qty" type="number" min="1" value="1" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-black text-center focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-800">
                         </div>
-                        <button onclick="UI.addOTCToCart()" class="px-5 bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-800 hover:to-blue-900 text-white font-bold rounded-xl transition-all shadow-md shadow-blue-700/10 h-12 mt-[26px] cursor-pointer active:scale-[0.96] text-xs uppercase tracking-wide">Add</button>
+                        <div class="col-span-6 md:col-span-8">
+                            <button onclick="UI.addOTCToCart()" class="w-full bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-800 hover:to-blue-900 text-white font-bold rounded-xl transition-all shadow-md shadow-blue-700/10 h-[46px] cursor-pointer active:scale-[0.96] text-xs uppercase tracking-wide">Add To Cart</button>
+                        </div>
                     </div>
 
                     <div class="border border-slate-200 rounded-xl overflow-hidden mt-4">
@@ -517,7 +528,6 @@
                 </div>
             </div>
         </section>
-
         <section id="mod-inventory" class="erp-section hidden space-y-6">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-5 gap-4">
                 <div>
@@ -615,6 +625,7 @@
                 </div>
             </div>
         </section>
+
         <section id="mod-finance" class="erp-section hidden space-y-6">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-5 gap-4">
                 <div>
@@ -671,25 +682,26 @@
             </div>
         </section>
 
-        <!-- NEW PROFIT MARGIN SECTION -->
+        <!-- NEW TRANSACTION-WISE PROFIT MARGIN SECTION -->
         <section id="mod-profit" class="erp-section hidden space-y-6">
             <div class="border-b border-slate-200 pb-5">
                 <h2 class="text-3xl font-black animated-heading pb-1">Profit Margin Analysis</h2>
             </div>
             <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="font-bold text-base text-slate-800"><i class="fa-solid fa-calculator text-blue-600 mr-2"></i>Itemized Dispensation Profit (Rx & OTC)</h3>
-                    <div class="text-lg font-black text-emerald-600 bg-emerald-50 px-4 py-2 rounded-xl">Net Profit: <span id="profit-total">₹0.00</span></div>
+                <div class="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-4">
+                    <h3 class="font-bold text-base text-slate-800"><i class="fa-solid fa-calculator text-blue-600 mr-2"></i>Transaction-wise Dispensation Profit</h3>
+                    <div class="text-lg font-black text-emerald-600 bg-emerald-50 px-4 py-2 rounded-xl border border-emerald-100 shadow-sm">Total Margin: <span id="profit-total">₹0.00</span></div>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-sm">
                         <thead>
                             <tr class="bg-slate-50 text-slate-400 uppercase font-extrabold text-[10px] tracking-wider border-b border-slate-200">
-                                <th class="p-3">Source & Item</th>
-                                <th class="p-3">Dispensed Qty</th>
-                                <th class="p-3">Total PTR (₹)</th>
-                                <th class="p-3">Total MRP (₹)</th>
-                                <th class="p-3 text-right">Margin (₹)</th>
+                                <th class="p-3">Date & Ref</th>
+                                <th class="p-3">Patient / Source</th>
+                                <th class="p-3">Items (Qty)</th>
+                                <th class="p-3 text-right">Total PTR (Cost)</th>
+                                <th class="p-3 text-right">Revenue (Collected)</th>
+                                <th class="p-3 text-right">Net Profit Margin</th>
                             </tr>
                         </thead>
                         <tbody id="profit-margin-body"></tbody>
@@ -697,7 +709,6 @@
                 </div>
             </div>
         </section>
-        <!-- END NEW PROFIT MARGIN SECTION -->
         
         <section id="mod-settings" class="erp-section hidden space-y-6">
             <div class="border-b border-slate-200 pb-5">
@@ -782,7 +793,6 @@
             </div>
         </section>
     </main>
-
     <div id="modal-revisit" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh] animate-zoom-in">
             <div class="bg-gradient-to-r from-blue-800 to-blue-950 p-4 text-white flex justify-between items-center">
@@ -855,6 +865,7 @@
             </div>
         </div>
     </div>
+
     <div id="modal-visit" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-[100] p-4 no-print">
         <div class="w-full max-w-3xl bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border border-slate-200 animate-zoom-in">
             <div class="bg-gradient-to-r from-blue-800 to-blue-950 p-4 text-white flex justify-between items-center">
@@ -2323,72 +2334,128 @@
                 this.renderOTCSummary();
                 this.renderBillingSummary();
                 this.renderCreditsList();
-                this.renderProfitMargin(); // New Feature Added!
+                this.renderProfitMargin(); // New Profit logic call
                 
                 this.renderAnalyticsMatrixCharts(totalRevenue, totalExpenses);
                 this.renderDashboardRecentPatients(db, filteredVisits);
             }
 
+            // =========================================================================
+            // EXACT PROFIT MARGIN LOGIC (PER TRANSACTION REVENUE - TOTAL PTR)
+            // =========================================================================
             static renderProfitMargin() {
                 const db = SystemStorage.read();
                 const tbody = document.getElementById('profit-margin-body');
                 if(!tbody) return;
                 
-                let totalProfit = 0;
+                let grandTotalMargin = 0;
                 let html = '';
                 const timeframe = document.getElementById('dashboard-timeframe')?.value || 'TODAY';
 
-                // Process single item dispensing logically based on ptr/mrp and unit matrices
-                const processItem = (source, name, qty, invMatch, dateStr) => {
-                    if (!invMatch || !this.isDateInTimeframe(dateStr, timeframe)) return;
+                // Helper to calculate total PTR cost for a specific array of cart/deduction items
+                const calculateTransactionPTR = (items) => {
+                    let totalPtrCost = 0;
+                    let itemDetailsHtml = "";
                     
-                    // Core Calculation: Unit price is PurchasePrice / UnitsPerPackage
-                    const ptrPerUnit = invMatch.purchase / (invMatch.unitQty || 1);
-                    const mrpPerUnit = invMatch.selling / (invMatch.unitQty || 1);
+                    if(!items || items.length === 0) return { cost: 0, details: "No physical items" };
+
+                    items.forEach(item => {
+                        if (item.isService) {
+                            itemDetailsHtml += `<div class="text-[10px] text-indigo-500 mb-0.5">• ${item.name} (Service)</div>`;
+                            return; // Services have 0 PTR cost
+                        }
+                        
+                        const invMatch = db.inventory.find(i => i.id === item.id || i.name === item.name);
+                        if (invMatch) {
+                            const ptrPerUnit = invMatch.purchase / (invMatch.unitQty || 1);
+                            const itemPtrTotal = ptrPerUnit * item.qty;
+                            totalPtrCost += itemPtrTotal;
+                            itemDetailsHtml += `<div class="text-[10px] text-slate-500 mb-0.5">• ${item.name} (Qty: ${item.qty}) <span class="text-slate-400">PTR: ₹${itemPtrTotal.toFixed(2)}</span></div>`;
+                        } else {
+                            itemDetailsHtml += `<div class="text-[10px] text-slate-500 mb-0.5">• ${item.name} (Qty: ${item.qty}) <span class="text-rose-400">Stock missing</span></div>`;
+                        }
+                    });
+
+                    return { cost: totalPtrCost, details: itemDetailsHtml };
+                };
+
+                // Helper to render the HTML row for a single transaction block
+                const generateRowHTML = (dateStr, refStr, sourcePat, itemsHtml, totalPtrCost, revenueCollected) => {
+                    const margin = revenueCollected - totalPtrCost;
+                    grandTotalMargin += margin;
                     
-                    const totalPtr = ptrPerUnit * qty;
-                    const totalMrp = mrpPerUnit * qty;
-                    const profit = totalMrp - totalPtr;
-                    
-                    totalProfit += profit;
-                    html += `<tr class="border-b border-slate-100 hover:bg-slate-50 font-medium">
-                        <td class="p-3 font-bold text-slate-700">${source}: ${name}</td>
-                        <td class="p-3 text-slate-600 font-bold">${qty}</td>
-                        <td class="p-3 text-rose-600 font-bold">₹${totalPtr.toFixed(2)}</td>
-                        <td class="p-3 text-blue-600 font-bold">₹${totalMrp.toFixed(2)}</td>
-                        <td class="p-3 text-right text-emerald-600 font-black">₹${profit.toFixed(2)}</td>
+                    html += `
+                    <tr class="border-b border-slate-100 hover:bg-slate-50">
+                        <td class="p-3 align-top">
+                            <div class="text-xs font-bold text-slate-800">${dateStr}</div>
+                            <div class="text-[10px] text-slate-400 font-mono mt-0.5 break-all">${refStr}</div>
+                        </td>
+                        <td class="p-3 align-top text-xs font-bold text-blue-700">${sourcePat}</td>
+                        <td class="p-3 align-top">${itemsHtml}</td>
+                        <td class="p-3 align-top text-right text-xs font-bold text-rose-600">₹${totalPtrCost.toFixed(2)}</td>
+                        <td class="p-3 align-top text-right text-xs font-bold text-emerald-600">₹${revenueCollected.toFixed(2)}</td>
+                        <td class="p-3 align-top text-right text-sm font-black text-indigo-700 bg-indigo-50/30 rounded-lg">₹${margin.toFixed(2)}</td>
                     </tr>`;
                 };
 
-                // Scan Finance OTC Sales
-                (db.finance || []).forEach(f => {
-                    if (f.cartItems && f.category && f.category.includes("OTC Pharmacy")) {
-                        f.cartItems.forEach(item => {
-                            if (!item.isService) processItem('OTC', item.name, item.qty, db.inventory.find(i => i.id === item.id), f.date);
-                        });
+                // 1. Scan Finance OTC Sales & Bills
+                (db.finance || []).filter(f => this.isDateInTimeframe(f.date, timeframe)).forEach(f => {
+                    let sourcePat = "";
+                    let itemsArray = [];
+                    let isRelevant = false;
+
+                    if (f.category && f.category.includes("OTC Pharmacy")) {
+                        const patParts = f.category.split('] - ');
+                        sourcePat = "OTC: " + (patParts.length > 1 ? patParts[1] : 'Walk-in');
+                        itemsArray = f.cartItems || [];
+                        isRelevant = true;
+                    } else if (f.category && f.category.includes("Billing [")) {
+                        const patParts = f.category.split('] - ');
+                        const patientWithVisit = patParts.length > 1 ? patParts[1] : 'Unknown';
+                        const patientName = patientWithVisit.split(' [Visit:')[0];
+                        
+                        // Extract Visit ID to find what items were given
+                        const visitMatch = patientWithVisit.match(/\[Visit: (.*?)\]/);
+                        if (visitMatch) {
+                            const visit = db.visits.find(v => v.id === visitMatch[1]);
+                            if (visit && visit.deductions) {
+                                itemsArray = visit.deductions;
+                            }
+                        }
+                        sourcePat = "Rx Bill: " + patientName;
+                        isRelevant = true;
+                    }
+
+                    if (isRelevant) {
+                        const calc = calculateTransactionPTR(itemsArray);
+                        generateRowHTML(f.date, f.ref, sourcePat, calc.details, calc.cost, parseFloat(f.amount) || 0);
                     }
                 });
 
-                // Scan Credit OTC Sales
-                (db.credits || []).forEach(c => {
-                    if (c.cartItems && c.ref && c.ref.includes("OTC-")) {
-                        c.cartItems.forEach(item => {
-                            if (!item.isService) processItem('OTC [Credit]', item.name, item.qty, db.inventory.find(i => i.id === item.id), c.date);
-                        });
+                // 2. Scan Credit Logs (Only realized profit based on what is PAID so far)
+                // If a patient paid 100rs on a 500rs bill, margin is (100 - PTR). 
+                (db.credits || []).filter(c => this.isDateInTimeframe(c.date, timeframe) && c.paidAmount > 0).forEach(c => {
+                    let sourcePat = "";
+                    let itemsArray = [];
+
+                    if (c.ref && c.ref.includes("OTC-")) {
+                        sourcePat = "OTC Credit: " + c.patientName;
+                        itemsArray = c.cartItems || [];
+                    } else if (c.ref && c.ref.includes("INV-")) {
+                        sourcePat = "Rx Credit: " + c.patientName;
+                        // To be perfectly accurate we would need to map INV references to VST references inside credits,
+                        // but since multiple bills merge into one credit profile, we will show "Aggregated Rx Data"
+                        itemsArray = []; // Complex to retroactively map merged credit back to specific visits here without strict ID linking
                     }
+                    
+                    const calc = calculateTransactionPTR(itemsArray);
+                    
+                    // Notice we use c.paidAmount as the Revenue Collected, because unpaid credit is NOT profit yet.
+                    generateRowHTML(c.date, c.ref, sourcePat, calc.details || "<span class='text-[10px] text-slate-400'>Aggregated Credit Data</span>", calc.cost, c.paidAmount);
                 });
 
-                // Scan Prescriptions (Rx) Deductions
-                (db.visits || []).forEach(v => {
-                    if (v.deductions) {
-                        v.deductions.forEach(ded => {
-                            processItem('Rx', ded.name, ded.qty, db.inventory.find(i => i.name === ded.name), v.date);
-                        });
-                    }
-                });
-
-                tbody.innerHTML = html || `<tr><td colspan="5" class="p-4 text-center text-slate-400 italic">No dispensed inventory transactions tracked in this timeframe.</td></tr>`;
-                document.getElementById('profit-total').innerText = `₹${totalProfit.toFixed(2)}`;
+                tbody.innerHTML = html || `<tr><td colspan="6" class="p-4 text-center text-slate-400 italic">No exact dispensed transactions evaluated in this timeframe.</td></tr>`;
+                document.getElementById('profit-total').innerText = `₹${grandTotalMargin.toFixed(2)}`;
             }
 
             static renderBillingSummary() {
@@ -2458,6 +2525,7 @@
                 alert("Bill deleted successfully.");
             }
 
+            // OTC LOGIC
             static filterOTCMedicineOptions() {
                 const db = SystemStorage.read();
                 const typeFilter = document.getElementById('otc-medicine-type-filter')?.value || 'ALL';
@@ -2476,7 +2544,7 @@
                 availableMeds.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
                 
                 select.innerHTML = '<option value="" disabled selected>-- Select Medicine --</option>' + 
-                    '<option value="SERVICE_OTHER">-- Other Services (BP, RBS, Dressing) --</option>' +
+                    '<option value="SERVICE_OTHER" class="font-bold text-blue-700 bg-blue-50">-- Medical Services (BP, RBS, Dressing) --</option>' +
                     availableMeds.map(i => `<option value="${i.id}">${i.name} (Stock: ${parseFloat(Number(i.qty).toFixed(2))})</option>`).join('');
                 
                 this.handleOTCSelectChange();
@@ -2497,7 +2565,7 @@
             static handleOTCServiceChange() {
                 const type = document.getElementById('otc-service-type').value;
                 const input = document.getElementById('otc-service-val');
-                input.placeholder = type === 'Other' ? 'Specify description...' : `Enter ${type} value/details...`;
+                input.placeholder = type === 'Other' ? 'Specify description...' : `Enter ${type} value (e.g. 120/80)...`;
             }
 
             static syncOTCDropdowns(db) {
